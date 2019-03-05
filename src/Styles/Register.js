@@ -13,5 +13,11 @@ export const MeuInput = styled.TextInput`
 
 export const MeuBotao = styled.TouchableOpacity`
   border: 2px solid #08F;
-  
+  width: 180px;
+  height: 35;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin: 10px;
+  background-color: #08F;
 `;

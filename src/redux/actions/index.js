@@ -1,4 +1,4 @@
-import Action from './actions';
+import Action from './types';
 
 export const setFirstName = (payload) => {
   return {
@@ -25,7 +25,6 @@ export const setNickName = (payload) => {
   }
 }
 export const setEmail = (payload) => {
-  console.log("ACITON ", payload);
   return {
     type: Action.SET_EMAIL,
     payload: {
@@ -36,6 +35,22 @@ export const setEmail = (payload) => {
 export const setPassword = (payload) => {
   return {
     type: Action.SET_PASSWORD,
+    payload: {
+      newValue: payload
+    },
+  }
+}
+export const setToken = (payload) => {
+  return {
+    type: Action.SET_TOKEN,
+    payload: {
+      newValue: payload
+    },
+  }
+}
+export const setUser = (payload) => {
+  return {
+    type: Action.SET_USER,
     payload: {
       newValue: payload
     },

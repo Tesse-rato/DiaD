@@ -5,4 +5,6 @@ export default actions = {
   SET_PASSWORD: 'set_password',
   SET_EMAIL: 'set_email',
   SET_BIO: 'set_bio',
+  SET_TOKEN: 'set_token',
+  SET_USER: 'set_user',
 }
