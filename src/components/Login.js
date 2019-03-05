@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import { MinhaView, Input, MeuBotao } from '../Styles/login';
-import Logo from '../../assets/Logo.svg';
+import Logo from '../assets/Logo.svg';
 
 
 export default class App extends Component {
@@ -11,9 +11,11 @@ export default class App extends Component {
 
   render() {
     console.disableYellowBox = true;
+    console.log(this.props);
     return (
       <MinhaView>
-        <View style={{ marginTop: 50 }}>
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
+        <View style={{ positon: 'absolute', top: 50 }}>
           <Logo width={200} height={200} />
         </View>
         <View style={{ marginBottom: 50, alignItems: 'center', justifyContent: 'space-between' }} >
