@@ -2,21 +2,23 @@ import React, { Component } from 'react';
 import { View, Text, StatusBar } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-
-import Api from '../api';
 import * as Actions from '../redux/actions';
-import { MinhaView, Input, MeuBotao } from '../Styles/login';
+import Api from '../api';
+
+import { Input, LogIn, Register } from '../styles/login';
+import { MinhaView } from '../styles/standard';
 import Logo from '../assets/Logo.svg';
 
-
 class Login extends Component {
-  state = {
-    error: ''
+  constructor() {
+    super()
+    this.state = {
+      error: ''
+    }
   }
   static navigationOptions = {
     header: null
   };
-
   login() {
     Api.post('/users/auth', {
       email: this.props.account.user.email,
@@ -34,37 +36,28 @@ class Login extends Component {
 
   render() {
     console.disableYellowBox = true;
-    const {
-      setEmail,
-      setPassword,
-      navigation: { navigate },
-      account: { user: { email, password } }
-    } = this.props;
-
     return (
       <MinhaView>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
-        <View style={{ positon: 'absolute', top: 50 }}>
-          <Logo width={200} height={200} />
-        </View>
-        <View style={{ position: 'absolute', top: 10 }}>
-          <Text style={{ color: '#F00' }}>{this.state.error}</Text>
-        </View>
-        <View style={{ marginBottom: 50, alignItems: 'center', justifyContent: 'space-between' }} >
-          <Input value={email} placeholder='Email' onChangeText={e => setEmail(e)} />
-          <Input value={password} placeholder='Senha' onChangeText={e => setPassword(e)} />
-          <View style={{ alignItems: 'center', marginTop: 40 }}>
-            <MeuBotao onPress={() => this.login()}>
-              <Text style={{ color: '#08F' }}>Entrar</Text>
-            </MeuBotao>
-            <MeuBotao style={{ backgroundColor: '#08F', borderWidth: 0 }} onPress={() => navigate('Register')} >
-              <Text style={{ color: '#FFF' }}>Cadastrar</Text>
-            </MeuBotao>
+
+        <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }} >
+          <View style={{ marginBottom: 20 }}>
+            <Logo width={150} height={150} />
           </View>
+          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
+          <Input placeholder='Email' />
+          <Input placeholder='Senha' />
         </View>
-        <View style={{ marginBottom: 10, alignItems: 'center' }}>
-          <Text stlye={{ color: '#333' }}>Atualizações do que acontece na cidade!</Text>
+
+        <View style={{ flex: 2, alignItems: 'center' }} >
+          <LogIn >
+            <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
+          </LogIn>
+          <Register onPress={() => this.props.navigation.navigate('Register')}>
+            <Text style={{ color: '#FFF', fontSize: 14 }}>Cadastrar</Text>
+          </Register>
         </View>
+
       </MinhaView>
     );
   }

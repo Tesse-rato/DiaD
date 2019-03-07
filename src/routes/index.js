@@ -17,7 +17,7 @@ const Routes = createStackNavigator({
   Home,
 },
   {
-    initialRouteName: 'Register'
+    initialRouteName: 'Login'
   }
 );
 

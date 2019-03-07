@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-
-import { MeuInput, MeuBotao } from '../Styles/register';
-import Logo from '../assets/Logo.svg';
-import GoBack from '../assets/GoBackDiaD.svg';
-
 import * as Actions from '../redux/actions';
 import Api from '../api';
+
+import { MinhaView } from '../styles/standard';
+import { Input, Continue, GoBack } from '../styles/register';
+import Logo from '../assets/Logo.svg';
 
 class Register extends Component {
   static navigationOptions = {
@@ -25,7 +24,7 @@ class Register extends Component {
       email: '',
       password: '',
       confirmPassword: '',
-      error: ''
+      error: 'Password not match'
     }
   }
   componentWillMount() {
@@ -56,32 +55,29 @@ class Register extends Component {
     } = this.props;
 
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <StatusBar backgroundColor='#FFF' barStyle='dark-content' />
-        <View style={{ position: 'absolute', top: 10, left: 10 }}>
-          <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-            <GoBack />
-          </TouchableOpacity>
+      <MinhaView >
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
+
+        <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ marginBottom: 20 }}>
+            <Logo width={150} height={150} />
+          </View>
+          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
+          <Input placeholder='Email' />
+          <Input placeholder='Senha' />
+          <Input placeholder='Confirme Senha' />
         </View>
-        <View style={{ position: 'absolute', top: 80 }}>
-          <Logo width={150} height={150} />
+
+        <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }}>
+          <Continue>
+            <Text style={{ color: '#08F', fontSize: 14 }}>Continuar</Text>
+          </Continue>
+          <GoBack onPress={() => this.props.navigation.goBack()}>
+            <Text style={{ color: '#08F', fontSize: 14 }}>Voltar</Text>
+          </GoBack>
         </View>
-        <View stlye={{ alignItems: 'center' }}>
-          <Text style={{ color: '#F00' }}>{this.state.error}</Text>
-        </View>
-        <View style={{ marginTop: 250 }}>
-          <MeuInput onChangeText={e => this.setState({ ...this.state, name: { ...this.state.name, first: e } })} value={this.state.name.first} placeholder='Nome' />
-          <MeuInput onChangeText={e => this.setState({ ...this.state, name: { ...this.state.name, last: e } })} value={this.state.name.last} placeholder='Sobrenome' />
-          <MeuInput onChangeText={e => this.setState({ ...this.state, name: { ...this.state.name, nickname: e } })} value={this.state.name.nickname} placeholder='Apelido' />
-          <MeuInput onChangeText={e => this.setState({ ...this.state, email: e })} value={email} value={this.state.email} placeholder='Email' />
-          <MeuInput onChangeText={e => this.setState({ ...this.state, password: e })} value={password} value={this.state.password} placeholder='Senha' />
-          <MeuInput onChangeText={e => this.setState({ ...this.state, confirmPassword: e })} value={this.state.confirmPassword} placeholder='Confirmar Senha' />
-        </View>
-        <Text style={{ fontSize: 12, margin: 5 }}>O seu apelido é o que vai te identificar no aplicativo, lembre-se disso</Text>
-        <MeuBotao onPress={() => this.register()}>
-          <Text style={{ color: '#FFF' }}>Continar</Text>
-        </MeuBotao>
-      </View>
+
+      </MinhaView>
     );
   }
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { View } from "react-native";
 import Register from './Register';
 
-import { MeuInput } from "../Styles/register";
+import { MeuInput } from "../styles/register";
 
 export default class Register2 extends Component {
   render() {
