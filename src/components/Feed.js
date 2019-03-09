@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StatusBar, FlatList } from 'react-native'
+import { View, Text, StatusBar, FlatList, Dimensions } from 'react-native'
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
@@ -52,9 +52,8 @@ class Feed extends Component {
     })
   }
 
-  debug() {
-    console.log('Clicou aqui e deu certo');
-    console.log(this.state.posts[0].content);
+  debug(e) {
+    console.log(e.nativeEvent.contentOffset.y);
   }
 
   render() {
@@ -67,12 +66,15 @@ class Feed extends Component {
         {
           this.state.loading == false ? (
             <FlatList
+              onMomentumScrollEnd={(e) => this.debug(e)}
               data={this.state.posts}
-              renderItem={({ item }) => (
-                <Post content={item.content} comments={item.comments} />
-              )
-              }
               keyExtractor={item => item._id}
+              renderItem={({ item }) => (<Post
+                content={item.content}
+                comments={item.comments}
+                debug={this.debug.bind(this)}
+              />
+              )}
             />
           ) : null
         }
