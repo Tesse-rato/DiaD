@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, StatusBar, Image, Picker } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
 import ImagePicker from 'react-native-image-picker';
@@ -7,16 +7,27 @@ import ImagePicker from 'react-native-image-picker';
 import * as Actions from '../redux/actions';
 import api from '../api';
 
+import { Input, Continue, GoBack, MeuInput } from "../styles/register";
+import { MinhaView } from "../styles/standard";
+
+import UserIco from '../assets/UserWhiteDiaD.svg';
+import UserImageIco from '../assets/UserImageDiaD.svg';
+import CityIco from '../assets/CityWhiteDiaD.svg';
+import DropDownIco from '../assets/DropDownDiaD.svg';
+
 export class Register2 extends Component {
   static navigationOptions = {
     header: null
   }
-
   constructor() {
     super()
 
     this.state = {
-      imageUri: ''
+      error: 'Apelido já esta em uso',
+      imageUri: '',
+      dataFormImage: '',
+      buttonNextState: '',
+      selectedCity: 'Cidade'
     }
   }
 
@@ -34,38 +45,86 @@ export class Register2 extends Component {
       headers: {
         'Accept': '',
         'Content-Type': 'multipart/form-data',
-        'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2UzYjZmNzMyODA5MjcxMGIwNjgxNyIsImlhdCI6MTU1MTg2NjIzNiwiZXhwIjoxNTUxOTUyNjM2fQ.QNiGB6zssrAZZNLD8c_vPIyl_3tbfmxxLeXnhqV66l4'
+        'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2ZiYzBiZWRlODlmMWZiMDRhMjNiYyIsImlhdCI6MTU1MTk2MTI2NCwiZXhwIjoxNTUyMDQ3NjY0fQ.4mvkRiXRUaHciL01MnFh5meuJo5kMVhLWAHqmJlzpFY'
       }
     }
 
     ImagePicker.showImagePicker(options, response => {
-      let data = new FormData()
+      console.log('Response = ', response);
 
-      data.append('file', {
-        name: response.fileName,
-        type: response.type,
-        uri: response.uri,
-      })
+      if (response.didCancel) {
+        console.log('User cancelled photo picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        let data = new FormData()
+        data.append('file', {
+          name: response.fileName,
+          type: response.type,
+          uri: response.uri,
+        });
+        this.setState({
+          imageUri: { uri: 'data:image/jpeg;base64,' + response.data },
+          dataFormImage: data,
+        }, () => {
+          api.patch('/users/profilePhoto/5c7fbc0bede89f1fb04a23bc', this.state.dataFormImage, header).then((response) => {
 
-      api.patch('/users/profilePhoto/5c7fbc0bede89f1fb04a23bc', data, header).then((response) => {
-        console.log('OKOK');
+          }).catch(err => {
+            console.log(err.response);
+          });
+        });
+      }
 
-      }).catch(err => {
-        console.log(err.response);
-      });
     });
   }
 
   render() {
     console.disableYellowBox = true;
+    console.log('TESTEANDO DEPURADOR');
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <TouchableOpacity onPress={this.selectImage.bind(this)} >
-          <View style={{ width: 200, height: 200, alignItems: 'center', justifyContent: 'center', backgroundColor: '#DDD' }}>
-            <Text>Select Image</Text>
+      <MinhaView>
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
+
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <TouchableOpacity onPress={this.selectImage.bind(this)} style={{ alignItems: 'center', margin: 10 }}>
+            {
+              this.state.imageUri === '' ? (
+                <UserImageIco width={150} height={150} />
+              ) : (
+                  <Image style={{ width: 150, height: 150, borderRadius: 75 }} source={this.state.imageUri} />
+                )
+            }
+          </TouchableOpacity>
+          {/* <Text style={{ fontSize: 12 }}>Selecionar Foto de Perfil</Text> */}
+        </View>
+
+        <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: 12, color: '#F00' }}>{this.state.error}</Text>
+          <MeuInput placeholder='Nome' ico={UserIco} />
+          <MeuInput placeholder='Sobrenome' ico={UserIco} />
+          <MeuInput placeholder='Apelido' ico={UserIco} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8E8E8', borderRadius: 25, margin: 5 }}>
+            <CityIco width={25} height={25} margin={10} />
+            <Picker style={{ width: 285, height: 50, color: '#FFF', fontSize: 12, backgroundColor: 'transparent' }} mode='dialog' selectedValue={this.state.selectedCity} onValueChange={(value) => this.setState({ selectedCity: value })} >
+              <Picker.Item label='Cidade' value='' />
+              <Picker.Item label='Tupaciguara' value='tupaciguara' />
+              <Picker.Item label='Uberlandia' value='uberlandia' />
+            </Picker>
           </View>
-        </TouchableOpacity>
-      </View>
+        </View>
+
+        <View style={{ flex: 0.5, alignItems: 'center', flexDirection: 'row-reverse' }}>
+          <Continue>
+            <Text style={{ fontSize: 16, color: '#08F' }}>Cadastrar</Text>
+          </Continue>
+          <GoBack onPress={() => this.props.navigation.goBack()}>
+            <Text style={{ fontSize: 14, color: '#08F' }}>Voltar</Text>
+          </GoBack>
+        </View>
+
+      </MinhaView>
     )
   }
 }

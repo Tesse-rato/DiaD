@@ -6,8 +6,11 @@ import * as Actions from '../redux/actions';
 import Api from '../api';
 
 import { MinhaView } from '../styles/standard';
-import { Input, Continue, GoBack } from '../styles/register';
-import Logo from '../assets/Logo.svg';
+import { MeuInput, Continue, GoBack } from '../styles/register';
+
+import LogoIcoIco from '../assets/Logo.svg';
+import EmailIco from '../assets/EmailWhiteDiaD.svg';
+import PasswordIco from '../assets/PassWordWhiteDiaD.svg';
 
 class Register extends Component {
   static navigationOptions = {
@@ -27,6 +30,7 @@ class Register extends Component {
       error: 'Password not match'
     }
   }
+
   componentWillMount() {
     if (!this.state.email && !this.state.password) {
       this.setState({ email: this.props.account.user.email, password: this.props.account.user.password });
@@ -58,19 +62,20 @@ class Register extends Component {
       <MinhaView >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
 
-        <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ marginBottom: 20 }}>
-            <Logo width={150} height={150} />
-          </View>
-          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <Input placeholder='Email' />
-          <Input placeholder='Senha' />
-          <Input placeholder='Confirme Senha' />
+        <View style={{ flex: 1, marginBottom: 20, justifyContent: 'center' }}>
+          <LogoIcoIco width={150} height={150} />
         </View>
 
-        <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }}>
-          <Continue>
-            <Text style={{ color: '#08F', fontSize: 14 }}>Continuar</Text>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
+          <MeuInput placeholder='Email' ico={EmailIco} />
+          <MeuInput placeholder='Senha' ico={PasswordIco} />
+          <MeuInput placeholder='Confirme Senha' ico={PasswordIco} />
+        </View>
+
+        <View style={{ flex: 0.5, justifyContent: 'center', alignItems: 'center', flexDirection: 'row-reverse' }}>
+          <Continue onPress={() => this.props.navigation.navigate('Register2')}>
+            <Text style={{ color: '#08F', fontSize: 16 }}>Continuar</Text>
           </Continue>
           <GoBack onPress={() => this.props.navigation.goBack()}>
             <Text style={{ color: '#08F', fontSize: 14 }}>Voltar</Text>

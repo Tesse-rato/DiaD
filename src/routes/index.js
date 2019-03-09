@@ -1,8 +1,10 @@
 import { createStackNavigator, createAppContainer } from "react-navigation";
+
 import Login from '../components/Login';
 import Register from '../components/Register';
 import Register2 from '../components/Register2';
-import Home from '../components/Home';
+import Welcome from '../components/Welcome';
+import MainScreen from '../components/MainScreen';
 
 // import {
 //   Login,
@@ -14,10 +16,14 @@ const Routes = createStackNavigator({
   Login,
   Register,
   Register2,
-  Home,
+  Welcome,
+  MainScreen,
 },
   {
-    initialRouteName: 'Register2'
+    initialRouteName: 'MainScreen',
+    navigationOptions: {
+      header: null,
+    }
   }
 );
 

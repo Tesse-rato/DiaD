@@ -1,24 +1,28 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar } from 'react-native';
+import { View, Text, StatusBar, Dimensions } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
 import Api from '../api';
 
-import { Input, LogIn, Register } from '../styles/login';
+import { MeuInput, LogIn, Register } from '../styles/login';
 import { MinhaView } from '../styles/standard';
+
 import Logo from '../assets/Logo.svg';
+import EmailIco from '../assets/EmailWhiteDiaD.svg';
+import PasswordIco from '../assets/PassWordWhiteDiaD.svg';
 
 class Login extends Component {
+  static navigationOptions = {
+    header: null
+  }
   constructor() {
     super()
     this.state = {
-      error: ''
+      error: 'Senha incorreta'
     }
   }
-  static navigationOptions = {
-    header: null
-  };
+
   login() {
     Api.post('/users/auth', {
       email: this.props.account.user.email,
@@ -40,21 +44,22 @@ class Login extends Component {
       <MinhaView>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
 
-        <View style={{ flex: 5, justifyContent: 'center', alignItems: 'center' }} >
-          <View style={{ marginBottom: 20 }}>
-            <Logo width={150} height={150} />
-          </View>
-          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <Input placeholder='Email' />
-          <Input placeholder='Senha' />
+        <View style={{ flex: 2, marginBottom: 20, justifyContent: 'center' }}>
+          <Logo width={150} height={150} />
         </View>
 
-        <View style={{ flex: 2, alignItems: 'center' }} >
-          <LogIn >
+        <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
+          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
+          <MeuInput placeholder='Email' ico={EmailIco} />
+          <MeuInput placeholder='Senha' ico={PasswordIco} />
+        </View>
+
+        <View style={{ flex: 1, justifyContent: 'center' }} >
+          <LogIn onPress={() => { this.props.navigation.navigate('Register') }} >
             <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
           </LogIn>
           <Register onPress={() => this.props.navigation.navigate('Register')}>
-            <Text style={{ color: '#FFF', fontSize: 14 }}>Cadastrar</Text>
+            <Text style={{ color: '#08F', fontSize: 14 }}>Cadastrar</Text>
           </Register>
         </View>
 

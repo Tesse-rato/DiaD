@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 import styled from 'styled-components/native';
 
 export const MinhaView = styled.View`
@@ -9,22 +11,23 @@ export const MinhaView = styled.View`
 
 export const StandardButton = styled.TouchableOpacity`
   width: 200px;
-  height: 40px;
+  height: 45px;
   margin: 5px;
   background-color: #08F;
-  border: 2px solid #08f;
-  border-radius: 10px;
+  border: 1px solid #08f;
+  border-radius: 15px;
   align-items: center;
   justify-content: center;
 `;
 
 export const StandardInput = styled.TextInput`
-  width: 300px;
-  height: 50px;
-  background-color: #FFF;
+  width: ${Dimensions.get('window').width - 85};
+  height: ${Dimensions.get('window').height - 600};
+  background-color: transparent;
   border-radius: 8px;
   padding: 10px;
-  border: 2px solid #DDD;
+  border: 0px;
   margin: 4px;
-  font-size: 12;
+  font-size: 14;
+  color: #FFF;
 `;

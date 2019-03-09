@@ -1,0 +1,6 @@
+[0308/090216.812:ERROR:process_reader_win.cc(151)] SuspendThread: Acesso negado. (0x5)
+[0308/090216.815:ERROR:process_reader_win.cc(151)] SuspendThread: Acesso negado. (0x5)
+[0308/090216.816:ERROR:process_reader_win.cc(151)] SuspendThread: Acesso negado. (0x5)
+[0308/090216.816:ERROR:process_reader_win.cc(151)] SuspendThread: Acesso negado. (0x5)
+[0308/090216.816:ERROR:process_reader_win.cc(151)] SuspendThread: Acesso negado. (0x5)
+[0308/090216.816:ERROR:exception_snapshot_win.cc(88)] thread ID 14552 not found in process
