@@ -41,7 +41,7 @@ class Feed extends Component {
     console.log('Component will mount');
     const config = {
       headers: {
-        'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2ZiYzBiZWRlODlmMWZiMDRhMjNiYyIsImlhdCI6MTU1MjA1NDE5NCwiZXhwIjoxNTUyMTQwNTk0fQ.cNJoinQPzl6QNmuawHibZRadiofPGMsm9Iu7-ynhO9A'
+        'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2ZiYzBiZWRlODlmMWZiMDRhMjNiYyIsImlhdCI6MTU1MjE0OTA3NywiZXhwIjoxNTUyMjM1NDc3fQ.BWxRA-5zYqgoO5N021pHB3rAL4tnD8iGnXa8U0qWFWk'
       }
     }
 
@@ -52,7 +52,7 @@ class Feed extends Component {
     })
   }
 
-  debug(e) {
+  debug(e = React.nativeEvent.contentOffset) {
     console.log(e.nativeEvent.contentOffset.y);
   }
 
@@ -61,7 +61,6 @@ class Feed extends Component {
     return (
       <View style={{ flex: 1, backgroundColor: '#E8E8E8', alignItems: 'center' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
-
         <Header placeholder='Id/Apelido' source={{ uri: 'http://192.168.1.2:3333/selfie.jpg' }} />
         {
           this.state.loading == false ? (
@@ -69,11 +68,12 @@ class Feed extends Component {
               onMomentumScrollEnd={(e) => this.debug(e)}
               data={this.state.posts}
               keyExtractor={item => item._id}
-              renderItem={({ item }) => (<Post
-                content={item.content}
-                comments={item.comments}
-                debug={this.debug.bind(this)}
-              />
+              renderItem={({ item }) => (
+                <Post
+                  content={item.content}
+                  comments={item.comments}
+                  debug={this.debug.bind(this)}
+                />
               )}
             />
           ) : null
