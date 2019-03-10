@@ -7,8 +7,8 @@ import * as Actions from '../redux/actions';
 
 import api from '../api';
 
-import { Header } from '../styles/header';
-import { Post } from '../styles/post';
+import { MinhaView, Header } from "../styles/standard";
+import { Post } from '../styles/postFeed';
 
 class Feed extends Component {
   static navigationOptions = {
@@ -52,14 +52,14 @@ class Feed extends Component {
     })
   }
 
-  debug(e = React.nativeEvent.contentOffset) {
+  debug(e) {
     console.log(e.nativeEvent.contentOffset.y);
   }
 
   render() {
     console.disableYellowBox = true;
     return (
-      <View style={{ flex: 1, backgroundColor: '#E8E8E8', alignItems: 'center' }}>
+      <MinhaView>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
         <Header placeholder='Id/Apelido' source={{ uri: 'http://192.168.1.2:3333/selfie.jpg' }} />
         {
@@ -78,7 +78,7 @@ class Feed extends Component {
             />
           ) : null
         }
-      </View>
+      </MinhaView>
     )
   }
 }

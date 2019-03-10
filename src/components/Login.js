@@ -41,7 +41,7 @@ class Login extends Component {
   render() {
     console.disableYellowBox = true;
     return (
-      <MinhaView>
+      <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
 
         <View style={{ flex: 2, marginBottom: 20, justifyContent: 'center' }}>

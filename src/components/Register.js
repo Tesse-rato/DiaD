@@ -3,6 +3,7 @@ import { View, Text, StatusBar } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
+
 import Api from '../api';
 
 import { MinhaView } from '../styles/standard';
@@ -59,7 +60,7 @@ class Register extends Component {
     } = this.props;
 
     return (
-      <MinhaView >
+      <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
 
         <View style={{ flex: 1, marginBottom: 20, justifyContent: 'center' }}>

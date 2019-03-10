@@ -5,6 +5,7 @@ import Register from '../components/Register';
 import Register2 from '../components/Register2';
 import Welcome from '../components/Welcome';
 import MainScreen from '../components/MainScreen';
+import Profile from '../components/Profile';
 
 // import {
 //   Login,
@@ -18,9 +19,10 @@ const Routes = createStackNavigator({
   Register2,
   Welcome,
   MainScreen,
+  Profile,
 },
   {
-    initialRouteName: 'MainScreen',
+    initialRouteName: 'Profile',
     navigationOptions: {
       header: null,
     }

@@ -84,7 +84,7 @@ export class Register2 extends Component {
     console.disableYellowBox = true;
     console.log('TESTEANDO DEPURADOR');
     return (
-      <MinhaView>
+      <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
 
         <View style={{ flex: 1, justifyContent: 'center' }}>
