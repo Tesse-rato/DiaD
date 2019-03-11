@@ -66,6 +66,29 @@ class Profile extends React.PureComponent {
     console.log(e.nativeEvent.contentOffset.x);
   }
 
+  momentumScroll(e) {
+    const { y } = e.nativeEvent.contentOffset;
+    this.setState({ startScroll: y })
+    if (y < 1) {
+      Animated.sequence([
+        Animated.delay(500),
+        Animated.timing(
+          this.state.animatedValueToBioView,
+          {
+            toValue: 0,
+            duration: 500
+          }
+        ),
+        Animated.timing(
+          this.state.animatedValueToProfileImage,
+          {
+            toValue: 60,
+            duration: 1000
+          }
+        )
+      ]).start()
+    }
+  }
   compareOffset(currentValueScroll) {
     const { startScroll } = this.state;
     const differenceBettweenValues = Math.abs(startScroll - currentValueScroll);
@@ -73,7 +96,8 @@ class Profile extends React.PureComponent {
     let valueToBioView = startScroll < currentValueScroll ? 0 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? this.state.tamBio : null;
     let valueToProfileImage = startScroll < currentValueScroll ? 60 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? 120 : 60;
 
-    Animated.parallel([
+    Animated.sequence([
+      Animated.delay(500),
       Animated.timing(
         this.state.animatedValueToBioView,
         {
@@ -93,7 +117,7 @@ class Profile extends React.PureComponent {
   render() {
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }}>
-        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         <HeaderProfile bio={this.state.bio}
           animatedValueToBioView={this.state.animatedValueToBioView}
           animatedValueToProfileImage={this.state.animatedValueToProfileImage}
@@ -102,7 +126,7 @@ class Profile extends React.PureComponent {
           !this.state.loading ? (
             <View style={{ backgroundColor: '#E8E8E8', flex: 1 }}>
               <FlatList
-                onScrollBeginDrag={e => this.setState({ startScroll: e.nativeEvent.contentOffset.y })}
+                onScrollBeginDrag={e => this.momentumScroll(e)}
                 onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
                 data={this.state.posts}
                 keyExtractor={item => item._id}
