@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, Dimensions } from 'react-native';
+import { View, Text, StatusBar, AsyncStorage } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
@@ -23,6 +23,51 @@ class Login extends Component {
     }
   }
 
+  async componentWillMount() {
+    const token = await AsyncStorage.getItem('token');
+
+    if (token) {
+
+      const config = {
+        headers: {
+          'authorization': `Bearer ${token}`
+        }
+      }
+
+      const email = await AsyncStorage.getItem('email');
+      const password = await AsyncStorage.getItem('password');
+      const _id = await AsyncStorage.getItem('_id');
+
+      Api.post('users/validateToken', { userId: _id }, config).then(async ({ data }) => {
+
+        this.props.setToken(token);
+        this.props.setUser(data);
+
+        this.props.navigation.navigate('Feed');
+
+      }).catch(async (err) => {
+
+        if (email && password) {
+
+          Api.post('/users/auth', { email, password }).then(({ data }) => {
+
+            if (!data) return
+
+            this.props.setUser(data);
+
+            AsyncStorage.setItem('token', data.token);
+            AsyncStorage.setItem('_id', data.user._id);
+
+            this.props.navigate.navigation('Feed');
+
+          }).catch(err => {
+            this.setState({ error: 'Verifique sua conexão' });
+          });
+        }
+      });
+    }
+  }
+
   validateUserInput() {
     const { email, password } = this.props.account.user;
 
@@ -35,12 +80,20 @@ class Login extends Component {
   }
 
   login() {
-    Api.post('/users/auth', {
-      email: this.props.account.user.email,
-      password: this.props.account.user.password
-    }).then(({ data }) => {
+
+    const { email, password } = this.props.account.user
+
+    Api.post('/users/auth', { email, password }).then(({ data }) => {
+
       this.props.setUser(data);
+
+      AsyncStorage.setItem('email', email);
+      AsyncStorage.setItem('password', password);
+      AsyncStorage.setItem('token', data.token);
+      AsyncStorage.setItem('_id', data.user._id);
+
       return this.props.navigation.navigate('Feed');
+
     }).catch(err => {
       if (!err.response.data) return alert('Verifique sua conexão com a internet');
 
@@ -54,6 +107,7 @@ class Login extends Component {
 
   render() {
     console.disableYellowBox = true;
+    console.log(this.props);
     return (
       <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />

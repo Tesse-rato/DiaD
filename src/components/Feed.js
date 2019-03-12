@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, StatusBar, FlatList, Dimensions } from 'react-native'
+import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, AsyncStorage } from 'react-native'
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
@@ -19,33 +19,23 @@ class Feed extends Component {
     super();
 
     this.state = {
-      posts: [{
-        pushes: {
-          times: 0,
-          users: []
-        },
-        createdAt: '',
-        _id: 0,
-        assignedTo: '',
-        content: '',
-        comments: [{
-          content: '',
-        }],
-        __v: 0
-      }],
+      posts: [],
+      user: [],
       loading: true
     };
   }
 
   componentWillMount() {
-    console.log('Component will mount');
+
+    const token = this.props.account.token;
+
     const config = {
       headers: {
-        'authorization': `Bearer ${this.props.account.token}`
+        'authorization': `Bearer ${token}`
       }
     }
 
-    api.get('http://192.168.1.2/posts/list', config).then(({ data: posts }) => {
+    api.get('/posts/list', config).then(({ data: posts }) => {
       this.setState({ posts, loading: false });
     }).catch(err => {
       console.log(err.response);
@@ -58,6 +48,7 @@ class Feed extends Component {
 
   render() {
     console.disableYellowBox = true;
+    console.log(this.props);
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }} >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
@@ -76,7 +67,15 @@ class Feed extends Component {
                 />
               )}
             />
-          ) : null
+          ) : (
+              <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center' }} >
+                <ProgressBarAndroid
+                  indeterminate={true}
+                  color={'#FFF'}
+                  styleAttr='Horizontal'
+                  style={{ width: Dimensions.get('window').width, height: 10 }} />
+              </View>
+            )
         }
       </MinhaView>
     )
