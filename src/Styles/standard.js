@@ -51,7 +51,8 @@ const ContainerHeader = styled.View`
   flex-direction: row;
   align-items: center;
   width: ${Dimensions.get('window').width};
-  height: ${Dimensions.get('window').height - 535};
+  /* height: ${Dimensions.get('window').height - 535}; */
+  padding: 5px;
   background-color: #FFF;
   border-bottom-width: 0.5px;
   border-bottom-color: #AAA;

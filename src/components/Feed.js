@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
-import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, AsyncStorage } from 'react-native'
+import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions } from 'react-native'
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
 
-import api from '../api';
+import Api from '../api';
+
+import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
+import FlameRedIco from '../assets/FlameRedDiaD.svg';
 
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
@@ -20,26 +23,15 @@ class Feed extends Component {
 
     this.state = {
       posts: [],
-      user: [],
-      loading: true
+      loading: true,
+      atualizar: false,
     };
   }
 
   componentWillMount() {
-
-    const token = this.props.account.token;
-
-    const config = {
-      headers: {
-        'authorization': `Bearer ${token}`
-      }
-    }
-
-    api.get('/posts/list', config).then(({ data: posts }) => {
-      this.setState({ posts, loading: false });
-    }).catch(err => {
-      console.log(err.response);
-    })
+    this.setState({ posts: this.props.data }, () => {
+      this.setState({ loading: false });
+    });
   }
 
   debug(e) {
@@ -51,7 +43,49 @@ class Feed extends Component {
   }
 
   pushPost(_id) {
-    console.log('pushPost - ', _id);
+
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+
+    const payload = {
+      assignedTo: this.props.account._id,
+      postId: _id
+    }
+
+    Api.patch('/posts/push', payload, config).then(() => {
+
+      const posts = this.state.posts;
+
+      posts.map(post => {
+        if (post._id == _id) {
+          post.pushes.times++
+          post.pushes.users.push(this.props.account._id);
+        }
+      });
+
+      this.setState({ posts });
+
+    }).catch(err => {
+
+      Api.delete('/posts/push', { data: payload, headers: { authorization: `Bearer ${this.props.account.token}` } }).then(() => {
+        const posts = this.state.posts;
+
+        posts.map(post => {
+          if (post._id == _id) {
+            post.pushes.times--
+            post.pushes.users = post.pushes.users.filter(user => user != this.props.account._id);
+          }
+        });
+
+        this.setState({ posts });
+      }).catch(err => {
+        console.log(err, 'ERROR');
+        console.log(err.response, 'ERROR');
+      });
+    });
   }
   newComment(_id) {
     console.log('New Comente - ', _id);
@@ -67,9 +101,9 @@ class Feed extends Component {
 
   render() {
     console.disableYellowBox = true;
-    console.log(this.props);
     return (
-      <MinhaView style={{ justifyContent: 'flex-start' }} >
+      //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
+      <MinhaView style={{ justifyContent: 'center' }} >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
         <Header
           placeholder='Id/Apelido'
@@ -77,45 +111,58 @@ class Feed extends Component {
           clickImageProfile={this.clickImageProfile.bind(this)}
 
         />
-        {
-          this.state.loading == false ? (
-            <FlatList
-              onMomentumScrollEnd={(e) => this.debug(e)}
-              data={this.state.posts}
-              keyExtractor={item => item._id}
-              renderItem={({ item }) => {
-                return (
-                  <Post
-                    user_id={this.props.account._id}
-                    post_id={item._id}
-                    assignedTo_id={item.assignedTo._id}
-                    firstName={item.assignedTo.name.first}
-                    lastName={item.assignedTo.name.last}
-                    nickname={item.assignedTo.name.nickname}
-                    thumbnail={item.assignedTo.photo.thumbnail}
-                    pushTimes={item.pushes.times}
-                    content={item.content}
-                    comments={item.comments}
-                    clickImageProfile={this.clickImageProfile.bind(this)}
-                    pushPost={this.pushPost.bind(this)}
-                    newComment={this.newComment.bind(this)}
-                    editComment={this.editComment.bind(this)}
-                    sharePost={this.sharePost.bind(this)}
-                    debug={this.debug.bind(this)}
-                  />
-                )
-              }}
-            />
-          ) : (
-              <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center' }} >
-                <ProgressBarAndroid
-                  indeterminate={true}
-                  color={'#FFF'}
-                  styleAttr='Horizontal'
-                  style={{ width: Dimensions.get('window').width, height: 10 }} />
-              </View>
-            )
-        }
+        {!this.state.loading ? (
+          <FlatList
+            onMomentumScrollEnd={(e) => this.debug(e)}
+            data={this.state.posts}
+            extraData={this.state.posts}
+            keyExtractor={item => item._id}
+            renderItem={({ item }) => {
+              let ico;
+              const pushed = item.pushes.users.find(id => id.toString() == this.props.account._id)
+              if (pushed) {
+                ico = FlameRedIco;
+                console.log('Vermelho');
+              } else {
+                ico = FlameBlueIco;
+                console.log('Azul');
+              }
+
+
+              return (
+                <Post
+                  key={item._id}
+                  ico={ico}
+                  user_id={this.props.account._id}
+                  post_id={item._id}
+                  assignedTo_id={item.assignedTo._id}
+                  firstName={item.assignedTo.name.first}
+                  lastName={item.assignedTo.name.last}
+                  nickname={item.assignedTo.name.nickname}
+                  thumbnail={item.assignedTo.photo.thumbnail}
+                  pushTimes={item.pushes.times}
+                  pushAssignedTo={pushed}
+                  content={item.content}
+                  comments={item.comments}
+                  clickImageProfile={this.clickImageProfile.bind(this)}
+                  pushPost={this.pushPost.bind(this)}
+                  newComment={this.newComment.bind(this)}
+                  editComment={this.editComment.bind(this)}
+                  sharePost={this.sharePost.bind(this)}
+                  debug={this.debug.bind(this)}
+                />
+              )
+            }}
+          />
+        ) : (
+            <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center' }} >
+              <ProgressBarAndroid
+                indeterminate={true}
+                color={'#FFF'}
+                styleAttr='Horizontal'
+                style={{ width: Dimensions.get('window').width, height: 10 }} />
+            </View>
+          )}
       </MinhaView>
     )
   }

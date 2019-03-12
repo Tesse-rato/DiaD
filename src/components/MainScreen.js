@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from "react-navigation";
 
-import Feed from './Feed';
+import Geral from './Geral';
 import Justice from './Justice';
 import NewPost from './NewPost';
 import Bussines from './Bussines';
@@ -14,8 +14,8 @@ import BussinesIco from '../assets/BussinesDiaD.svg';
 import FavoritesIco from '../assets/FavoritesDiaD.svg';
 
 export default TabBarBottom = createBottomTabNavigator({
-  Feed: {
-    screen: Feed,
+  Geral: {
+    screen: Geral,
     navigationOptions: {
       tabBarLabel: 'Geral',
       tabBarIcon: () => (
@@ -62,8 +62,8 @@ export default TabBarBottom = createBottomTabNavigator({
   }
 },
   {
-    initialRouteName: 'Feed',
-    order: ['Feed', 'Justice', 'NewPost', 'Bussines', 'Favorites'],
+    initialRouteName: 'Geral',
+    order: ['Geral', 'Justice', 'NewPost', 'Bussines', 'Favorites'],
     navigationOptions: {
       header: null,
 

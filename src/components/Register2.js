@@ -92,8 +92,7 @@ export class Register2 extends Component {
       const url = `/users/profilePhoto/${data.user._id}`;
 
       Api.patch(url, this.state.dataFormImage, config).then(() => {
-        console.log('Navegando pro Feed');
-        this.props.navigation.navigate('Feed');
+        this.props.navigation.navigate('Geral');
 
       }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
     }).catch(err => {

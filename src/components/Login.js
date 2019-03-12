@@ -43,7 +43,7 @@ class Login extends Component {
         this.props.setToken(token);
         this.props.setUser(data);
 
-        this.props.navigation.navigate('Feed');
+        this.props.navigation.navigate('Geral');
 
       }).catch(async (err) => {
 
@@ -58,7 +58,7 @@ class Login extends Component {
             AsyncStorage.setItem('token', data.token);
             AsyncStorage.setItem('_id', data.user._id);
 
-            this.props.navigate.navigation('Feed');
+            this.props.navigate.navigation('Geral');
 
           }).catch(err => {
             this.setState({ error: 'Verifique sua conexão' });
@@ -92,7 +92,7 @@ class Login extends Component {
       AsyncStorage.setItem('token', data.token);
       AsyncStorage.setItem('_id', data.user._id);
 
-      return this.props.navigation.navigate('Feed');
+      return this.props.navigation.navigate('Geral');
 
     }).catch(err => {
       if (!err.response.data) return alert('Verifique sua conexão com a internet');
@@ -107,7 +107,6 @@ class Login extends Component {
 
   render() {
     console.disableYellowBox = true;
-    console.log(this.props);
     return (
       <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />

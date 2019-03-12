@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
 
 import styled from 'styled-components/native';
 
 import FlameBlue from '../assets/FlameBlueDiaD.svg';
+import FlameRedIco from '../assets/FlameRedDiaD.svg';
 import CommentIco from '../assets/CommentDiaD.svg';
 import ShareIco from '../assets/ShareDiaD.svg';
 
@@ -15,7 +16,7 @@ const ContainerPost = styled.View`
   align-items: center;
   background-color: #FFF;
   border-radius: 5px;
-  margin-top: 10px;
+  margin: 5px;
 `;
 const ContainerHeader = styled.View`
   flex-direction: row;
@@ -55,7 +56,7 @@ export const HeaderPost = props => (
     </ContainerHeaderPost>
     <View style={{ alignItems: 'center' }}>
       <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
-        <FlameBlue width={32} height={32} />
+        <props.ico width={32} height={32} />
       </TouchableOpacity>
       <Text style={{ color: '#333' }}>{props.pushTimes}</Text>
     </View>
@@ -82,13 +83,17 @@ export const FooterPost = props => (
 
 export const Post = props => (
   <ContainerPost>
+    <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
     <HeaderPost
+      ico={props.ico}
+      user_id={props.user_id}
       post_id={props.post_id}
       thumbnail={props.thumbnail}
       firstName={props.firstName}
       lastName={props.lastName}
       nickname={props.nickname}
       pushTimes={props.pushTimes}
+      pushAssignedTo={props.pushAssignedTo}
       assignedTo_id={props.assignedTo_id}
       clickImageProfile={props.clickImageProfile}
       pushPost={props.pushPost}
