@@ -25,7 +25,6 @@ export class Register2 extends Component {
       error: '',
       imageUri: '',
       dataFormImage: '',
-      buttonNextState: '',
       selectedCity: 'Tupaciguara'
     }
   }
@@ -59,6 +58,16 @@ export class Register2 extends Component {
         });
       }
     });
+  }
+
+  validateUserInput() {
+    const { name: { first, last, nickname } } = this.props.account.user;
+    if (!first) return this.setState({ error: 'Preencha o campo Nome' });
+    if (!last) return this.setState({ error: 'Preencha o campo Sobrenome' });
+    if (!nickname) return this.setState({ error: 'Preencha o campo Apelido' });
+
+    this.registerUser();
+
   }
 
   registerUser() {
@@ -123,7 +132,7 @@ export class Register2 extends Component {
         </View>
 
         <View style={{ flex: 0.5, alignItems: 'center', flexDirection: 'row-reverse' }}>
-          <Continue onPress={() => this.registerUser()} >
+          <Continue onPress={() => this.validateUserInput()} >
             <Text style={{ fontSize: 16, color: '#08F' }}>Registrar</Text>
           </Continue>
           <GoBack onPress={() => this.props.navigation.goBack()}>

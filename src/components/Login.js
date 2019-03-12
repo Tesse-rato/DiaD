@@ -23,6 +23,17 @@ class Login extends Component {
     }
   }
 
+  validateUserInput() {
+    const { email, password } = this.props.account.user;
+
+    if (!email) return this.setState({ error: 'Preencha o campo Email' });
+
+    if (!password) return this.setState({ error: 'Preencha o campo Senha' });
+
+    this.login();
+
+  }
+
   login() {
     Api.post('/users/auth', {
       email: this.props.account.user.email,
@@ -58,7 +69,7 @@ class Login extends Component {
         </View>
 
         <View style={{ flex: 1, justifyContent: 'center' }} >
-          <LogIn onPress={() => this.login()} >
+          <LogIn onPress={() => this.validateUserInput()} >
             <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
           </LogIn>
           <Register onPress={() => this.props.navigation.navigate('Register')}>

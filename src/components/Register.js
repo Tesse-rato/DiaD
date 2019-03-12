@@ -38,6 +38,16 @@ class Register extends Component {
     }
   }
 
+  validateUserInput() {
+    const { email, password } = this.props.account.user
+
+    if (!email) return this.setState({ error: 'Preencha o campo Email' })
+    if (!password) return this.setState({ error: 'Preencha o campo Senha' })
+    if (!this.state.confirmPassword) return this.setState({ error: 'Preencha o campo Confirmar Senha' });
+
+    this.verifyUserAccount();
+
+  }
 
   verifyUserAccount() {
     if (this.props.account.user.password != this.state.confirmPassword) {
@@ -72,7 +82,7 @@ class Register extends Component {
         </View>
 
         <View style={{ flex: 0.5, justifyContent: 'center', alignItems: 'center', flexDirection: 'row-reverse' }}>
-          <Continue onPress={() => this.verifyUserAccount()}>
+          <Continue onPress={() => this.validateUserInput()}>
             <Text style={{ color: '#08F', fontSize: 16 }}>Continuar</Text>
           </Continue>
           <GoBack onPress={() => this.props.navigation.goBack()}>
