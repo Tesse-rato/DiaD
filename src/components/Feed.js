@@ -41,7 +41,7 @@ class Feed extends Component {
     console.log('Component will mount');
     const config = {
       headers: {
-        'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2ZiYzBiZWRlODlmMWZiMDRhMjNiYyIsImlhdCI6MTU1MjE0OTA3NywiZXhwIjoxNTUyMjM1NDc3fQ.BWxRA-5zYqgoO5N021pHB3rAL4tnD8iGnXa8U0qWFWk'
+        'authorization': `Bearer ${this.props.account.token}`
       }
     }
 
@@ -59,7 +59,7 @@ class Feed extends Component {
   render() {
     console.disableYellowBox = true;
     return (
-      <MinhaView>
+      <MinhaView style={{ justifyContent: 'flex-start' }} >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
         <Header placeholder='Id/Apelido' source={{ uri: 'http://192.168.1.2:3333/selfie.jpg' }} />
         {

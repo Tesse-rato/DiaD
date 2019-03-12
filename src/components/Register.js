@@ -28,7 +28,7 @@ class Register extends Component {
       email: '',
       password: '',
       confirmPassword: '',
-      error: 'Password not match'
+      error: ''
     }
   }
 
@@ -38,27 +38,24 @@ class Register extends Component {
     }
   }
 
-  register() {
-    Api.post('/users/create', { ...this.state }).then(({ data }) => {
-      console.log(data);
-      console.log('DEU CERTO');
-      this.props.setUser(data);
-      return this.props.navigation.navigate('Home');
+
+  verifyUserAccount() {
+    if (this.props.account.user.password != this.state.confirmPassword) {
+      return this.setState({ error: 'Senhas não combinam' });
+    }
+
+    const url = '/users/exists/' + this.props.account.user.email;
+    Api.get(url).then(() => {
+      this.props.navigation.navigate('Register2');
     }).catch(err => {
-      return this.setState({ error: err.response.data.error })
-    })
+      err.response.data.error == 'User already exists' ?
+        this.setState({ error: 'Email já cadastrado' }) :
+        this.setState({ error: 'Verifique sua conexão ' });
+    });
   }
 
   render() {
     console.disableYellowBox = true;
-    const {
-      account: {
-        user: {
-          email, password
-        }
-      }
-    } = this.props;
-
     return (
       <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
@@ -69,13 +66,13 @@ class Register extends Component {
 
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput placeholder='Email' ico={EmailIco} />
-          <MeuInput placeholder='Senha' ico={PasswordIco} />
-          <MeuInput placeholder='Confirme Senha' ico={PasswordIco} />
+          <MeuInput onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+          <MeuInput onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
+          <MeuInput value={this.state.confirmPassword} onChangeText={(e) => this.setState({ confirmPassword: e })} placeholder='Confirme Senha' ico={PasswordIco} />
         </View>
 
         <View style={{ flex: 0.5, justifyContent: 'center', alignItems: 'center', flexDirection: 'row-reverse' }}>
-          <Continue onPress={() => this.props.navigation.navigate('Register2')}>
+          <Continue onPress={() => this.verifyUserAccount()}>
             <Text style={{ color: '#08F', fontSize: 16 }}>Continuar</Text>
           </Continue>
           <GoBack onPress={() => this.props.navigation.goBack()}>

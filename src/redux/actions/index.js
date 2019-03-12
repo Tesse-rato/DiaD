@@ -16,7 +16,7 @@ export const setLastName = (payload) => {
     },
   }
 }
-export const setNickName = (payload) => {
+export const setNickname = (payload) => {
   return {
     type: Action.SET_NICKNAME,
     payload: {

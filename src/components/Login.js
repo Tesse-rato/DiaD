@@ -19,7 +19,7 @@ class Login extends Component {
   constructor() {
     super()
     this.state = {
-      error: 'Senha incorreta'
+      error: ''
     }
   }
 
@@ -29,11 +29,14 @@ class Login extends Component {
       password: this.props.account.user.password
     }).then(({ data }) => {
       this.props.setUser(data);
-      return this.props.navigation.navigate('Home');
+      return this.props.navigation.navigate('Feed');
     }).catch(err => {
+      if (!err.response.data) return alert('Verifique sua conexão com a internet');
+
       if (err.response.data.error === 'Invalid password') {
-        return this.setState({ error: err.response.data.error });
+        return this.setState({ error: 'Senha incorreta' });
       }
+
       return this.props.navigation.navigate('Register');
     });
   }
@@ -50,15 +53,15 @@ class Login extends Component {
 
         <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
           <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput placeholder='Email' ico={EmailIco} />
-          <MeuInput placeholder='Senha' ico={PasswordIco} />
+          <MeuInput value={this.props.account.user.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+          <MeuInput value={this.props.account.user.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
         </View>
 
         <View style={{ flex: 1, justifyContent: 'center' }} >
-          <LogIn onPress={() => { this.props.navigation.navigate('Register') }} >
+          <LogIn onPress={() => this.login()} >
             <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
           </LogIn>
-          <Register onPress={() => this.props.navigation.navigate('Profile')}>
+          <Register onPress={() => this.props.navigation.navigate('Register')}>
             <Text style={{ color: '#08F', fontSize: 14 }}>Cadastrar</Text>
           </Register>
         </View>

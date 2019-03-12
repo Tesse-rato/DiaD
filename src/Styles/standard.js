@@ -37,7 +37,7 @@ export const StandardInput = styled.TextInput`
 
 export const Find = props => (
   <View style={{ backgroundColor: '#CCC', borderRadius: 25, marginRight: 15 }}>
-    <StandardInput onChangeText={props.onChangeText} style={{ height: 35 }} placeholder={props.placeholder} placeholderTextColor='#FFF' selectionColor='#FFF' />
+    <StandardInput value={props.value} onChangeText={(e) => props.onChangeText(e)} style={{ height: 35 }} placeholder={props.placeholder} placeholderTextColor='#FFF' selectionColor='#FFF' />
   </View>
 );
 
