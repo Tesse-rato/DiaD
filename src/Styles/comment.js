@@ -34,22 +34,26 @@ export const Comment = props => (
       <ContainerComment key={comment._id} >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <ContainerHeaderComment>
-            <TouchableOpacity>
-              <Image style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' source={{ uri: 'http://192.168.1.2:3333/comment.jpg' }} />
+            <TouchableOpacity onPress={() => props.clickImageProfile(comment.assignedTo._id)}>
+              <Image style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' source={{ uri: comment.assignedTo.photo.thumbnail }} />
             </TouchableOpacity>
             <View style={{ marginLeft: 8 }}>
-              <Text style={{ fontSize: 16 }} >Nome Sobrenome</Text>
-              <Text style={{ fontSize: 12 }} >@ap3liDo</Text>
+              <Text style={{ fontSize: 16 }} >{`${comment.assignedTo.name.first} ${comment.assignedTo.name.last}`}</Text>
+              <Text style={{ fontSize: 12 }} >@{comment.assignedTo.name.nickname}</Text>
             </View>
           </ContainerHeaderComment>
-          <TouchableOpacity>
-            <EditIco width={32} height={32} />
-          </TouchableOpacity>
+          {props.user_id == comment.assignedTo._id ? (
+            <TouchableOpacity onPress={() => props.editComment(comment._id, props.post_id)} >
+              <EditIco width={32} height={32} />
+            </TouchableOpacity>
+          ) : null
+          }
         </View>
         <View style={{ margin: 10 }}>
           <Text>{comment.content}</Text>
         </View>
       </ContainerComment>
-    ))}
+    )
+    )}
   </ScrollView>
 );

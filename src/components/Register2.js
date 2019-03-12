@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, StatusBar, Image, Picker } from 'react-native'
+import { View, Text, TouchableOpacity, StatusBar, Image, Picker, AsyncStorage } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
 import ImagePicker from 'react-native-image-picker';
@@ -79,7 +79,9 @@ export class Register2 extends Component {
     } = this.props.account.user
 
     Api.post('/users/create', { name, email, password, city: this.state.selectedCity, confirmPassword: this.props.account.user.password }).then(({ data }) => {
+
       this.props.setUser(data);
+      AsyncStorage.setItem('token', data.token);
 
       const config = {
         headers: {

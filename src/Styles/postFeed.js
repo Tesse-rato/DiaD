@@ -44,18 +44,20 @@ const ContainerFooterPost = styled.View`
 export const HeaderPost = props => (
   <ContainerHeader>
     <ContainerHeaderPost>
-      <TouchableOpacity>
-        <ImageHeaderPost resizeMode='cover' source={{ uri: 'http://192.168.1.2:3333/selfie.jpg' }} />
+      <TouchableOpacity onPress={() => props.clickImageProfile(props.assignedTo_id)} >
+        <ImageHeaderPost resizeMode='cover' source={{ uri: props.thumbnail }} />
       </TouchableOpacity>
       <View style={{ marginLeft: 8 }}>
-        <Text style={{ fontSize: 22 }} >Nome Sobrenome</Text>
-        <Text style={{ fontSize: 12 }} >@ap3liDo</Text>
+        <Text style={{ fontSize: 22 }} >{`${props.firstName} ${props.lastName}`}</Text>
+        <Text style={{ fontSize: 12 }} >@{props.nickname}</Text>
         <Text style={{ fontSize: 12 }} >email@gmail.com</Text>
       </View>
     </ContainerHeaderPost>
     <View style={{ alignItems: 'center' }}>
-      <FlameBlue width={32} height={32} />
-      <Text style={{ color: '#333' }}>4235</Text>
+      <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
+        <FlameBlue width={32} height={32} />
+      </TouchableOpacity>
+      <Text style={{ color: '#333' }}>{props.pushTimes}</Text>
     </View>
   </ContainerHeader>
 );
@@ -67,12 +69,12 @@ export const ContentPost = props => (
 export const FooterPost = props => (
   <ContainerFooterPost>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => props.newComment(props.post_id)}>
         <CommentIco width={24} height={24} />
       </TouchableOpacity>
-      <Text>54</Text>
+      <Text style={{ marginLeft: 2 }}>{props.comments.length}</Text>
     </View>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => props.sharePost(props.post_id)}>
       <ShareIco width={24} height={24} />
     </TouchableOpacity>
   </ContainerFooterPost>
@@ -80,9 +82,31 @@ export const FooterPost = props => (
 
 export const Post = props => (
   <ContainerPost>
-    <HeaderPost />
+    <HeaderPost
+      post_id={props.post_id}
+      thumbnail={props.thumbnail}
+      firstName={props.firstName}
+      lastName={props.lastName}
+      nickname={props.nickname}
+      pushTimes={props.pushTimes}
+      assignedTo_id={props.assignedTo_id}
+      clickImageProfile={props.clickImageProfile}
+      pushPost={props.pushPost}
+    />
     <ContentPost content={props.content} />
-    <Comment comments={props.comments} debug={props.debug} />
-    <FooterPost />
+    <Comment
+      user_id={props.user_id}
+      comments={props.comments}
+      debug={props.debug}
+      clickImageProfile={props.clickImageProfile}
+      editComment={props.editComment}
+      post_id={props.post_id}
+    />
+    <FooterPost
+      comments={props.comments}
+      post_id={props.post_id}
+      newComment={props.newComment}
+      sharePost={props.sharePost}
+    />
   </ContainerPost >
 );
