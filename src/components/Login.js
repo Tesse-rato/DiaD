@@ -58,7 +58,7 @@ class Login extends Component {
           <LogIn onPress={() => { this.props.navigation.navigate('Register') }} >
             <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
           </LogIn>
-          <Register onPress={() => this.props.navigation.navigate('Register')}>
+          <Register onPress={() => this.props.navigation.navigate('Profile')}>
             <Text style={{ color: '#08F', fontSize: 14 }}>Cadastrar</Text>
           </Register>
         </View>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, FlatList, Dimensions, Animated } from 'react-native';
+import { View, Text, StatusBar, FlatList, Dimensions, Animated, ProgressBarAndroid } from 'react-native';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -45,16 +46,16 @@ class Profile extends React.PureComponent {
   componentWillMount() {
     const { bio } = this.state;
 
-    const tamBio = (Math.ceil((Math.ceil(this.state.bio.length / 45) * 17.2) + 45));
+    const tamBio = (Dimensions.get('window').height - 200) - (Math.ceil((Math.ceil(this.state.bio.length / 45) * 17.2) + 45));
 
     this.setState({ tamBio, animatedValueToBioView: new Animated.Value(tamBio) }, () => {
       const config = {
         headers: {
-          'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2ZiYzBiZWRlODlmMWZiMDRhMjNiYyIsImlhdCI6MTU1MjIzNTY2NywiZXhwIjoxNTUyMzIyMDY3fQ.sIUcoK0g7dD4JFKz8WJ_PW_V_uvgKd3l0oJMt7lSZyw'
-        },
+          'authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2ZiYzBiZWRlODlmMWZiMDRhMjNiYyIsImlhdCI6MTU1MjM1NzU3NSwiZXhwIjoxNTUyNDQzOTc1fQ.Fgijw2DYlhBTrcc-x__gXXs513BZcqL8r-7h9o7kF2A'
+        }
       };
 
-      api.get('http://192.168.1.2/posts/list', config).then(({ data: posts }) => {
+      api.get('/posts/list', config).then(({ data: posts }) => {
         this.setState({ posts, loading: false });
       }).catch(err => {
         console.log(err.response);
@@ -71,7 +72,7 @@ class Profile extends React.PureComponent {
     this.setState({ startScroll: y })
     if (y < 1) {
       Animated.sequence([
-        Animated.delay(500),
+        Animated.delay(300),
         Animated.timing(
           this.state.animatedValueToBioView,
           {
@@ -97,7 +98,7 @@ class Profile extends React.PureComponent {
     let valueToProfileImage = startScroll < currentValueScroll ? 60 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? 120 : 60;
 
     Animated.sequence([
-      Animated.delay(500),
+      Animated.delay(300),
       Animated.timing(
         this.state.animatedValueToBioView,
         {
@@ -119,6 +120,8 @@ class Profile extends React.PureComponent {
       <MinhaView style={{ justifyContent: 'flex-start' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         <HeaderProfile bio={this.state.bio}
+          goBack={this.props.navigation.goBack}
+          settings={this.props.navigation.navigate}
           animatedValueToBioView={this.state.animatedValueToBioView}
           animatedValueToProfileImage={this.state.animatedValueToProfileImage}
         />
@@ -135,7 +138,13 @@ class Profile extends React.PureComponent {
                 )}
               />
             </View>
-          ) : (<View style={{ width: Dimensions.get('window').width, flex: 1, backgroundColor: '#E8E8E8' }} />)
+          ) : (
+              <ProgressBarAndroid
+                indeterminate={true}
+                color={'#FFF'}
+                styleAttr='Horizontal'
+                style={{ width: Dimensions.get('window').width, height: 10 }} />
+            )
         }
       </MinhaView>
     );

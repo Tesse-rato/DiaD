@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, View, Text, Image, TouchableOpacity, Animated } from 'react-native';
+import { Dimensions, View, Text, Image, TouchableOpacity, Animated, ScrollView } from 'react-native';
 
 import styled from 'styled-components/native';
 
@@ -13,19 +13,10 @@ import TumblrIco from '../assets/Tumblr.svg';
 import WhatsAppIco from '../assets/WhatsApp.svg';
 import YouTubeIco from '../assets/YouTube.svg';
 
-
-
 export const ContainerHeaderProfile = styled.View`
   width: ${Dimensions.get('window').width};
   background-color: #fff;
   align-items: center;
-`;
-const ImageProfile = styled.Image`
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  margin-bottom: 20px;
-  margin-top: 20px;
 `;
 const ContainerBackConfig = styled.View`
   width: ${Dimensions.get('window').width};
@@ -49,12 +40,6 @@ const ContainerSocialMedia = styled.View`
   flex-direction: row;
   justify-content: space-around;
 `;
-const ContainerPostProfile = styled.View`
-  width: ${Dimensions.get('window').width - 13};
-  align-items: center;
-  background-color: #FFF;
-  border-radius: 10px;
-`;
 const SocialMedia = props => (
   <ContainerSocialMedia>
     <TouchableOpacity>
@@ -76,24 +61,26 @@ const SocialMedia = props => (
 );
 const GoBackConfig = props => (
   <ContainerBackConfig>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => props.goBack()} >
       <GoBackIco width={32} height={32} />
     </TouchableOpacity>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => props.settings('SettingsProfile')}>
       <ConfigIco width={32} height={32} />
     </TouchableOpacity>
   </ContainerBackConfig>
 );
 const BioHeaderProfile = props => (
   <ContainerBio>
-    <Text style={{ textAlign: 'center', fontSize: 14 }}>
-      {props.bio}
-    </Text>
+    <ScrollView>
+      <Text style={{ textAlign: 'center', fontSize: 14, marginBottom: 10 }}>
+        {props.bio}
+      </Text>
+    </ScrollView>
   </ContainerBio>
 );
 export const HeaderProfile = props => (
   <ContainerHeaderProfile>
-    <GoBackConfig />
+    <GoBackConfig goBack={props.goBack} settings={props.settings} />
     <Animated.Image
       style={{
         width: props.animatedValueToProfileImage,
@@ -114,10 +101,4 @@ export const HeaderProfile = props => (
     </Animated.View>
     <View style={{ width: Dimensions.get('window').width, height: 3, backgroundColor: '#E8E8E8' }} />
   </ContainerHeaderProfile>
-);
-
-export const PostProfile = props => (
-  <ContainerPostProfile>
-
-  </ContainerPostProfile>
 );

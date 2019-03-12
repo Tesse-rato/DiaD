@@ -6,6 +6,7 @@ import Register2 from '../components/Register2';
 import Welcome from '../components/Welcome';
 import MainScreen from '../components/MainScreen';
 import Profile from '../components/Profile';
+import SettingsProfile from '../components/SettingsProfile';
 
 // import {
 //   Login,
@@ -20,6 +21,7 @@ const Routes = createStackNavigator({
   Welcome,
   MainScreen,
   Profile,
+  SettingsProfile,
 },
   {
     initialRouteName: 'Profile',

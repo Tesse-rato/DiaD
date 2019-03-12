@@ -116,7 +116,7 @@ export class Register2 extends Component {
         </View>
 
         <View style={{ flex: 0.5, alignItems: 'center', flexDirection: 'row-reverse' }}>
-          <Continue>
+          <Continue onPress={() => this.props.navigation.navigate('Profile')} >
             <Text style={{ fontSize: 16, color: '#08F' }}>Cadastrar</Text>
           </Continue>
           <GoBack onPress={() => this.props.navigation.goBack()}>
