@@ -104,33 +104,31 @@ class Feed extends Component {
      * NewComment apenas inicia um comentario falso
      * Colocando o minimo para a funcao EditOrNewPost 
      * Fazer o que foi feita para fazer
-     * Gera um _id falso para ser identificado nos components
+     * Recebe um _id falso para ser identificado nos components
      * E tambem colocado no state real da aplicacao
      * Isso porque ele precisa ser reconhecido no component FlatList
      */
-    generateSecureRandom(8).then(bytes => {
-      let posts = this.state.posts;
-      let _id = bytes.reduce((acumulador, currentValue) => acumulador + currentValue.toString());
+    let posts = this.state.posts;
+    let _id = 'NOVO POST';
 
-      let comment = {
-        _id,
-        content: '',
-        assignedTo: {
-          _id: this.props.account._id,
-          name: this.props.account.name,
-          photo: this.props.account.photo
-        },
-      };
+    let comment = {
+      _id,
+      content: '',
+      assignedTo: {
+        _id: this.props.account._id,
+        name: this.props.account.name,
+        photo: this.props.account.photo
+      },
+    };
 
-      posts.map((post, index) => post._id.toString() == postId ? this.indexOfPost = index : null);
+    posts.map((post, index) => post._id.toString() == postId ? this.indexOfPost = index : null);
 
-      let comments = [comment, ...this.state.posts[this.indexOfPost].comments];
+    let comments = [comment, ...this.state.posts[this.indexOfPost].comments];
 
-      posts[this.indexOfPost].comments = comments;
+    posts[this.indexOfPost].comments = comments;
 
-      this.setState({ posts, editContentComment: { newComment: true, commentId: _id } }, () => {
-        this.editOrNewComment('editContent', _id, postId);
-      });
+    this.setState({ posts, editContentComment: { newComment: true } }, () => {
+      this.editOrNewComment('editContent', _id, postId);
     });
   }
   editOrNewComment(arg, commentId, postId, newContent) {
@@ -194,7 +192,7 @@ class Feed extends Component {
        * Assim nao é alterado nada no conteudo original do comentario
        * 
        * Se o usuario tiver cancelado a operacao de novo post
-       * E o novo post estiver vazio é feito umam chamada recursiva com parametro 'delete'
+       * E o novo post estiver vazio é feito uma chamada recursiva com parametro 'delete'
        */
       this.state.posts[this.indexOfPost].comments[0].content == '' ? this.editOrNewComment('delete', commentId, postId) : null
 
