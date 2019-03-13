@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions } from 'react-native'
+import { generateSecureRandom } from 'react-native-securerandom';
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
@@ -30,6 +31,7 @@ class Feed extends Component {
         upload: false,
         commentId: '',
         contentComment: '',
+        newComment: false,
       },
       newComment: {
         postId: '',
@@ -99,18 +101,30 @@ class Feed extends Component {
   }
   newComment(postId) {
 
-    // let posts = this.state.posts;
-    // let comment = {
-    //   _id: 'NADA POR ENQUANTO',
-    //   assignedTo: `${this.props.account}`
-    // }
+    generateSecureRandom(8).then(bytes => {
+      let posts = this.state.posts;
+      let _id = bytes.reduce((acumulador, currentValue) => acumulador + currentValue.toString());
 
-    let random = [];
-    for (let i = 0; i < 12; i++) {
-      random.push(Math.random() * 100);
-    }
+      let comment = {
+        _id,
+        content: '',
+        assignedTo: {
+          _id: this.props.account._id,
+          name: this.props.account.name,
+          photo: this.props.account.photo
+        },
+      };
 
-    console.log(random.toString('hex'));
+      posts.map((post, index) => post._id.toString() == postId ? this.indexOfPost = index : null);
+
+      let comments = [comment, ...this.state.posts[this.indexOfPost].comments];
+
+      posts[this.indexOfPost].comments = comments;
+
+      this.setState({ posts, editContentComment: { newComment: true } }, () => {
+        this.editComment('editContent', _id, postId);
+      });
+    });
   }
   editComment(arg, commentId, postId, newContent) {
 
@@ -142,6 +156,7 @@ class Feed extends Component {
     else if (arg === 'editContent') {
       this.setState({
         editContentComment: {
+          ...this.state.editContentComment,
           commentId,
           edit: true,
           contentComment: newContent
@@ -159,37 +174,74 @@ class Feed extends Component {
 
       if (this.state.editContentComment.contentComment == '') return this.editComment('delete', commentId, postId);
 
-      const payload = this.state.posts;
-      payload[this.indexOfPost].comments[this.indexOfComment].content = this.state.editContentComment.contentComment;
-
       const config = {
         headers: {
           authorization: `Bearer ${this.props.account.token}`
         }
       }
 
-      let data = {
-        postId,
-        commentId,
-        content: this.state.editContentComment.contentComment
-      }
+      if (this.state.editContentComment.newComment) {
 
-      this.setState({ editContentComment: { ...this.state.editContentComment, upload: true } }, () => {
-        Api.patch('/posts/editComment', data, config).then(() => {
-          this.setState({
-            posts: payload
-          }, () => {
+        let data = {
+          postId,
+          assignedTo: this.props.account._id,
+          content: this.state.editContentComment.contentComment,
+        }
+
+        this.setState({
+          editContentComment: {
+            ...this.state.editContentComment,
+            upload: true
+          }
+        }, () => {
+
+          Api.patch('/posts/comment', data, config).then(({ data: comment }) => {
+
+            let payload = this.state.posts;
+            payload[this.indexOfPost].comments[0] = comment;
+
             this.setState({
+              posts: payload,
               editContentComment: {
+                newPost: false,
+                upload: false,
                 edit: false,
-                upload: false
-              }
+              },
             });
+          }).catch(err => {
+            console.log(err.response);
           });
-        }).catch(err => {
-          console.log(err);
         });
-      })
+      }
+      else {
+
+        const payload = this.state.posts;
+        payload[this.indexOfPost].comments[this.indexOfComment].content = this.state.editContentComment.contentComment;
+
+
+        let data = {
+          postId,
+          commentId,
+          content: this.state.editContentComment.contentComment
+        }
+
+        this.setState({ editContentComment: { ...this.state.editContentComment, upload: true } }, () => {
+          Api.patch('/posts/editComment', data, config).then(() => {
+            this.setState({
+              posts: payload
+            }, () => {
+              this.setState({
+                editContentComment: {
+                  edit: false,
+                  upload: false
+                }
+              });
+            });
+          }).catch(err => {
+            console.log(err);
+          });
+        });
+      }
     }
     else if (arg === 'delete') {
 
