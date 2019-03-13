@@ -100,7 +100,14 @@ class Feed extends Component {
     });
   }
   newComment(postId) {
-
+    /**
+     * NewComment apenas inicia um comentario falso
+     * Colocando o minimo para a funcao EditOrNewPost 
+     * Fazer o que foi feita para fazer
+     * Gera um _id falso para ser identificado nos components
+     * E tambem colocado no state real da aplicacao
+     * Isso porque ele precisa ser reconhecido no component FlatList
+     */
     generateSecureRandom(8).then(bytes => {
       let posts = this.state.posts;
       let _id = bytes.reduce((acumulador, currentValue) => acumulador + currentValue.toString());
@@ -121,7 +128,7 @@ class Feed extends Component {
 
       posts[this.indexOfPost].comments = comments;
 
-      this.setState({ posts, editContentComment: { newComment: true } }, () => {
+      this.setState({ posts, editContentComment: { newComment: true, commentId: _id } }, () => {
         this.editOrNewComment('editContent', _id, postId);
       });
     });
@@ -185,7 +192,12 @@ class Feed extends Component {
        * Esse bloco é se caso o usuario clicar no EDIT
        * Indica que o usuario cancelou a operacao
        * Assim nao é alterado nada no conteudo original do comentario
+       * 
+       * Se o usuario tiver cancelado a operacao de novo post
+       * E o novo post estiver vazio é feito umam chamada recursiva com parametro 'delete'
        */
+      this.state.posts[this.indexOfPost].comments[0].content == '' ? this.editOrNewComment('delete', commentId, postId) : null
+
       this.setState({
         editContentComment: {
           edit: false
@@ -194,18 +206,25 @@ class Feed extends Component {
     }
     else if (arg === 'done') {
       /**
-       * Done tem tres tarefas
+       * Done tem quatro tarefas
        * 1º se o conteudo temporario do comentario estiver vazio 
        * É intendido que nao existe comentario
        * Entao é feito uma chamada recursiva passando 'delete' no parametro da funcao
        * 
-       * 2º No estado EditContentComment tem um campo NewComment
+       * 2º É no caso do usuario criar um novo comentario com conteudo vazio
+       * Clicando em done a aplicacao vai conferir no index do post sendo editado
+       * Se o primeiro comentario (novo) estiver vazio
+       * É feito uma chamada recursiva com parametro de 'delete'
+       * 
+       * 3º No estado EditContentComment tem um campo NewComment
        * Se ele estiver setado entra no campo responsavel pelo tal
        * 
-       * 3ª Campo NewComment = false 
+       * 4ª Campo NewComment = false 
        * Entra no corpo que vai realizar payload na Api com o conteudo temporario
        */
+
       if (this.state.editContentComment.contentComment == '') return this.editOrNewComment('delete', commentId, postId);
+      if (this.state.posts[this.indexOfPost].comments[0].content == '') return this.editOrNewComment('delete', commentId, postId);
 
       const config = {
         headers: {
