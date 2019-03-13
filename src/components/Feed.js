@@ -25,6 +25,16 @@ class Feed extends Component {
       posts: [],
       loading: true,
       atualizar: false,
+      editContentComment: {
+        edit: false,
+        upload: false,
+        commentId: '',
+        contentComment: '',
+      },
+      newComment: {
+        postId: '',
+        content: '',
+      }
     };
   }
 
@@ -87,12 +97,129 @@ class Feed extends Component {
       });
     });
   }
-  newComment(_id) {
-    console.log('New Comente - ', _id);
+  newComment(postId) {
+
+    // let posts = this.state.posts;
+    // let comment = {
+    //   _id: 'NADA POR ENQUANTO',
+    //   assignedTo: `${this.props.account}`
+    // }
+
+    let random = [];
+    for (let i = 0; i < 12; i++) {
+      random.push(Math.random() * 100);
+    }
+
+    console.log(random.toString('hex'));
   }
-  editComment(commentId, postId) {
-    console.log(commentId, ' COMMENT ID');
-    console.log(postId, ' POST ID');
+  editComment(arg, commentId, postId, newContent) {
+
+    let posts = this.state.posts;
+
+    if (!this.state.editContentComment.edit && arg === 'edit') {
+      console.log(arg);
+
+      this.setState({ editContentComment: { edit: true, commentId } });
+
+      posts.forEach((post, index) => {
+        post._id.toString() == postId ? this.indexOfPost = index : null
+      });
+
+      posts[this.indexOfPost].comments.forEach((comment, index) => {
+        comment._id.toString() == commentId ? this.indexOfComment = index : null
+      });
+
+      const contentComment = this.state.posts[this.indexOfPost].comments[this.indexOfComment].content;
+
+      this.setState({
+        editContentComment: {
+          commentId,
+          edit: true,
+          contentComment
+        }
+      });
+    }
+    else if (arg === 'editContent') {
+      this.setState({
+        editContentComment: {
+          commentId,
+          edit: true,
+          contentComment: newContent
+        }
+      });
+    }
+    else if (arg === 'edit' && this.state.editContentComment.edit) {
+      this.setState({
+        editContentComment: {
+          edit: false
+        }
+      });
+    }
+    else if (arg === 'done') {
+
+      if (this.state.editContentComment.contentComment == '') return this.editComment('delete', commentId, postId);
+
+      const payload = this.state.posts;
+      payload[this.indexOfPost].comments[this.indexOfComment].content = this.state.editContentComment.contentComment;
+
+      const config = {
+        headers: {
+          authorization: `Bearer ${this.props.account.token}`
+        }
+      }
+
+      let data = {
+        postId,
+        commentId,
+        content: this.state.editContentComment.contentComment
+      }
+
+      this.setState({ editContentComment: { ...this.state.editContentComment, upload: true } }, () => {
+        Api.patch('/posts/editComment', data, config).then(() => {
+          this.setState({
+            posts: payload
+          }, () => {
+            this.setState({
+              editContentComment: {
+                edit: false,
+                upload: false
+              }
+            });
+          });
+        }).catch(err => {
+          console.log(err);
+        });
+      })
+    }
+    else if (arg === 'delete') {
+
+      let config = {
+        headers: {
+          authorization: `Bearer ${this.props.account.token}`
+        },
+        data: {
+          commentId,
+          postId
+        }
+      }
+      this.setState({ editContentComment: { ...this.state.editContentComment, upload: true } });
+      Api.delete('/posts/comment', config).then(() => {
+
+        let payload = [];
+
+        payload = this.state.posts[this.indexOfPost].comments.filter(comment => comment._id.toString() != commentId);
+
+        let posts = this.state.posts;
+
+        posts[this.indexOfPost].comments = payload;
+
+        this.setState({ posts, editContentComment: { edit: false, upload: false } });
+
+
+      }).catch(err => {
+        console.log(err);
+      });
+    }
   }
 
   sharePost(_id) {
@@ -120,19 +247,12 @@ class Feed extends Component {
             renderItem={({ item }) => {
               let ico;
               const pushed = item.pushes.users.find(id => id.toString() == this.props.account._id)
-              if (pushed) {
-                ico = FlameRedIco;
-                console.log('Vermelho');
-              } else {
-                ico = FlameBlueIco;
-                console.log('Azul');
-              }
-
+              ico = pushed ? FlameRedIco : FlameBlueIco;
 
               return (
                 <Post
                   key={item._id}
-                  ico={ico}
+                  push_ico={ico}
                   user_id={this.props.account._id}
                   post_id={item._id}
                   assignedTo_id={item.assignedTo._id}
@@ -144,6 +264,7 @@ class Feed extends Component {
                   pushAssignedTo={pushed}
                   content={item.content}
                   comments={item.comments}
+                  editContentComment={this.state.editContentComment}
                   clickImageProfile={this.clickImageProfile.bind(this)}
                   pushPost={this.pushPost.bind(this)}
                   newComment={this.newComment.bind(this)}

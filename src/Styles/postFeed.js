@@ -3,8 +3,6 @@ import { View, Text, StatusBar, Dimensions, TouchableOpacity } from 'react-nativ
 
 import styled from 'styled-components/native';
 
-import FlameBlue from '../assets/FlameBlueDiaD.svg';
-import FlameRedIco from '../assets/FlameRedDiaD.svg';
 import CommentIco from '../assets/CommentDiaD.svg';
 import ShareIco from '../assets/ShareDiaD.svg';
 
@@ -42,6 +40,8 @@ const ContainerFooterPost = styled.View`
   flex-direction: row;
   padding: 10px;
 `;
+
+
 export const HeaderPost = props => (
   <ContainerHeader>
     <ContainerHeaderPost>
@@ -56,7 +56,7 @@ export const HeaderPost = props => (
     </ContainerHeaderPost>
     <View style={{ alignItems: 'center' }}>
       <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
-        <props.ico width={32} height={32} />
+        <props.push_ico width={32} height={32} />
       </TouchableOpacity>
       <Text style={{ color: '#333' }}>{props.pushTimes}</Text>
     </View>
@@ -83,9 +83,9 @@ export const FooterPost = props => (
 
 export const Post = props => (
   <ContainerPost>
-    <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
+    <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
     <HeaderPost
-      ico={props.ico}
+      push_ico={props.push_ico}
       user_id={props.user_id}
       post_id={props.post_id}
       thumbnail={props.thumbnail}
@@ -98,15 +98,21 @@ export const Post = props => (
       clickImageProfile={props.clickImageProfile}
       pushPost={props.pushPost}
     />
+
     <ContentPost content={props.content} />
+
+
+
     <Comment
       user_id={props.user_id}
       comments={props.comments}
+      editContentComment={props.editContentComment}
       debug={props.debug}
       clickImageProfile={props.clickImageProfile}
       editComment={props.editComment}
       post_id={props.post_id}
     />
+
     <FooterPost
       comments={props.comments}
       post_id={props.post_id}
