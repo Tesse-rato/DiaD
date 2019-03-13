@@ -109,7 +109,7 @@ export const Post = props => (
       editContentComment={props.editContentComment}
       debug={props.debug}
       clickImageProfile={props.clickImageProfile}
-      editComment={props.editComment}
+      editOrNewComment={props.editOrNewComment}
       post_id={props.post_id}
     />
 

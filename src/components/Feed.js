@@ -122,17 +122,29 @@ class Feed extends Component {
       posts[this.indexOfPost].comments = comments;
 
       this.setState({ posts, editContentComment: { newComment: true } }, () => {
-        this.editComment('editContent', _id, postId);
+        this.editOrNewComment('editContent', _id, postId);
       });
     });
   }
-  editComment(arg, commentId, postId, newContent) {
-
+  editOrNewComment(arg, commentId, postId, newContent) {
+    /**
+     * EditOrNewComment é responsavel por toda a logica de comunicação com a api
+     * E de fato é ela quem faz todo o trabalho duro
+     * StartNewComment so inicia um comentario falso no state
+     * Apos isso EditOrNewComment pega o comentario falso e sobe para api
+     * A api retorna o novo comentario e entao o comentario falso é substituido pelo retorno da api
+     */
     let posts = this.state.posts;
 
     if (!this.state.editContentComment.edit && arg === 'edit') {
-      console.log(arg);
-
+      /**
+       * Se ainda nao estiver no ESTADO_EDIT entra nesse corpo
+       * É setado o atributo edit do STATE
+       * É iterado pelo STATE para pegar os index referente ao POST && COMMENT
+       * Entao é setado um atributo na classe <this.indexOfPost, this,indexOfComment>
+       * Esses indexs sao reaproveitado ao longo da funcao
+       * A funcao desse bloco é apenas encontrar o index
+       */
       this.setState({ editContentComment: { edit: true, commentId } });
 
       posts.forEach((post, index) => {
@@ -154,6 +166,11 @@ class Feed extends Component {
       });
     }
     else if (arg === 'editContent') {
+      /**
+       * EditContent poe o estado da aplicação para editar o conteudo do comentario
+       * OBS o conteudo alterado nao é o original do comentario
+       * É um campo temporario no state da aplicacao
+       */
       this.setState({
         editContentComment: {
           ...this.state.editContentComment,
@@ -164,6 +181,11 @@ class Feed extends Component {
       });
     }
     else if (arg === 'edit' && this.state.editContentComment.edit) {
+      /**
+       * Esse bloco é se caso o usuario clicar no EDIT
+       * Indica que o usuario cancelou a operacao
+       * Assim nao é alterado nada no conteudo original do comentario
+       */
       this.setState({
         editContentComment: {
           edit: false
@@ -171,8 +193,19 @@ class Feed extends Component {
       });
     }
     else if (arg === 'done') {
-
-      if (this.state.editContentComment.contentComment == '') return this.editComment('delete', commentId, postId);
+      /**
+       * Done tem tres tarefas
+       * 1º se o conteudo temporario do comentario estiver vazio 
+       * É intendido que nao existe comentario
+       * Entao é feito uma chamada recursiva passando 'delete' no parametro da funcao
+       * 
+       * 2º No estado EditContentComment tem um campo NewComment
+       * Se ele estiver setado entra no campo responsavel pelo tal
+       * 
+       * 3ª Campo NewComment = false 
+       * Entra no corpo que vai realizar payload na Api com o conteudo temporario
+       */
+      if (this.state.editContentComment.contentComment == '') return this.editOrNewComment('delete', commentId, postId);
 
       const config = {
         headers: {
@@ -181,7 +214,16 @@ class Feed extends Component {
       }
 
       if (this.state.editContentComment.newComment) {
-
+        /**
+         * Esse é o corpo pro caso do campo NewComment estiver setado
+         * Áte aqui os atributos do comentario sao falsos
+         * É upado apenas o conteudo temporario para api
+         * PostId e AssignedTo referente a situacao real
+         * Apos o patch a api retorna todos dados daquele novo comentario
+         * Entao é usado aquele atributo da classe indexOfPost
+         * Naquele index o comentario{0} da primeira posicao é o comentario com atributos falsos
+         * Entao naquele index do post no primeiro comentario recebe o comentario real retornado da api
+         */
         let data = {
           postId,
           assignedTo: this.props.account._id,
@@ -214,7 +256,13 @@ class Feed extends Component {
         });
       }
       else {
-
+        /**
+         * Esse campo é para o caso do comentario ja existir na api e estar sofrendo alteracao
+         * É feito um patch na api com o conteudo temporario no state da aplicacao
+         * Apos o retorno de ok da api
+         * Aquele comentario que ja tem dados reais da api no state recebe o conteudo temporario
+         * Isso porque informacoes como _id nao sao alteradas, apenas o conteudo
+         */
         const payload = this.state.posts;
         payload[this.indexOfPost].comments[this.indexOfComment].content = this.state.editContentComment.contentComment;
 
@@ -244,7 +292,12 @@ class Feed extends Component {
       }
     }
     else if (arg === 'delete') {
-
+      /**
+       * Esse corpo 'delete' primeiro faz a request na api
+       * Se retornado ok é carregado numa variavel temporaria payload
+       * Todo restante do conteudo de comments daquele post no index
+       * É atualizada o state posts da aplicacao desconsiderando o comentario que foi excluido na api
+       */
       let config = {
         headers: {
           authorization: `Bearer ${this.props.account.token}`
@@ -320,7 +373,7 @@ class Feed extends Component {
                   clickImageProfile={this.clickImageProfile.bind(this)}
                   pushPost={this.pushPost.bind(this)}
                   newComment={this.newComment.bind(this)}
-                  editComment={this.editComment.bind(this)}
+                  editOrNewComment={this.editOrNewComment.bind(this)}
                   sharePost={this.sharePost.bind(this)}
                   debug={this.debug.bind(this)}
                 />

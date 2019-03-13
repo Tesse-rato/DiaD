@@ -47,10 +47,10 @@ const CloseDoneToEditComment = props => (
       </ContainerToButtonsCloseEditComment>
     ) : (
         <ContainerToButtonsCloseEditComment>
-          <TouchableOpacity onPress={() => props.editComment('delete', props.commentId, props.post_id)} >
+          <TouchableOpacity onPress={() => props.editOrNewComment('delete', props.commentId, props.post_id)} >
             <DeleteIco width={24} heigth={24} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => props.editComment('done', props.commentId, props.post_id)} >
+          <TouchableOpacity onPress={() => props.editOrNewComment('done', props.commentId, props.post_id)} >
             <DoneGreenIco width={24} heigth={24} />
           </TouchableOpacity>
         </ContainerToButtonsCloseEditComment>
@@ -82,7 +82,7 @@ export const Comment = props => (
           </ContainerHeaderComment>
           {props.user_id == comment.assignedTo._id ? (
             <View>
-              <TouchableOpacity onPress={() => props.editComment('edit', comment._id, props.post_id)} >
+              <TouchableOpacity onPress={() => props.editOrNewComment('edit', comment._id, props.post_id)} >
                 <EditIco width={32} height={32} />
               </TouchableOpacity>
             </View>
@@ -93,7 +93,7 @@ export const Comment = props => (
           {props.editContentComment.edit && props.editContentComment.commentId == comment._id.toString() ? (
             <TextInput
               multiline
-              onChangeText={e => props.editComment('editContent', comment._id, props.post_id, e)}
+              onChangeText={e => props.editOrNewComment('editContent', comment._id, props.post_id, e)}
               value={props.editContentComment.contentComment}
               style={{ borderRadius: 10, backgroundColor: '#FFF' }}
             />
@@ -105,7 +105,7 @@ export const Comment = props => (
         {
           props.editContentComment.edit && props.editContentComment.commentId == comment._id.toString() ? (
             <CloseDoneToEditComment
-              editComment={props.editComment}
+              editOrNewComment={props.editOrNewComment}
               commentId={comment._id}
               post_id={props.post_id}
               editContentComment={props.editContentComment}
