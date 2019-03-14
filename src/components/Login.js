@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, AsyncStorage } from 'react-native';
+import { View, Text, StatusBar, AsyncStorage, Animated, Easing } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
@@ -9,6 +9,7 @@ import { MeuInput, LogIn, Register } from '../styles/login';
 import { MinhaView } from '../styles/standard';
 
 import Logo from '../assets/Logo.svg';
+import LogoOnly from '../assets/LogoOnly.svg';
 import EmailIco from '../assets/EmailWhiteDiaD.svg';
 import PasswordIco from '../assets/PassWordWhiteDiaD.svg';
 
@@ -19,11 +20,38 @@ class Login extends Component {
   constructor() {
     super()
     this.state = {
-      error: ''
+      error: '',
+      automaticLogin: true,
+      valueSpin: new Animated.Value(0)
     }
+    this.spinLogo = this.state.valueSpin.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '360deg']
+    });
+  }
+
+  spin() {
+    this.state.valueSpin.setValue(0);
+    Animated.sequence([
+      Animated.timing(
+        this.state.valueSpin,
+        {
+          toValue: 1,
+          duration: 20000,
+          useNativeDriver: true,
+          easing: Easing.linear
+        }
+      )
+    ]).start(() => {
+      this.spin();
+    })
+  }
+  componentDidMount() {
+    this.spin();
   }
 
   async componentWillMount() {
+
     const token = await AsyncStorage.getItem('token');
 
     if (token) {
@@ -43,7 +71,6 @@ class Login extends Component {
         const user = { token, user: data }
 
         this.props.setUser(user);
-        console.log(data, ' Login Automatico');
 
         this.props.navigation.navigate('Geral');
 
@@ -63,10 +90,12 @@ class Login extends Component {
             this.props.navigate.navigation('Geral');
 
           }).catch(err => {
-            this.setState({ error: 'Verifique sua conexão' });
+            this.setState({ error: 'Verifique sua conexão', automaticLogin: false });
           });
         }
       });
+    } else {
+      this.setState({ automaticLogin: false });
     }
   }
 
@@ -82,13 +111,11 @@ class Login extends Component {
   }
 
   login() {
-    console.log('login');
     const { user: { email, password } } = this.props.account
 
     Api.post('/users/auth', { email, password }).then(({ data }) => {
 
       this.props.setUser(data);
-      console.log(data, ' Login manual');
 
       AsyncStorage.setItem('email', email);
       AsyncStorage.setItem('password', password);
@@ -98,7 +125,7 @@ class Login extends Component {
       return this.props.navigation.navigate('Geral');
 
     }).catch(err => {
-      console.log(err);
+
       if (!err.response.data) return alert('Verifique sua conexão com a internet');
 
       if (err.response.data.error === 'Invalid password') {
@@ -113,26 +140,37 @@ class Login extends Component {
     console.disableYellowBox = true;
     return (
       <MinhaView white >
-        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
+        {!this.state.automaticLogin ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-        <View style={{ flex: 2, marginBottom: 20, justifyContent: 'center' }}>
-          <Logo width={150} height={150} />
-        </View>
+            <View style={{ flex: 2, marginBottom: 20, justifyContent: 'center' }}>
+              <Logo width={150} height={150} />
+            </View>
 
-        <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
-          <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput textContentType='emailAddress' value={this.props.account.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
-          <MeuInput textContentType='password' value={this.props.account.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
-        </View>
+            <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
+              <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
+              <MeuInput textContentType='emailAddress' value={this.props.account.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+              <MeuInput textContentType='password' value={this.props.account.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
+            </View>
 
-        <View style={{ flex: 1, justifyContent: 'center' }} >
-          <LogIn onPress={() => this.validateUserInput()} >
-            <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
-          </LogIn>
-          <Register onPress={() => this.props.navigation.navigate('Register')}>
-            <Text style={{ color: '#08F', fontSize: 14 }}>Cadastrar</Text>
-          </Register>
-        </View>
+            <View style={{ flex: 1, justifyContent: 'center' }} >
+              <LogIn onPress={() => this.validateUserInput()} >
+                <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
+              </LogIn>
+              <Register onPress={() => this.props.navigation.navigate('Register')}>
+                <Text style={{ color: '#08F', fontSize: 14 }}>Cadastrar</Text>
+              </Register>
+            </View>
+          </View>
+        ) : (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Animated.View style={{ transform: [{ rotate: this.spinLogo }] }} >
+                <LogoOnly width={150} height={150} />
+              </Animated.View>
+            </View>
+          )
+        }
 
       </MinhaView>
     );

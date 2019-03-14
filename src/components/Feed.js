@@ -41,10 +41,10 @@ class Feed extends Component {
   }
 
   componentWillMount() {
-    console.log(this.props);
-    this.setState({ posts: this.props.data }, () => {
-      this.setState({ loading: false });
-    });
+    this.setState({ posts: this.props.data });
+  }
+  componentDidMount() {
+    setTimeout(() => this.setState({ loading: false }), 200);
   }
 
   debug(e) {
@@ -60,7 +60,7 @@ class Feed extends Component {
     }
 
     Api.get(`/users/profile/${_id}`, config).then(({ data: user }) => {
-      console.log(user.name.first);
+      alert(user.name.first);
     }).catch(err => {
       console.log(err.response.data.error);
     })
@@ -373,17 +373,19 @@ class Feed extends Component {
       //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
       <MinhaView style={{ justifyContent: 'center' }} >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
-        <Header
-          placeholder='Id/Apelido'
-          source={{ uri: this.props.account.user.photo.thumbnail }}
-          clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
 
-        />
         {!this.state.loading ? (
           <FlatList
             onMomentumScrollEnd={(e) => this.debug(e)}
+            ListHeaderComponent={() => (
+              <Header
+                placeholder='Id/Apelido'
+                source={{ uri: this.props.account.user.photo.thumbnail }}
+                clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+              />
+            )}
             data={this.state.posts}
-            extraData={this.state.posts}
+            showsVerticalScrollIndicator={false}
             keyExtractor={item => item._id}
             renderItem={({ item }) => {
               let ico;
@@ -417,12 +419,12 @@ class Feed extends Component {
             }}
           />
         ) : (
-            <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center' }} >
+            <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center', backgroundColor: '#FFF' }} >
               <ProgressBarAndroid
                 indeterminate={true}
-                color={'#FFF'}
-                styleAttr='Horizontal'
-                style={{ width: Dimensions.get('window').width, height: 10 }} />
+                color={'#08F'}
+                styleAttr='Normal'
+              />
             </View>
           )}
       </MinhaView>
