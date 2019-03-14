@@ -106,7 +106,7 @@ export const Post = props => (
     <Comment
       user_id={props.user_id}
       comments={props.comments}
-      editContentComment={props.editContentComment}
+      commentController={props.commentController}
       debug={props.debug}
       clickImageProfile={props.clickImageProfile}
       editOrNewComment={props.editOrNewComment}

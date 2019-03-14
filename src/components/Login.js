@@ -117,8 +117,8 @@ class Login extends Component {
 
         <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
           <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput value={this.props.account.user.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
-          <MeuInput value={this.props.account.user.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
+          <MeuInput textContentType='emailAddress' value={this.props.account.user.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+          <MeuInput textContentType='password' value={this.props.account.user.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
         </View>
 
         <View style={{ flex: 1, justifyContent: 'center' }} >

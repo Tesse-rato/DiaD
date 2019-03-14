@@ -41,7 +41,7 @@ const ContainerToButtonsCloseEditComment = styled.View`
 `;
 const CloseDoneToEditComment = props => (
   <ContainerDeleteDoneEditComment>
-    {props.editContentComment.upload ? (
+    {props.commentController.upload ? (
       <ContainerToButtonsCloseEditComment>
         <ProgressBarAndroid styleAttr='Small' color='#08F' />
       </ContainerToButtonsCloseEditComment>
@@ -90,11 +90,14 @@ export const Comment = props => (
           }
         </View>
         <View style={{ margin: 10 }}>
-          {props.editContentComment.edit && props.editContentComment.commentId == comment._id.toString() ? (
+          {props.commentController.edit && props.commentController.commentId == comment._id.toString() ? (
             <TextInput
               multiline
+              keyboardAppearance='light'
+              maxLength={200}
               onChangeText={e => props.editOrNewComment('editContent', comment._id, props.post_id, e)}
-              value={props.editContentComment.contentComment}
+              onEndEditing={() => props.editOrNewComment('done', comment._id, props.post_id)}
+              value={props.commentController.tempCommentContent}
               style={{ borderRadius: 10, backgroundColor: '#FFF' }}
             />
           ) : (
@@ -103,12 +106,12 @@ export const Comment = props => (
           }
         </View>
         {
-          props.editContentComment.edit && props.editContentComment.commentId == comment._id.toString() ? (
+          props.commentController.edit && props.commentController.commentId == comment._id.toString() ? (
             <CloseDoneToEditComment
               editOrNewComment={props.editOrNewComment}
               commentId={comment._id}
               post_id={props.post_id}
-              editContentComment={props.editContentComment}
+              commentController={props.commentController}
             />
           ) : null
         }

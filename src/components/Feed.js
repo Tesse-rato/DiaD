@@ -26,12 +26,12 @@ class Feed extends Component {
       posts: [],
       loading: true,
       atualizar: false,
-      editContentComment: {
+      commentController: {
         edit: false,
         upload: false,
         commentId: '',
-        contentComment: '',
         newComment: false,
+        tempCommentContent: '',
       },
       newComment: {
         postId: '',
@@ -55,7 +55,13 @@ class Feed extends Component {
   }
 
   pushPost(_id) {
-
+    /**
+     * PushPost tenta fazer um request de push na api
+     * Lá é validado se o usuario ja fez esse push
+     * Caso nao é retorndo ok e o estado da aplicação é alterado
+     * Case recusado e retornado 400 é intendido que o usuario quer retirar seu push
+     * Entao é alterado novamente o estado da alteracao
+     */
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -127,7 +133,7 @@ class Feed extends Component {
 
     posts[this.indexOfPost].comments = comments;
 
-    this.setState({ posts, editContentComment: { newComment: true } }, () => {
+    this.setState({ posts, commentController: { newComment: true } }, () => {
       this.editOrNewComment('editContent', commentId, postId);
     });
   }
@@ -141,7 +147,7 @@ class Feed extends Component {
      */
     let posts = this.state.posts;
 
-    if (!this.state.editContentComment.edit && arg === 'edit') {
+    if (!this.state.commentController.edit && arg === 'edit') {
       /**
        * Se ainda nao estiver no ESTADO_EDIT entra nesse corpo
        * É setado o atributo edit do STATE
@@ -150,7 +156,7 @@ class Feed extends Component {
        * Esses indexs sao reaproveitado ao longo da funcao
        * A funcao desse bloco é apenas encontrar o index
        */
-      this.setState({ editContentComment: { edit: true, commentId } });
+      this.setState({ commentController: { edit: true, commentId } });
 
       posts.forEach((post, index) => {
         post._id.toString() == postId ? this.indexOfPost = index : null
@@ -160,13 +166,13 @@ class Feed extends Component {
         comment._id.toString() == commentId ? this.indexOfComment = index : null
       });
 
-      const contentComment = this.state.posts[this.indexOfPost].comments[this.indexOfComment].content;
+      const tempCommentContent = this.state.posts[this.indexOfPost].comments[this.indexOfComment].content;
 
       this.setState({
-        editContentComment: {
+        commentController: {
           commentId,
           edit: true,
-          contentComment
+          tempCommentContent
         }
       });
     }
@@ -176,16 +182,17 @@ class Feed extends Component {
        * OBS o conteudo alterado nao é o original do comentario
        * É um campo temporario no state da aplicacao
        */
+      console.log(newContent);
       this.setState({
-        editContentComment: {
-          ...this.state.editContentComment,
+        commentController: {
+          ...this.state.commentController,
           commentId,
           edit: true,
-          contentComment: newContent
+          tempCommentContent: newContent
         }
       });
     }
-    else if (arg === 'edit' && this.state.editContentComment.edit) {
+    else if (arg === 'edit' && this.state.commentController.edit) {
       /**
        * Esse bloco é se caso o usuario clicar no EDIT
        * Indica que o usuario cancelou a operacao
@@ -197,7 +204,7 @@ class Feed extends Component {
       this.state.posts[this.indexOfPost].comments[0].content == '' ? this.editOrNewComment('delete', commentId, postId) : null
 
       this.setState({
-        editContentComment: {
+        commentController: {
           edit: false
         }
       });
@@ -214,13 +221,13 @@ class Feed extends Component {
        * Se o primeiro comentario (novo) estiver vazio
        * É feito uma chamada recursiva com parametro de 'delete'
        * 
-       * 3º No estado EditContentComment tem um campo NewComment
+       * 3º No estado commentController tem um campo NewComment
        * Se ele estiver setado entra no campo responsavel pelo tal
        * 
        * 4ª Campo NewComment = false 
        * Entra no corpo que vai realizar payload na Api com o conteudo temporario
        */
-      if (!this.state.editContentComment.contentComment) return this.editOrNewComment('delete', commentId, postId);
+      if (!this.state.commentController.tempCommentContent) return this.editOrNewComment('delete', commentId, postId);
 
       const config = {
         headers: {
@@ -228,7 +235,7 @@ class Feed extends Component {
         }
       }
 
-      if (this.state.editContentComment.newComment) {
+      if (this.state.commentController.newComment) {
         /**
          * Esse é o corpo pro caso do campo NewComment estiver setado
          * Áte aqui os atributos do comentario sao falsos
@@ -242,12 +249,12 @@ class Feed extends Component {
         let data = {
           postId,
           assignedTo: this.props.account._id,
-          content: this.state.editContentComment.contentComment,
+          content: this.state.commentController.tempCommentContent,
         }
 
         this.setState({
-          editContentComment: {
-            ...this.state.editContentComment,
+          commentController: {
+            ...this.state.commentController,
             upload: true
           }
         }, () => {
@@ -259,7 +266,7 @@ class Feed extends Component {
 
             this.setState({
               posts: payload,
-              editContentComment: {
+              commentController: {
                 newPost: false,
                 upload: false,
                 edit: false,
@@ -279,22 +286,22 @@ class Feed extends Component {
          * Isso porque informacoes como _id nao sao alteradas, apenas o conteudo
          */
         const payload = this.state.posts;
-        payload[this.indexOfPost].comments[this.indexOfComment].content = this.state.editContentComment.contentComment;
+        payload[this.indexOfPost].comments[this.indexOfComment].content = this.state.commentController.tempCommentContent;
 
 
         let data = {
           postId,
           commentId,
-          content: this.state.editContentComment.contentComment
+          content: this.state.commentController.tempCommentContent
         }
 
-        this.setState({ editContentComment: { ...this.state.editContentComment, upload: true } }, () => {
+        this.setState({ commentController: { ...this.state.commentController, upload: true } }, () => {
           Api.patch('/posts/editComment', data, config).then(() => {
             this.setState({
               posts: payload
             }, () => {
               this.setState({
-                editContentComment: {
+                commentController: {
                   edit: false,
                   upload: false
                 }
@@ -313,7 +320,7 @@ class Feed extends Component {
        * Todo restante do conteudo de comments daquele post no index
        * É atualizada o state posts da aplicacao desconsiderando o comentario que foi excluido na api
        */
-      if (this.state.editContentComment.contentComment == '') return this.editOrNewComment('delete', commentId, postId);
+      if (this.state.commentController.tempCommentContent == '') return this.editOrNewComment('delete', commentId, postId);
 
       let config = {
         headers: {
@@ -324,7 +331,7 @@ class Feed extends Component {
           postId
         }
       }
-      this.setState({ editContentComment: { ...this.state.editContentComment, upload: true } });
+      this.setState({ commentController: { ...this.state.commentController, upload: true } });
       Api.delete('/posts/comment', config).then(() => {
 
         let payload = [];
@@ -335,7 +342,7 @@ class Feed extends Component {
 
         posts[this.indexOfPost].comments = payload;
 
-        this.setState({ posts, editContentComment: { edit: false, upload: false } });
+        this.setState({ posts, commentController: { edit: false, upload: false } });
 
 
       }).catch(err => {
@@ -386,7 +393,7 @@ class Feed extends Component {
                   pushAssignedTo={pushed}
                   content={item.content}
                   comments={item.comments}
-                  editContentComment={this.state.editContentComment}
+                  commentController={this.state.commentController}
                   clickImageProfile={this.clickImageProfile.bind(this)}
                   pushPost={this.pushPost.bind(this)}
                   newComment={this.newComment.bind(this)}
