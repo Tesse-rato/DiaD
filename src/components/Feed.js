@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions } from 'react-native'
-import { generateSecureRandom } from 'react-native-securerandom';
+// import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
@@ -109,10 +109,10 @@ class Feed extends Component {
      * Isso porque ele precisa ser reconhecido no component FlatList
      */
     let posts = this.state.posts;
-    let _id = 'NOVO POST';
+    let commentId = 'NOVO POST';
 
     let comment = {
-      _id,
+      _id: commentId,
       content: '',
       assignedTo: {
         _id: this.props.account._id,
@@ -128,7 +128,7 @@ class Feed extends Component {
     posts[this.indexOfPost].comments = comments;
 
     this.setState({ posts, editContentComment: { newComment: true } }, () => {
-      this.editOrNewComment('editContent', _id, postId);
+      this.editOrNewComment('editContent', commentId, postId);
     });
   }
   editOrNewComment(arg, commentId, postId, newContent) {
@@ -220,9 +220,7 @@ class Feed extends Component {
        * 4ª Campo NewComment = false 
        * Entra no corpo que vai realizar payload na Api com o conteudo temporario
        */
-
-      if (this.state.editContentComment.contentComment == '') return this.editOrNewComment('delete', commentId, postId);
-      if (this.state.posts[this.indexOfPost].comments[0].content == '') return this.editOrNewComment('delete', commentId, postId);
+      if (!this.state.editContentComment.contentComment) return this.editOrNewComment('delete', commentId, postId);
 
       const config = {
         headers: {
@@ -315,6 +313,8 @@ class Feed extends Component {
        * Todo restante do conteudo de comments daquele post no index
        * É atualizada o state posts da aplicacao desconsiderando o comentario que foi excluido na api
        */
+      if (this.state.editContentComment.contentComment == '') return this.editOrNewComment('delete', commentId, postId);
+
       let config = {
         headers: {
           authorization: `Bearer ${this.props.account.token}`
