@@ -39,6 +39,7 @@ const ContainerHeader = styled.View`
   align-items: center;
   width: ${Dimensions.get('window').width};
   /* height: ${Dimensions.get('window').height - 535}; */
+  height: 60px;
   padding: 5px;
   background-color: #FFF;
   border-bottom-width: 0.5px;

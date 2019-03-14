@@ -42,7 +42,10 @@ class Geral extends Component {
               style={{ width: Dimensions.get('window').width, height: 10 }} />
           </View>
         ) : (
-            <Feed data={this.state.data} />
+            <Feed
+              data={this.state.data}
+              url='/posts/list'
+            />
           )}
       </View>
     );

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions } from 'react-native'
+import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, Animated, TouchableOpacity } from 'react-native'
 // import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
@@ -10,6 +10,7 @@ import Api from '../api';
 
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
+import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
@@ -25,7 +26,7 @@ class Feed extends Component {
     this.state = {
       posts: [],
       loading: true,
-      atualizar: false,
+      refresh: false,
       commentController: {
         edit: false,
         upload: false,
@@ -36,7 +37,8 @@ class Feed extends Component {
       newComment: {
         postId: '',
         content: '',
-      }
+      },
+      valueToAnimatedView: new Animated.Value(0)
     };
   }
 
@@ -44,7 +46,16 @@ class Feed extends Component {
     this.setState({ posts: this.props.data });
   }
   componentDidMount() {
-    setTimeout(() => this.setState({ loading: false }), 200);
+    Animated.sequence([
+      Animated.delay(100),
+      Animated.timing(
+        this.state.valueToAnimatedView,
+        {
+          toValue: Dimensions.get('window').height,
+          duration: 500,
+        }
+      )
+    ]).start(() => this.setState({ loading: false }));
   }
 
   debug(e) {
@@ -362,70 +373,112 @@ class Feed extends Component {
       });
     }
   }
+  handleRefresh() {
+    this.setState({ refreshing: true }, () => {
+      const config = {
+        headers: {
+          authorization: `Bearer ${this.props.account.token}`
+        }
+      }
+
+      Api.get(this.props.url, config).then(({ data: posts }) => {
+        this.setState({ posts, refreshing: false });
+
+      }).catch(err => {
+        alert('Nao foi possivel atualzar');
+        this.setState({ refreshing: false });
+      });
+    });
+  }
 
   sharePost(_id) {
     console.log('SHARE POST - ', _id);
   }
+  scrollTo() {
+    this.flatListRef.scrollToOffset({ animated: true, offset: 0, duration: 1000 });
+  }
 
   render() {
     console.disableYellowBox = true;
+    console.log(this.props);
     return (
       //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
-      <MinhaView style={{ justifyContent: 'center' }} >
-        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
-
+      <MinhaView style={{ justifyContent: 'center' }}>
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
-          <FlatList
-            onMomentumScrollEnd={(e) => this.debug(e)}
-            ListHeaderComponent={() => (
-              <Header
-                placeholder='Id/Apelido'
-                source={{ uri: this.props.account.user.photo.thumbnail }}
-                clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
-              />
-            )}
-            data={this.state.posts}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={item => item._id}
-            renderItem={({ item }) => {
-              let ico;
-              const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-              ico = pushed ? FlameRedIco : FlameBlueIco;
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Header
+              placeholder='Id/Apelido'
+              source={{ uri: this.props.account.user.photo.thumbnail }}
+              clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+            />
+            <FlatList
+              ref={(ref) => this.flatListRef = ref}
+              onRefresh={() => this.handleRefresh()}
+              refreshing={this.state.refresh}
+              onMomentumScrollEnd={(e) => this.debug(e)}
+              ListFooterComponent={() => (
+                <View style={{ alignItems: 'center', padding: 5 }}>
+                  <TouchableOpacity
+                    style={{
+                      alignItems: 'center',
+                      width: Dimensions.get('window').width - 20,
+                      height: Dimensions.get('window').height - 540,
+                      padding: 10,
+                      borderRadius: 60,
+                      backgroundColor: '#FFF'
+                    }}
+                    onPress={() => this.scrollTo()}
+                  >
+                    <ScrolltoUpIco width={32} height={32} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              data={this.state.posts}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={item => item._id}
+              renderItem={({ item }) => {
+                let ico;
+                const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                ico = pushed ? FlameRedIco : FlameBlueIco;
 
-              return (
-                <Post
-                  key={item._id}
-                  push_ico={ico}
-                  user_id={this.props.account.user._id}
-                  post_id={item._id}
-                  assignedTo_id={item.assignedTo._id}
-                  firstName={item.assignedTo.name.first}
-                  lastName={item.assignedTo.name.last}
-                  nickname={item.assignedTo.name.nickname}
-                  thumbnail={item.assignedTo.photo.thumbnail}
-                  pushTimes={item.pushes.times}
-                  pushAssignedTo={pushed}
-                  content={item.content}
-                  comments={item.comments}
-                  commentController={this.state.commentController}
-                  clickImageProfile={this.clickImageProfile.bind(this)}
-                  pushPost={this.pushPost.bind(this)}
-                  newComment={this.newComment.bind(this)}
-                  editOrNewComment={this.editOrNewComment.bind(this)}
-                  sharePost={this.sharePost.bind(this)}
-                  debug={this.debug.bind(this)}
-                />
-              )
-            }}
-          />
+                return (
+                  <Post
+                    key={item._id}
+                    push_ico={ico}
+                    user_id={this.props.account.user._id}
+                    post_id={item._id}
+                    assignedTo_id={item.assignedTo._id}
+                    firstName={item.assignedTo.name.first}
+                    lastName={item.assignedTo.name.last}
+                    nickname={item.assignedTo.name.nickname}
+                    thumbnail={item.assignedTo.photo.thumbnail}
+                    pushTimes={item.pushes.times}
+                    pushAssignedTo={pushed}
+                    content={item.content}
+                    comments={item.comments}
+                    commentController={this.state.commentController}
+                    clickImageProfile={this.clickImageProfile.bind(this)}
+                    pushPost={this.pushPost.bind(this)}
+                    newComment={this.newComment.bind(this)}
+                    editOrNewComment={this.editOrNewComment.bind(this)}
+                    sharePost={this.sharePost.bind(this)}
+                    debug={this.debug.bind(this)}
+                  />
+                )
+              }}
+            />
+          </View>
         ) : (
-            <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center', backgroundColor: '#FFF' }} >
-              <ProgressBarAndroid
-                indeterminate={true}
-                color={'#08F'}
-                styleAttr='Normal'
-              />
-            </View>
+            <Animated.View style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8E8E8' }}>
+              <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center', backgroundColor: '#FFF' }} >
+                <ProgressBarAndroid
+                  indeterminate={true}
+                  color={'#08F'}
+                  styleAttr='Normal'
+                />
+              </View>
+            </Animated.View>
           )}
       </MinhaView>
     )

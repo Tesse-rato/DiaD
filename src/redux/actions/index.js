@@ -56,3 +56,11 @@ export const setUser = (payload) => {
     },
   }
 }
+export const setProfileId = (payload) => {
+  return {
+    type: Action.SET_PROFILE_ID,
+    payload: {
+      newValue: payload
+    },
+  }
+}

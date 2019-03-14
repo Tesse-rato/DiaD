@@ -10,11 +10,11 @@ import { Comment } from './comment';
 
 
 const ContainerPost = styled.View`
-  width: ${Dimensions.get('window').width - 13};
+  width: ${Dimensions.get('window').width};
   align-items: center;
   background-color: #FFF;
-  border-radius: 5px;
-  margin: 5px;
+  border-radius: 15px;
+  margin-top: 1px;
 `;
 const ContainerHeader = styled.View`
   flex-direction: row;
