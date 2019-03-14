@@ -7,4 +7,5 @@ export default actions = {
   SET_BIO: 'set_bio',
   SET_TOKEN: 'set_token',
   SET_USER: 'set_user',
+  SET_PROFILE_ID: 'set_profile_id',
 }

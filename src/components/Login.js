@@ -40,8 +40,10 @@ class Login extends Component {
 
       Api.post('users/validateToken', { userId: _id }, config).then(async ({ data }) => {
 
-        this.props.setToken(token);
-        this.props.setUser(data);
+        const user = { token, user: data }
+
+        this.props.setUser(user);
+        console.log(data, ' Login Automatico');
 
         this.props.navigation.navigate('Geral');
 
@@ -69,7 +71,7 @@ class Login extends Component {
   }
 
   validateUserInput() {
-    const { email, password } = this.props.account.user;
+    const { user: { email, password } } = this.props.account;
 
     if (!email) return this.setState({ error: 'Preencha o campo Email' });
 
@@ -80,12 +82,13 @@ class Login extends Component {
   }
 
   login() {
-
-    const { email, password } = this.props.account.user
+    console.log('login');
+    const { user: { email, password } } = this.props.account
 
     Api.post('/users/auth', { email, password }).then(({ data }) => {
 
       this.props.setUser(data);
+      console.log(data, ' Login manual');
 
       AsyncStorage.setItem('email', email);
       AsyncStorage.setItem('password', password);
@@ -95,6 +98,7 @@ class Login extends Component {
       return this.props.navigation.navigate('Geral');
 
     }).catch(err => {
+      console.log(err);
       if (!err.response.data) return alert('Verifique sua conexão com a internet');
 
       if (err.response.data.error === 'Invalid password') {
@@ -117,8 +121,8 @@ class Login extends Component {
 
         <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
           <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput textContentType='emailAddress' value={this.props.account.user.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
-          <MeuInput textContentType='password' value={this.props.account.user.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
+          <MeuInput textContentType='emailAddress' value={this.props.account.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+          <MeuInput textContentType='password' value={this.props.account.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
         </View>
 
         <View style={{ flex: 1, justifyContent: 'center' }} >

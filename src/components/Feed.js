@@ -41,6 +41,7 @@ class Feed extends Component {
   }
 
   componentWillMount() {
+    console.log(this.props);
     this.setState({ posts: this.props.data }, () => {
       this.setState({ loading: false });
     });
@@ -51,7 +52,18 @@ class Feed extends Component {
   }
 
   clickImageProfile(_id) {
-    console.log('Clicoi em aqi oh - ', _id);
+
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+
+    Api.get(`/users/profile/${_id}`, config).then(({ data: user }) => {
+      console.log(user.name.first);
+    }).catch(err => {
+      console.log(err.response.data.error);
+    })
   }
 
   pushPost(_id) {
@@ -69,7 +81,7 @@ class Feed extends Component {
     }
 
     const payload = {
-      assignedTo: this.props.account._id,
+      assignedTo: this.props.account.user._id,
       postId: _id
     }
 
@@ -80,7 +92,7 @@ class Feed extends Component {
       posts.map(post => {
         if (post._id == _id) {
           post.pushes.times++
-          post.pushes.users.push(this.props.account._id);
+          post.pushes.users.push(this.props.account.user._id);
         }
       });
 
@@ -94,7 +106,7 @@ class Feed extends Component {
         posts.map(post => {
           if (post._id == _id) {
             post.pushes.times--
-            post.pushes.users = post.pushes.users.filter(user => user != this.props.account._id);
+            post.pushes.users = post.pushes.users.filter(user => user != this.props.account.user._id);
           }
         });
 
@@ -121,9 +133,9 @@ class Feed extends Component {
       _id: commentId,
       content: '',
       assignedTo: {
-        _id: this.props.account._id,
-        name: this.props.account.name,
-        photo: this.props.account.photo
+        _id: this.props.account.user._id,
+        name: this.props.account.user.name,
+        photo: this.props.account.user.photo
       },
     };
 
@@ -248,7 +260,7 @@ class Feed extends Component {
          */
         let data = {
           postId,
-          assignedTo: this.props.account._id,
+          assignedTo: this.props.account.user._id,
           content: this.state.commentController.tempCommentContent,
         }
 
@@ -363,8 +375,8 @@ class Feed extends Component {
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
         <Header
           placeholder='Id/Apelido'
-          source={{ uri: this.props.account.photo.thumbnail }}
-          clickImageProfile={this.clickImageProfile.bind(this)}
+          source={{ uri: this.props.account.user.photo.thumbnail }}
+          clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
 
         />
         {!this.state.loading ? (
@@ -375,14 +387,14 @@ class Feed extends Component {
             keyExtractor={item => item._id}
             renderItem={({ item }) => {
               let ico;
-              const pushed = item.pushes.users.find(id => id.toString() == this.props.account._id)
+              const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
               ico = pushed ? FlameRedIco : FlameBlueIco;
 
               return (
                 <Post
                   key={item._id}
                   push_ico={ico}
-                  user_id={this.props.account._id}
+                  user_id={this.props.account.user._id}
                   post_id={item._id}
                   assignedTo_id={item.assignedTo._id}
                   firstName={item.assignedTo.name.first}
