@@ -41,11 +41,19 @@ class Feed extends Component {
       valueToAnimatedView: new Animated.Value(0)
     };
   }
-
   componentWillMount() {
-    this.setState({ posts: this.props.data });
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+
+    Api.get(this.props.url, config).then(({ data: posts }) => {
+      this.setState({ posts, loading: false });
+    })
   }
   componentDidMount() {
+    // this.setState({ loading: false });
     Animated.sequence([
       Animated.delay(100),
       Animated.timing(
@@ -63,18 +71,8 @@ class Feed extends Component {
   }
 
   clickImageProfile(_id) {
-
-    const config = {
-      headers: {
-        authorization: `Bearer ${this.props.account.token}`
-      }
-    }
-
-    Api.get(`/users/profile/${_id}`, config).then(({ data: user }) => {
-      alert(user.name.first);
-    }).catch(err => {
-      console.log(err.response.data.error);
-    })
+    this.props.setProfileId(_id);
+    this.props.navigation.navigate('Profile');
   }
 
   pushPost(_id) {

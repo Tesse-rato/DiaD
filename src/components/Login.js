@@ -87,7 +87,7 @@ class Login extends Component {
             AsyncStorage.setItem('token', data.token);
             AsyncStorage.setItem('_id', data.user._id);
 
-            this.props.navigate.navigation('Geral');
+            this.props.navigation.navigate('Geral');
 
           }).catch(err => {
             this.setState({ error: 'Verifique sua conexão', automaticLogin: false });

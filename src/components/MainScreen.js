@@ -70,7 +70,6 @@ export default TabBarBottom = createBottomTabNavigator({
     },
     tabBarOptions: {
       activeTintColor: '#08F',
-      height: 60
     }
   }
 );

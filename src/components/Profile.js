@@ -116,6 +116,7 @@ class Profile extends React.PureComponent {
   }
 
   render() {
+    console.disableYellowBox = true;
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
