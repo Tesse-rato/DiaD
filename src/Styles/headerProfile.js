@@ -90,10 +90,10 @@ export const HeaderProfile = props => (
         marginBottom: 10
       }}
       resizeMode='cover'
-      source={{ uri: 'http://192.168.1.2:3333/selfie.jpg' }}
+      source={{ uri: props.thumbnail }}
     />
-    <Text style={{ fontSize: 28, color: '#333' }}>Amanda Lee</Text>
-    <Text style={{ fontSize: 16, color: '#333' }}>@LeeManda</Text>
+    <Text style={{ fontSize: 28, color: '#333' }}>{`${props.firstName} ${props.lastName}`}</Text>
+    <Text style={{ fontSize: 16, color: '#333' }}>@{props.nickname}</Text>
     <Separator />
     <Animated.View style={{ height: props.animatedValueToBioView, alignItems: 'center' }}>
       <SocialMedia />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
 
 import styled from 'styled-components/native';
 
@@ -83,7 +83,6 @@ export const FooterPost = props => (
 
 export const Post = props => (
   <ContainerPost>
-    <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
     <HeaderPost
       push_ico={props.push_ico}
       user_id={props.user_id}
