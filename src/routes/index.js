@@ -24,7 +24,7 @@ const Routes = createStackNavigator({
   SettingsProfile,
 },
   {
-    initialRouteName: 'Login',
+    initialRouteName: 'Profile',
     navigationOptions: {
       header: null,
     }

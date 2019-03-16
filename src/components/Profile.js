@@ -1,5 +1,5 @@
 import React, { PureComponent as Component } from 'react';
-import { View, Text, StatusBar, FlatList, Dimensions, Animated, Easing, ProgressBarAndroid } from 'react-native';
+import { View, Text, StatusBar, FlatList, Dimensions, Animated, Easing, ProgressBarAndroid, Linking, Clipboard } from 'react-native';
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 import { connect } from 'react-redux';
@@ -46,31 +46,35 @@ class Profile extends Component {
       },
       tamBio: 0,
       startScroll: 0,
+      messageSocialMedia: '',
       animatedValueToBioView: new Animated.Value(45),
       animatedValueToProfileImage: new Animated.Value(120),
-      animatedValueToBottomNotificationFollowing: new Animated.Value(0)
+      animatedValueToBottomNotificationFollowing: new Animated.Value(0),
+      animatedValueToNotificationErrorOrWhatsappNumber: new Animated.Value(0)
     };
   }
   componentDidMount() {
     const config = {
       headers: {
-        authorization: `Bearer ${this.props.account.token}`
+        // authorization: `Bearer ${this.props.account.token}`
+        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1MjczNDU2NCwiZXhwIjoxNTUyODIwOTY0fQ.qNo8hwY_6g_RUw2WaiSlpfGaRyERJarYPH5GKtd3goY`
       }
     }
 
-    const url = `/users/profile/${this.props.account.profileId}`;
+    const url = `/users/profile/5c87bc1e12458240f471c8fb`;
+    // const url = `/users/profile/${this.props.account.profileId}`;
 
     Api.get(url, config).then(({ data: user }) => {
 
       const tamBio = (Dimensions.get('window').height - 580) + (Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 45));
-      const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
+      // const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
       decreasePostsUserName(user.posts).then(posts => {
         this.setState({
           user,
           posts,
           tamBio,
-          following,
+          // following,
           loading: false,
           animatedValueToBioView: new Animated.Value(tamBio)
         });
@@ -140,8 +144,54 @@ class Profile extends Component {
   }
 
   sharePost(_id) {
-    console.log(_id);
+    Linking.openURL('https://www.facebook.com/').catch(err => {
+    });
   }
+
+  animateMessageSocialMedia() {
+    Animated.sequence([
+      Animated.delay(200),
+      Animated.timing(
+        this.state.animatedValueToNotificationErrorOrWhatsappNumber,
+        {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+          easing: Easing.circle
+        }
+      ),
+      Animated.delay(5000),
+      Animated.timing(
+        this.state.animatedValueToNotificationErrorOrWhatsappNumber,
+        {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+          easing: Easing.circle
+        }
+      )
+    ]).start();
+  }
+  socialMedia(arg) {
+
+
+    if (arg == 'whatsapp') {
+
+      Clipboard.setString(this.state.user.socialMedia.whatsapp);
+
+      return this.setState({ messageSocialMedia: 'O numero foi copiado c:' }, () => {
+        this.animateMessageSocialMedia();
+      });
+    }
+
+    let url = this.state.user.socialMedia[arg];
+
+    Linking.openURL('https://' + url).catch(err => {
+      this.setState({ messageSocialMedia: 'Algum problema com o link :/' });
+      this.animateMessageSocialMedia()
+    });
+  }
+
 
   _pushPost(postId) {
     this.pushPost(postId).then(posts => {
@@ -206,6 +256,7 @@ class Profile extends Component {
 
   render() {
     console.disableYellowBox = true;
+    console.log(this.state.user);
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
@@ -223,6 +274,8 @@ class Profile extends Component {
               settings={this.props.navigation.navigate}
               following={this.state.following}
               follow={this.follow.bind(this)}
+              clickSocialMedia={this.socialMedia.bind(this)}
+              socialMedia={this.state.user.socialMedia}
               animatedValueToBioView={this.state.animatedValueToBioView}
               animatedValueToProfileImage={this.state.animatedValueToProfileImage}
             />
@@ -275,6 +328,25 @@ class Profile extends Component {
               }}
             >
               <Text style={{ fontSize: 12, color: '#FFF' }}>Seguindo</Text>
+            </Animated.View>
+            <Animated.View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: Dimensions.get('window').width - 50,
+                height: 100,
+                borderRadius: 10,
+                position: 'absolute',
+                backgroundColor: '#FFF',
+                transform: [{
+                  translateY: this.state.animatedValueToNotificationErrorOrWhatsappNumber.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-Dimensions.get('window').height / 2, Dimensions.get('window').height / 2]
+                  })
+                }]
+              }}
+            >
+              <Text style={{ color: '#08F', alignText: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
             </Animated.View>
           </View>
         ) : (

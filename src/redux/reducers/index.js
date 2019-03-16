@@ -20,6 +20,13 @@ const INITIAL_STATE_ACCOUNT = {
       originalPhoto: '',
       thumbnail: '',
     },
+    socialMedia: {
+      facebook: '',
+      linkedin: '',
+      tumblr: '',
+      whatsapp: '',
+      youtube: ''
+    }
   },
 };
 

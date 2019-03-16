@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, Animated, TouchableOpacity, Share } from 'react-native'
+import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, Animated, TouchableOpacity, Share, Linking } from 'react-native'
 // import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
@@ -103,9 +103,9 @@ class Feed extends Component {
 
   sharePost(_id) {
     console.log('SHARE POST - ', _id);
-    Share.share({
-      message: 'Compartilhar postagem'
-    });
+    Linking.openURL('https://www.facebook.com').catch(err => {
+      alert('Erro');
+    })
   }
   scrollTo() {
     this.flatListRef.scrollToOffset({ animated: true, offset: 0, duration: 1000 });

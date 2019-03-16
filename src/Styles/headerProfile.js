@@ -42,21 +42,31 @@ const ContainerSocialMedia = styled.View`
 `;
 const SocialMedia = props => (
   <ContainerSocialMedia>
-    <TouchableOpacity>
-      <FaceBookIco width={24} height={24} />
-    </TouchableOpacity>
-    <TouchableOpacity>
-      <LinkedinIco width={24} height={24} />
-    </TouchableOpacity>
-    <TouchableOpacity>
-      <TumblrIco width={24} height={24} />
-    </TouchableOpacity>
-    <TouchableOpacity>
-      <WhatsAppIco width={24} height={24} />
-    </TouchableOpacity>
-    <TouchableOpacity>
-      <YouTubeIco width={24} height={24} />
-    </TouchableOpacity>
+    {props.socialMedia.facebook ? (
+      <TouchableOpacity onPress={() => props.clickSocialMedia('facebook')}>
+        <FaceBookIco width={24} height={24} />
+      </TouchableOpacity>
+    ) : null}
+    {props.socialMedia.linkedin ? (
+      <TouchableOpacity onPress={() => props.clickSocialMedia('linkedin')}>
+        <LinkedinIco width={24} height={24} />
+      </TouchableOpacity>
+    ) : null}
+    {props.socialMedia.tumblr ? (
+      <TouchableOpacity onPress={() => props.clickSocialMedia('tumblr')}>
+        <TumblrIco width={24} height={24} />
+      </TouchableOpacity>
+    ) : null}
+    {props.socialMedia.whatsapp ? (
+      <TouchableOpacity onPress={() => props.clickSocialMedia('whatsapp')}>
+        <WhatsAppIco width={24} height={24} />
+      </TouchableOpacity>
+    ) : null}
+    {props.socialMedia.youtube ? (
+      <TouchableOpacity onPress={() => props.clickSocialMedia('youtube')}>
+        <YouTubeIco width={24} height={24} />
+      </TouchableOpacity>
+    ) : null}
   </ContainerSocialMedia>
 );
 const GoBackOrConfigOrFollow = props => (
@@ -117,7 +127,12 @@ export const HeaderProfile = props => (
     <Separator />
 
     <Animated.View style={{ height: props.animatedValueToBioView, alignItems: 'center' }}>
-      <SocialMedia />
+
+      <SocialMedia
+        clickSocialMedia={props.clickSocialMedia}
+        socialMedia={props.socialMedia}
+      />
+
       <BioHeaderProfile bio={props.bio} />
     </Animated.View>
 
