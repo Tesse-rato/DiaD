@@ -3,8 +3,6 @@ import { Dimensions, View, Text, Image, TouchableOpacity, Animated, ScrollView }
 
 import styled from 'styled-components/native';
 
-import { MinhaView } from "./standard";
-
 import GoBackIco from '../assets/GoBackDiaD.svg';
 import ConfigIco from '../assets/ConfigDiaD.svg';
 import FaceBookIco from '../assets/Facebook.svg';
@@ -12,6 +10,8 @@ import LinkedinIco from '../assets/Linkedin.svg';
 import TumblrIco from '../assets/Tumblr.svg';
 import WhatsAppIco from '../assets/WhatsApp.svg';
 import YouTubeIco from '../assets/YouTube.svg';
+import FollowIco from '../assets/Follow.svg';
+import DontFollowIco from '../assets/DontFollow.svg';
 
 export const ContainerHeaderProfile = styled.View`
   width: ${Dimensions.get('window').width};
@@ -59,14 +59,24 @@ const SocialMedia = props => (
     </TouchableOpacity>
   </ContainerSocialMedia>
 );
-const GoBackConfig = props => (
+const GoBackOrConfigOrFollow = props => (
   <ContainerBackConfig>
     <TouchableOpacity onPress={() => props.goBack()} >
       <GoBackIco width={32} height={32} />
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => props.settings('SettingsProfile')}>
-      <ConfigIco width={32} height={32} />
-    </TouchableOpacity>
+    {props.user_id.toString() == props.my_user_id.toString() ? (
+      <TouchableOpacity onPress={() => props.settings('SettingsProfile')}>
+        <ConfigIco width={32} height={32} />
+      </TouchableOpacity>
+    ) : props.following ? (
+      <TouchableOpacity onPress={() => props.follow(props.user_id)} >
+        <FollowIco width={42} height={42} />
+      </TouchableOpacity>
+    ) : (
+          <TouchableOpacity onPress={() => props.follow(props.user_id)} >
+            <DontFollowIco width={42} height={42} />
+          </TouchableOpacity>
+        )}
   </ContainerBackConfig>
 );
 const BioHeaderProfile = props => (
@@ -80,25 +90,37 @@ const BioHeaderProfile = props => (
 );
 export const HeaderProfile = props => (
   <ContainerHeaderProfile>
-    <GoBackConfig goBack={props.goBack} settings={props.settings} />
+    <GoBackOrConfigOrFollow
+      goBack={props.goBack}
+      follow={props.follow}
+      following={props.following}
+      settings={props.settings}
+      user_id={props.user_id}
+      my_user_id={props.my_user_id}
+    />
+
     <Animated.Image
       style={{
         width: props.animatedValueToProfileImage,
         height: props.animatedValueToProfileImage,
-        borderRadius: 60,
+        borderRadius: 4,
         marginTop: 20,
         marginBottom: 10
       }}
       resizeMode='cover'
       source={{ uri: props.thumbnail }}
     />
+
     <Text style={{ fontSize: 28, color: '#333' }}>{`${props.firstName} ${props.lastName}`}</Text>
     <Text style={{ fontSize: 16, color: '#333' }}>@{props.nickname}</Text>
+
     <Separator />
+
     <Animated.View style={{ height: props.animatedValueToBioView, alignItems: 'center' }}>
       <SocialMedia />
       <BioHeaderProfile bio={props.bio} />
     </Animated.View>
+
     <View style={{ width: Dimensions.get('window').width, height: 3, backgroundColor: '#E8E8E8' }} />
   </ContainerHeaderProfile>
 );

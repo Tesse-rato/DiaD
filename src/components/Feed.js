@@ -15,7 +15,7 @@ import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
 
-import { editOrNewComment, newComment, pushPost } from "../funcs";
+import { editOrNewComment, newComment, pushPost, increaseUserNamePosts } from "../funcs";
 
 class Feed extends Component {
   static navigationOptions = {
@@ -55,8 +55,10 @@ class Feed extends Component {
     }
 
     Api.get(this.props.url, config).then(({ data: posts }) => {
-      this.setState({ posts, loading: false });
-    })
+      increaseUserNamePosts(posts).then(posts => {
+        this.setState({ posts, loading: false });
+      });
+    });
   }
   componentDidMount() {
     // this.setState({ loading: false });
@@ -105,10 +107,16 @@ class Feed extends Component {
   scrollTo() {
     this.flatListRef.scrollToOffset({ animated: true, offset: 0, duration: 1000 });
   }
+  _pushPost(postId) {
+    this.pushPost(postId).then(posts => {
+      this.setState({ posts });
+    }).catch(err => {
+      console.log(err);
+    });
+  }
 
   render() {
     console.disableYellowBox = true;
-    console.log('render');
     return (
       //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
       <MinhaView style={{ justifyContent: 'center' }}>
@@ -146,10 +154,8 @@ class Feed extends Component {
               showsVerticalScrollIndicator={false}
               keyExtractor={item => item._id}
               renderItem={({ item }) => {
-                let ico;
                 const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                ico = pushed ? FlameRedIco : FlameBlueIco;
-
+                const ico = pushed ? FlameRedIco : FlameBlueIco;
                 return (
                   <Post
                     key={item._id}
@@ -167,7 +173,7 @@ class Feed extends Component {
                     comments={item.comments}
                     commentController={this.state.commentController}
                     clickImageProfile={this.clickImageProfile.bind(this)}
-                    pushPost={this.pushPost.bind(this)}
+                    pushPost={this._pushPost.bind(this)}
                     newComment={this.newComment.bind(this)}
                     editOrNewComment={this.editOrNewComment.bind(this)}
                     sharePost={this.sharePost.bind(this)}

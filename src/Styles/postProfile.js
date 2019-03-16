@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, Dimensions, TouchableOpacity } from 'react-native'
 
 import styled from 'styled-components/native';
-import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import CommentIco from '../assets/CommentDiaD.svg';
 import ShareIco from '../assets/ShareDiaD.svg';
 
@@ -38,9 +37,9 @@ const ContainerFooterPost = styled.View`
 
 const HeaderPostProfile = props => (
   <ContainerHeaderPostProfile>
-    <Text>28 Jan 2019</Text>
+    <Text>{`${props.datePost[0]} ${props.datePost[1]} ${props.datePost[2]}`}</Text>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text style={{ fontSize: 12, marginRight: 5 }}>228</Text>
+      <Text style={{ fontSize: 12, marginRight: 5 }}>{props.pushTimes}</Text>
       <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
         <props.push_ico width={24} height={24} />
       </TouchableOpacity>
@@ -67,7 +66,14 @@ export const FooterPost = props => (
 );
 export const PostProfile = props => (
   <ContainerPostProfile>
-    <HeaderPostProfile post_id={props.post_id} push_ico={props.push_ico} pushPost={props.pushPost} />
+    <HeaderPostProfile
+      post_id={props.post_id}
+      push_ico={props.push_ico}
+      pushPost={props.pushPost}
+      datePost={props.datePost}
+      pushTimes={props.pushTimes}
+    />
+
     <ContentPostProfile content={props.content} />
 
     <Comment

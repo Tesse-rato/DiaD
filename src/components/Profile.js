@@ -1,5 +1,5 @@
 import React, { PureComponent as Component } from 'react';
-import { View, Text, StatusBar, FlatList, Dimensions, Animated, ProgressBarAndroid, AsyncStorage } from 'react-native';
+import { View, Text, StatusBar, FlatList, Dimensions, Animated, Easing, ProgressBarAndroid } from 'react-native';
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 import { connect } from 'react-redux';
@@ -32,6 +32,7 @@ class Profile extends Component {
       posts: [],
       force: true,
       loading: true,
+      following: false,
       commentController: {
         edit: false,
         upload: false,
@@ -47,39 +48,37 @@ class Profile extends Component {
       startScroll: 0,
       animatedValueToBioView: new Animated.Value(45),
       animatedValueToProfileImage: new Animated.Value(120),
+      animatedValueToBottomNotificationFollowing: new Animated.Value(0)
     };
   }
 
-  async componentWillMount() {
-
-    const token = await AsyncStorage.getItem('token');
-    const id = await AsyncStorage.getItem('_id');
+  componentWillMount() {
 
     const config = {
       headers: {
-        authorization: `Bearer ${token}`
+        authorization: `Bearer ${this.props.account.token}`
       }
     }
 
-    const url = `/users/profile/${id}`;
+    const url = `/users/profile/${this.props.account.profileId}`;
 
     Api.get(url, config).then(({ data: user }) => {
 
-      this.props.setUser({ token, user });
-      console.log(user);
-
       const tamBio = (Dimensions.get('window').height - 580) + (Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 45));
+      const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
       this.setState({
         user,
         tamBio,
+        following,
         loading: false,
         posts: user.posts,
         animatedValueToBioView: new Animated.Value(tamBio)
       });
 
     }).catch(err => {
-      console.log(err);
+      this.props.navigation.goBack();
+      console.log(err.response);
     });
   }
 
@@ -134,79 +133,157 @@ class Profile extends Component {
       )
     ]).start();
   }
+
   clickImageProfile(_id) {
     console.log(_id);
   }
+
   sharePost(_id) {
     console.log(_id);
   }
 
   _pushPost(postId) {
-    this.pushPost(postId, () => {
-      this.setState({ force: !this.state.force });
+    this.pushPost(postId).then(posts => {
+      this.setState({ posts, force: !this.state.force });
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  follow(_id) {
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+    const data = {
+      userId: this.props.account.user._id,
+      followUserId: _id
+    }
+
+    Api.post('/users/follow', data, config).then(() => {
+      this.setState({ following: true });
+
+      Animated.sequence([
+        Animated.delay(200),
+        Animated.timing(
+          this.state.animatedValueToBottomNotificationFollowing,
+          {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+            easing: Easing.bounce
+          }
+        ),
+        Animated.delay(1000),
+        Animated.timing(
+          this.state.animatedValueToBottomNotificationFollowing,
+          {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            easing: Easing.circle
+          }
+        )
+      ]).start();
+
+    }).catch(err => {
+      const data = {
+        userId: this.props.account.user._id,
+        unfollowUserId: _id
+      }
+
+      Api.post('/users/unfollow', data, config).then(() => {
+        this.setState({ following: false });
+        console.log('unfollow');
+
+      }).catch(err => {
+        console.log(err.response);
+      });
     });
   }
 
   render() {
     console.disableYellowBox = true;
-    console.log('render');
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
-        {
-          !this.state.loading ? (
-            <View style={{ backgroundColor: '#E8E8E8', flex: 1, alignItems: 'center' }}>
-              <HeaderProfile bio={this.state.user.bio}
-                firstName={this.state.user.name.first}
-                lastName={this.state.user.name.last}
-                nickname={this.state.user.name.nickname}
-                thumbnail={this.state.user.photo.thumbnail}
-                goBack={this.props.navigation.goBack}
-                settings={this.props.navigation.navigate}
-                animatedValueToBioView={this.state.animatedValueToBioView}
-                animatedValueToProfileImage={this.state.animatedValueToProfileImage}
-              />
+        {!this.state.loading ? (
+          <View style={{ backgroundColor: '#E8E8E8', flex: 1, alignItems: 'center' }}>
+            <HeaderProfile
+              user_id={this.state.user._id}
+              my_user_id={this.props.account.user._id}
+              bio={this.state.user.bio}
+              firstName={this.state.user.name.first}
+              lastName={this.state.user.name.last}
+              nickname={this.state.user.name.nickname}
+              thumbnail={this.state.user.photo.thumbnail}
+              goBack={this.props.navigation.goBack}
+              settings={this.props.navigation.navigate}
+              following={this.state.following}
+              follow={this.follow.bind(this)}
+              animatedValueToBioView={this.state.animatedValueToBioView}
+              animatedValueToProfileImage={this.state.animatedValueToProfileImage}
+            />
 
-              <FlatList
-                onScrollBeginDrag={e => this.momentumScroll(e)}
-                onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
-                data={this.state.posts}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={item => item._id}
-                renderItem={({ item }) => {
-                  let ico;
-                  const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                  ico = pushed ? FlameRedIco : FlameBlueIco;
-                  console.log('Atualizou a lista');
-
-                  return (
-                    <View style={{ backgroundColor: '#E8E8E8' }}>
-                      <PostProfile
-                        push_ico={ico}
-                        post_id={item._id}
-                        user_id={this.state.user._id}
-                        comments={item.comments}
-                        content={item.content}
-                        commentController={this.state.commentController}
-                        clickImageProfile={this.clickImageProfile}
-                        editOrNewComment={this.editOrNewComment}
-                        newComment={this.newComment}
-                        pushPost={this._pushPost.bind(this)}
-                        sharePost={this.sharePost.bind(this)}
-                        debug={this.debug.bind(this)}
-                      />
-                    </View>
-                  )
-                }}
-              />
-            </View>
-          ) : (
-              <ProgressBarAndroid
-                indeterminate={true}
-                color={'#FFF'}
-                styleAttr='Horizontal'
-                style={{ width: Dimensions.get('window').width, height: 10 }} />
-            )
+            <FlatList
+              onScrollBeginDrag={e => this.momentumScroll(e)}
+              onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
+              data={this.state.posts}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={item => item._id}
+              renderItem={({ item }) => {
+                const datePost = item.createdAt.split('T')[0].split('-').reverse();
+                const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                const ico = pushed ? FlameRedIco : FlameBlueIco;
+                return (
+                  <View style={{ backgroundColor: '#E8E8E8' }}>
+                    <PostProfile
+                      push_ico={ico}
+                      post_id={item._id}
+                      user_id={this.props.account.user._id}
+                      datePost={datePost}
+                      pushTimes={item.pushes.times}
+                      comments={item.comments}
+                      content={item.content}
+                      commentController={this.state.commentController}
+                      clickImageProfile={this.clickImageProfile}
+                      editOrNewComment={this.editOrNewComment}
+                      newComment={this.newComment}
+                      pushPost={this._pushPost.bind(this)}
+                      sharePost={this.sharePost.bind(this)}
+                      debug={this.debug.bind(this)}
+                    />
+                  </View>
+                )
+              }}
+            />
+            <Animated.View
+              style={{
+                width: Dimensions.get('window').width, height: 30,
+                position: 'absolute',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#08F',
+                transform: [{
+                  translateY: this.state.animatedValueToBottomNotificationFollowing.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-30, Dimensions.get('window').height - 30]
+                  })
+                }]
+              }}
+            >
+              <Text style={{ fontSize: 12, color: '#FFF' }}>Seguindo</Text>
+            </Animated.View>
+          </View>
+        ) : (
+            <ProgressBarAndroid
+              indeterminate={true}
+              color={'#FFF'}
+              styleAttr='Horizontal'
+              style={{ width: Dimensions.get('window').width, height: 10 }}
+            />
+          )
         }
       </MinhaView>
     );

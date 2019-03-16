@@ -245,7 +245,7 @@ export function newComment(postId) {
     this.editOrNewComment('editContent', commentId, postId);
   });
 }
-export function pushPost(_id, cb) {
+export function pushPost(_id) {
   /**
    * PushPost tenta fazer um request de push na api
    * Lá é validado se o usuario ja fez esse push
@@ -253,57 +253,88 @@ export function pushPost(_id, cb) {
    * Case recusado e retornado 400 é intendido que o usuario quer retirar seu push
    * Entao é alterado novamente o estado da alteracao
    */
-  const config = {
-    headers: {
-      authorization: `Bearer ${this.props.account.token}`
-    }
-  }
+  return new Promise((resolve, reject) => {
 
-  const payload = {
-    assignedTo: this.props.account.user._id,
-    postId: _id
-  }
-
-  Api.patch('/posts/push', payload, config).then(() => {
-
-    const posts = this.state.posts;
-
-    posts.map(post => {
-      if (post._id == _id) {
-        post.pushes.times++
-        post.pushes.users.push(this.props.account.user._id);
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
       }
-    });
+    }
 
-    console.log('Push Com sucesso');
-    console.log(this.state.posts);
+    const payload = {
+      assignedTo: this.props.account.user._id,
+      postId: _id
+    }
 
-    this.setState({ posts }, () => {
-      if (cb) cb(posts)
-    });
+    Api.patch('/posts/push', payload, config).then(() => {
 
-  }).catch(err => {
-
-    Api.delete('/posts/push', { data: payload, headers: { authorization: `Bearer ${this.props.account.token}` } }).then(() => {
       const posts = this.state.posts;
 
       posts.map(post => {
         if (post._id == _id) {
-          post.pushes.times--
-          post.pushes.users = post.pushes.users.filter(user => user != this.props.account.user._id);
+          post.pushes.times++
+          post.pushes.users.push(this.props.account.user._id);
         }
       });
 
-      console.log('unPush com sucesso');
-      console.log(this.state.posts);
-
-      this.setState({ posts }, () => {
-        if (cb) cb(posts)
-      });
+      resolve(posts);
 
     }).catch(err => {
-      console.log(err, 'ERROR');
-      console.log(err.response, 'ERROR');
+
+      Api.delete('/posts/push', { data: payload, headers: { authorization: `Bearer ${this.props.account.token}` } }).then(() => {
+        const posts = this.state.posts;
+
+        posts.map(post => {
+          if (post._id == _id) {
+            post.pushes.times > 0 ? post.pushes.times-- : null;
+            post.pushes.users = post.pushes.users.filter(user => user != this.props.account.user._id);
+          }
+        });
+
+        resolve(posts);
+
+      }).catch(err => reject(err));
     });
+  });
+}
+
+export function increaseUserNamePosts(posts) {
+  return new Promise((resolve, reject) => {
+    let newPosts = posts;
+
+    try {
+      newPosts.map((post) => {
+
+        let { assignedTo: { name: { first, last } } } = post
+
+        if (first.length >= 16) {
+
+          newName = [...first]
+
+          while (newName.length > 13) {
+            newName.pop()
+          }
+
+          post.assignedTo.name.last = ''
+          post.assignedTo.name.first = newName.reduce((acm, cur) => acm + cur) + '...';
+
+        }
+        else if (first.length + last.length > 16) {
+          let newName = [...last];
+
+          while (first.length + newName.length > 14) {
+            newName.pop()
+          }
+
+          post.assignedTo.name.last = newName.reduce((acm, cur) => acm + cur) + '...';
+
+        }
+      });
+
+      resolve(newPosts);
+
+    } catch (err) {
+      reject(err);
+    }
   });
 }
