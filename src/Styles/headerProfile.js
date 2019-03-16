@@ -111,8 +111,8 @@ export const HeaderProfile = props => (
       source={{ uri: props.thumbnail }}
     />
 
-    <Text style={{ fontSize: 28, color: '#333' }}>{`${props.firstName} ${props.lastName}`}</Text>
-    <Text style={{ fontSize: 16, color: '#333' }}>@{props.nickname}</Text>
+    <Text style={{ textAlign: 'center', fontSize: 28, color: '#333' }}>{`${props.firstName} ${props.lastName}`}</Text>
+    <Text style={{ textAlign: 'center', fontSize: 16, color: '#333' }}>@{props.nickname}</Text>
 
     <Separator />
 

@@ -297,8 +297,7 @@ export function pushPost(_id) {
     });
   });
 }
-
-export function increaseUserNamePosts(posts) {
+export function decreasePostsUserName(posts) {
   return new Promise((resolve, reject) => {
     let newPosts = posts;
 
@@ -329,6 +328,34 @@ export function increaseUserNamePosts(posts) {
           post.assignedTo.name.last = newName.reduce((acm, cur) => acm + cur) + '...';
 
         }
+
+        post.comments.map(comment => {
+          let { assignedTo: { name: { first, last } } } = comment
+
+          if (first.length >= 23) {
+
+            newName = [...first]
+
+            while (newName.length > 23) {
+              newName.pop()
+            }
+
+            comment.assignedTo.name.last = ''
+            comment.assignedTo.name.first = newName.reduce((acm, cur) => acm + cur) + '...';
+
+          }
+          else if (first.length + last.length > 23) {
+            let newName = [...last];
+
+            while (first.length + newName.length > 21) {
+              newName.pop()
+            }
+
+            comment.assignedTo.name.last = newName.reduce((acm, cur) => acm + cur) + '...';
+
+          }
+        })
+
       });
 
       resolve(newPosts);

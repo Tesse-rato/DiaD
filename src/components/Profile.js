@@ -7,7 +7,7 @@ import { bindActionCreators } from 'redux';
 import * as Actions from '../redux/actions'
 
 import Api from '../api';
-import { editOrNewComment, newComment, pushPost } from '../funcs'
+import { editOrNewComment, newComment, pushPost, decreasePostsUserName } from '../funcs'
 
 import { MinhaView } from "../styles/standard";
 import { HeaderProfile } from "../styles/headerProfile";
@@ -51,9 +51,7 @@ class Profile extends Component {
       animatedValueToBottomNotificationFollowing: new Animated.Value(0)
     };
   }
-
-  componentWillMount() {
-
+  componentDidMount() {
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -67,18 +65,21 @@ class Profile extends Component {
       const tamBio = (Dimensions.get('window').height - 580) + (Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 45));
       const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
-      this.setState({
-        user,
-        tamBio,
-        following,
-        loading: false,
-        posts: user.posts,
-        animatedValueToBioView: new Animated.Value(tamBio)
+      decreasePostsUserName(user.posts).then(posts => {
+        this.setState({
+          user,
+          posts,
+          tamBio,
+          following,
+          loading: false,
+          animatedValueToBioView: new Animated.Value(tamBio)
+        });
+      }).catch(err => {
+        console.log(err);
       });
 
     }).catch(err => {
-      this.props.navigation.goBack();
-      console.log(err.response);
+      console.log(err);
     });
   }
 

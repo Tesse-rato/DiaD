@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, Animated, TouchableOpacity } from 'react-native'
+import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, Animated, TouchableOpacity, Share } from 'react-native'
 // import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
@@ -15,7 +15,7 @@ import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
 
-import { editOrNewComment, newComment, pushPost, increaseUserNamePosts } from "../funcs";
+import { editOrNewComment, newComment, pushPost, decreasePostsUserName } from "../funcs";
 
 class Feed extends Component {
   static navigationOptions = {
@@ -55,7 +55,7 @@ class Feed extends Component {
     }
 
     Api.get(this.props.url, config).then(({ data: posts }) => {
-      increaseUserNamePosts(posts).then(posts => {
+      decreasePostsUserName(posts).then(posts => {
         this.setState({ posts, loading: false });
       });
     });
@@ -103,6 +103,9 @@ class Feed extends Component {
 
   sharePost(_id) {
     console.log('SHARE POST - ', _id);
+    Share.share({
+      message: 'Compartilhar postagem'
+    });
   }
   scrollTo() {
     this.flatListRef.scrollToOffset({ animated: true, offset: 0, duration: 1000 });
