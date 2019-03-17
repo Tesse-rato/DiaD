@@ -28,7 +28,15 @@ class Profile extends Component {
     this.editOrNewComment = editOrNewComment.bind(this);
 
     this.state = {
-      user: {},
+      user: {
+        socialMedia: {
+          tumblr: '',
+          youtube: '',
+          facebook: '',
+          linkedin: '',
+          whatsapp: '',
+        }
+      },
       posts: [],
       force: true,
       loading: true,
@@ -56,25 +64,25 @@ class Profile extends Component {
   componentDidMount() {
     const config = {
       headers: {
-        // authorization: `Bearer ${this.props.account.token}`
-        authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1MjczNDU2NCwiZXhwIjoxNTUyODIwOTY0fQ.qNo8hwY_6g_RUw2WaiSlpfGaRyERJarYPH5GKtd3goY`
+        authorization: `Bearer ${this.props.account.token}`
+        // authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1MjczNDU2NCwiZXhwIjoxNTUyODIwOTY0fQ.qNo8hwY_6g_RUw2WaiSlpfGaRyERJarYPH5GKtd3goY`
       }
     }
 
-    const url = `/users/profile/5c87bc1e12458240f471c8fb`;
-    // const url = `/users/profile/${this.props.account.profileId}`;
+    // const url = `/users/profile/5c87bcc212458240f471c8fc`;
+    const url = `/users/profile/${this.props.account.profileId}`;
 
     Api.get(url, config).then(({ data: user }) => {
 
       const tamBio = (Dimensions.get('window').height - 580) + (Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 45));
-      // const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
+      const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
       decreasePostsUserName(user.posts).then(posts => {
         this.setState({
-          user,
+          user: { ...this.state.user, ...user },
           posts,
           tamBio,
-          // following,
+          following,
           loading: false,
           animatedValueToBioView: new Animated.Value(tamBio)
         });
@@ -256,7 +264,7 @@ class Profile extends Component {
 
   render() {
     console.disableYellowBox = true;
-    console.log(this.state.user);
+    console.log(this.state.user.socialMedia, ' SOCIAL MEDIA');
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
@@ -346,7 +354,7 @@ class Profile extends Component {
                 }]
               }}
             >
-              <Text style={{ color: '#08F', alignText: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
+              <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
             </Animated.View>
           </View>
         ) : (

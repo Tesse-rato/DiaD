@@ -120,6 +120,7 @@ class Feed extends Component {
 
   render() {
     console.disableYellowBox = true;
+    console.log(this.props.account.user);
     return (
       //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
       <MinhaView style={{ justifyContent: 'center' }}>
