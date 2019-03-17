@@ -36,6 +36,8 @@ class SettingsProfile extends Component {
           originalPhoto: '',
         },
         bio: '',
+        email: '',
+        password: '',
       },
       update: {
         ok: true,
@@ -46,6 +48,7 @@ class SettingsProfile extends Component {
         show: false,
         message: '',
       },
+      change: false,
       imageUri: '',
       dataImage: '',
       oldNickname: '',
@@ -83,18 +86,18 @@ class SettingsProfile extends Component {
     // this.setState({ user: { ...this.state.user, ...this.props.account.user }, currentPassword });
   }
 
-  showOrHiddenOtherSettings() {
+  showOrHideOtherSettings() {
 
     if (!this.state.settingsSocialMedia) {
       return this.setState({ settingsSocialMedia: true }, () => {
-        this.animeshowOrHiddenOtherSettings('show');
+        this.animeBoxOtherSettings('show');
       });
     }
 
-    this.animeshowOrHiddenOtherSettings('hidden');
+    this.animeBoxOtherSettings('hidden');
   }
 
-  animeshowOrHiddenOtherSettings(arg) {
+  animeBoxOtherSettings(arg) {
     if (arg == 'show') {
       Animated.sequence([
         Animated.delay(200),
@@ -127,7 +130,7 @@ class SettingsProfile extends Component {
       });
     }
   }
-  animeDoneMessage() {
+  animeBoxDoneMessage() {
     Animated.sequence([
       Animated.delay(200),
       Animated.timing(
@@ -157,6 +160,40 @@ class SettingsProfile extends Component {
         }
       });
     });
+  }
+  animeBoxChangePassword() {
+    if (!this.state.changePassword) {
+      this.setState({ changePassword: true }, () => {
+        Animated.sequence([
+          Animated.delay(200),
+          Animated.timing(
+            this.state.animatedValueToChangePassword,
+            {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: true,
+              easing: Easing.circle
+            }
+          )
+        ]).start()
+      });
+    }
+    else if (this.state.changePassword) {
+      Animated.sequence([
+        Animated.delay(200),
+        Animated.timing(
+          this.state.animatedValueToChangePassword,
+          {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            easing: Easing.circe
+          }
+        )
+      ]).start(() => {
+        this.setState({ changePassword: false });
+      })
+    }
   }
 
   doneOtherSettings() {
@@ -198,7 +235,7 @@ class SettingsProfile extends Component {
 
       Api.get(url).then(() => {
 
-        this.showOrHiddenOtherSettings();
+        this.showOrHideOtherSettings();
 
       }).catch(err => {
         if (err.response.data.error == 'User already exists') {
@@ -211,7 +248,7 @@ class SettingsProfile extends Component {
         }
       });
     } else {
-      this.showOrHiddenOtherSettings();
+      this.showOrHideOtherSettings();
     }
   }
 
@@ -231,7 +268,7 @@ class SettingsProfile extends Component {
 
       }).catch(err => {
         this.setState({ done: { ok: false, show: true, message: 'Esse apelido já está em uso' } }, () => {
-          this.animeDoneMessage();
+          this.animeBoxDoneMessage();
         });
       });
     } else {
@@ -246,19 +283,19 @@ class SettingsProfile extends Component {
       }
     }
 
+
+
     const data = {
       userId: this.state.user._id,
       name: this.state.user.name,
-      socialMedia: this.state.socialMedia,
+      socialMedia: this.state.user.socialMedia,
       bio: this.state.user.bio,
       photo: this.state.user.photo,
       email: this.state.user.email,
-      password: this.state.currentPassword
+      password: this.state.user.password
     }
 
     Api.put('/users/edit', data, config).then(() => {
-
-      alert('Sucesso na api ao editar');
 
       this.setState({
         done: {
@@ -267,28 +304,43 @@ class SettingsProfile extends Component {
           message: 'Sua conta foi atualizada c:'
         }
       }, () => {
-        this.animeDoneMessage();
+        this.animeBoxDoneMessage();
       });
 
     }).catch(err => {
-      alert(err.response.data.error);
       return this.setState({
         done: {
           ok: false,
           show: true,
           message: 'Verifique sua internet'
         }
-      }, () => this.animeDoneMessage());
+      }, () => this.animeBoxDoneMessage());
     });
   }
 
   done() {
-    this.verifyNickname();
+    if (!this.state.change) {
+      this.props.navigation.goBack();
+
+    } else if (!this.state.user.password) {
+      alert(this.state.currentPassword);
+      this.setState({
+        user: {
+          ...this.state.user,
+          password: this.state.currentPassword
+        }
+      }, () => {
+        this.verifyNickname();
+      });
+    } else {
+      this.verifyNickname();
+    }
   }
 
   setOtherSettingsValue(arg, value) {
     const obj = this.state;
 
+    obj.change = true;
     obj.user.socialMedia[arg] = value;
 
     this.setState(obj);
@@ -304,43 +356,11 @@ class SettingsProfile extends Component {
       obj[arg] = value;
     }
 
+    obj.change = true;
     this.setState(obj);
 
   }
-  changePassword() {
-    if (!this.state.changePassword) {
-      this.setState({ changePassword: true }, () => {
-        Animated.sequence([
-          Animated.delay(200),
-          Animated.timing(
-            this.state.animatedValueToChangePassword,
-            {
-              toValue: 1,
-              duration: 200,
-              useNativeDriver: true,
-              easing: Easing.circle
-            }
-          )
-        ]).start()
-      });
-    }
-    else if (this.state.changePassword) {
-      Animated.sequence([
-        Animated.delay(200),
-        Animated.timing(
-          this.state.animatedValueToChangePassword,
-          {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-            easing: Easing.circe
-          }
-        )
-      ]).start(() => {
-        this.setState({ changePassword: false });
-      })
-    }
-  }
+
 
   selectImage() {
     const options = {
@@ -385,7 +405,7 @@ class SettingsProfile extends Component {
           bio={this.state.user.bio}
           thumbnail={this.state.user.photo.thumbnail}
           goBack={this.props.navigation.goBack}
-          showOrHiddenOtherSettings={this.showOrHiddenOtherSettings.bind(this)}
+          showOrHiddenOtherSettings={this.showOrHideOtherSettings.bind(this)}
           selectImage={this.selectImage.bind(this)}
           done={this.done.bind(this)}
           setUser={this.setUser.bind(this)}
@@ -410,14 +430,14 @@ class SettingsProfile extends Component {
             }}
           >
             <SettingsSocialMedia
-              showOrHiddenOtherSettings={this.showOrHiddenOtherSettings.bind(this)}
+              showOrHiddenOtherSettings={this.showOrHideOtherSettings.bind(this)}
               setOtherSettingsValue={this.setOtherSettingsValue.bind(this)}
               doneOtherSettings={this.doneOtherSettings.bind(this)}
               socialMedia={this.state.user.socialMedia}
               stateToUpdate={this.state.update}
               user={this.state.user}
               setUser={this.setUser.bind(this)}
-              changePassword={this.changePassword.bind(this)}
+              changePassword={this.animeBoxChangePassword.bind(this)}
               getRef={this.getRefToScrollViewSettingsProfile.bind(this)}
             />
           </Animated.View>
@@ -448,7 +468,7 @@ class SettingsProfile extends Component {
             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#FFF', borderRadius: 20, padding: 10, margin: 10 }}>
               <TextInput onChangeText={e => this.setState({ newPasswordOnChange: e })} placeholder='Nova senha' ></TextInput>
             </View>
-            <TouchableOpacity onPress={() => this.changePassword()}>
+            <TouchableOpacity onPress={() => this.animeBoxChangePassword()}>
               <Text style={{ color: '#08F', fontSize: 16 }}>Certo</Text>
             </TouchableOpacity>
           </Animated.View>
