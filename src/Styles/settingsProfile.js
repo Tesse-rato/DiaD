@@ -1,7 +1,5 @@
 import React from 'react'
-import { View, Text, TextInput, Image, TouchableOpacity, Dimensions, Picker } from 'react-native';
-
-import { ScrollView } from 'react-native-gesture-handler'
+import { View, Text, TextInput, Image, TouchableOpacity, Dimensions, Picker, ScrollView } from 'react-native';
 
 import styled from 'styled-components/native';
 import GoBackIcon from '../assets/GoBackDiaD.svg';
@@ -70,11 +68,11 @@ export const HeaderSettingsProfile = props => (
       <Image style={{ width: 120, height: 120, borderRadius: 60, marginTop: 20, marginBottom: 10 }} source={{ uri: props.thumbnail }} />
     </TouchableOpacity>
 
-    <View style={{ flexDirection: 'row', margin: 10, padding: 10 }}>
+    <View style={{ height: 50, flexDirection: 'row', alignItems: 'center' }}>
       <TextInput onChangeText={e => props.setUser('first', e)} value={props.firstName} style={{ fontSize: 28, color: '#333' }} />
       <TextInput onChangeText={e => props.setUser('last', e)} value={props.lastName} style={{ fontSize: 28, color: '#333' }} />
     </View>
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <View style={{ height: 45, flexDirection: 'row', alignItems: 'center' }}>
       <Text>@</Text>
       <TextInput onChangeText={e => props.setUser('nickname', e)} value={props.nickname} style={{ fontSize: 16, color: '#333' }} />
     </View>
@@ -83,7 +81,9 @@ export const HeaderSettingsProfile = props => (
 
     <ButtonSettingsMediaSocialAndCity showOrHiddenOtherSettings={props.showOrHiddenOtherSettings} />
 
-    <TextInput onChangeText={e => props.setUser('bio', e)} value={props.bio} multiline style={{ textAlign: 'center' }} />
+    <ScrollView>
+      <TextInput onChangeText={e => props.setUser('bio', e)} value={props.bio} multiline style={{ textAlign: 'center' }} />
+    </ScrollView>
 
   </ContainerHeaderSettingsProfile>
 );

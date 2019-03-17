@@ -80,7 +80,7 @@ export class Register2 extends Component {
 
     Api.post('/users/create', { name, email, password, city: this.state.selectedCity, confirmPassword: this.props.account.user.password }).then(({ data }) => {
 
-      this.props.setUser(data);
+      this.props.setUser({ token: data.token, user: data.user });
       AsyncStorage.setItem('token', data.token);
 
       const config = {

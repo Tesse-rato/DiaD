@@ -49,7 +49,6 @@ class SettingsProfile extends Component {
         message: '',
       },
       change: false,
-      imageUri: '',
       dataImage: '',
       oldNickname: '',
       currentPassword: '',
@@ -297,33 +296,56 @@ class SettingsProfile extends Component {
 
     Api.put('/users/edit', data, config).then(() => {
 
-      this.setState({
-        done: {
-          ok: true,
-          show: true,
-          message: 'Sua conta foi atualizada c:'
+      if (this.state.dataImage) {
+        const config = {
+          headers: {
+            authorization: `Bearer ${this.props.account.token}`
+          }
         }
-      }, () => {
-        this.animeBoxDoneMessage();
-      });
+
+        Api.patch(`/users/profilePhoto/${this.state.user._id}`, this.state.dataImage, config).then(() => {
+          this.success();
+
+        }).catch(() => {
+          this.failed();
+        });
+
+      } else {
+        this.success();
+      }
 
     }).catch(err => {
-      return this.setState({
-        done: {
-          ok: false,
-          show: true,
-          message: 'Verifique sua internet'
-        }
-      }, () => this.animeBoxDoneMessage());
+      this.failed();
     });
   }
 
+  success() {
+    this.setState({
+      done: {
+        ok: true,
+        show: true,
+        message: 'Sua conta foi atualizada c:'
+      }
+    }, () => {
+      this.animeBoxDoneMessage();
+    });
+  }
+
+  failed() {
+    this.setState({
+      done: {
+        ok: false,
+        show: true,
+        message: 'Verifique sua internet'
+      }
+    }, () => this.animeBoxDoneMessage());
+  }
   done() {
     if (!this.state.change) {
       this.props.navigation.goBack();
 
     } else if (!this.state.user.password) {
-      alert(this.state.currentPassword);
+
       this.setState({
         user: {
           ...this.state.user,
@@ -381,9 +403,23 @@ class SettingsProfile extends Component {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
+
+        const formDataImage = new FormData();
+        formDataImage.append('file', {
+          name: response.fileName,
+          type: response.type,
+          uri: response.uri
+        })
+
         this.setState({
-          imageUri: { uri: 'data:image/jpeg;base64,' + response.data },
-          dataImage: response.data
+          user: {
+            ...this.state.user, photo: {
+              ...this.state.user.photo,
+              thumbnail: 'data:image/jpeg;base64,' + response.data
+            }
+          },
+          dataImage: formDataImage,
+          change: true
         });
       }
     });
