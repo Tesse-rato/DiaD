@@ -1,5 +1,16 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Animated, Easing, StatusBar, Dimensions, AsyncStorage } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Animated,
+  Easing,
+  StatusBar,
+  Dimensions,
+  AsyncStorage
+} from 'react-native';
+
 import ImagePicker from 'react-native-image-picker';
 
 import { connect } from 'react-redux';
@@ -65,24 +76,24 @@ class SettingsProfile extends Component {
   async componentDidMount() {
     const currentPassword = await AsyncStorage.getItem('password');
 
-    const config = {
-      headers: {
-        authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58'
-      }
-    }
+    // const config = {
+    //   headers: {
+    //     authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58'
+    //   }
+    // }
 
-    Api.get('/users/profile/5c87bc1e12458240f471c8fb', config).then(({ data: user }) => {
+    // Api.get('/users/profile/5c87bc1e12458240f471c8fb', config).then(({ data: user }) => {
 
-      this.setState({ user: { ...this.state.user, ...user }, currentPassword, oldNickname: user.name.nickname });
+    //   this.setState({ user: { ...this.state.user, ...user }, currentPassword, oldNickname: user.name.nickname });
 
-      this.props.setUser({
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58',
-        user
-      })
+    //   this.props.setUser({
+    //     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58',
+    //     user
+    //   })
 
-    })
+    // })
 
-    // this.setState({ user: { ...this.state.user, ...this.props.account.user }, currentPassword });
+    this.setState({ user: { ...this.state.user, ...this.props.account.user }, currentPassword, oldNickname: this.props.account.user.name.nickname });
   }
 
   showOrHideOtherSettings() {

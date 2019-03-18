@@ -1,5 +1,16 @@
 import React, { Component } from 'react'
-import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions, Animated, TouchableOpacity, Share, Linking } from 'react-native'
+import {
+  View,
+  StatusBar,
+  FlatList,
+  ProgressBarAndroid,
+  Dimensions,
+  Animated,
+  TouchableOpacity,
+  Share,
+  Linking
+} from 'react-native'
+
 // import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
@@ -122,7 +133,6 @@ class Feed extends Component {
     console.disableYellowBox = true;
     console.log(this.props.account.user);
     return (
-      //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
       <MinhaView style={{ justifyContent: 'center' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
@@ -188,15 +198,13 @@ class Feed extends Component {
             />
           </View>
         ) : (
-            <Animated.View style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8E8E8' }}>
-              <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center', backgroundColor: '#FFF' }} >
-                <ProgressBarAndroid
-                  indeterminate={true}
-                  color={'#08F'}
-                  styleAttr='Normal'
-                />
-              </View>
-            </Animated.View>
+            <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
+              <ProgressBarAndroid
+                indeterminate={true}
+                color={'#08F'}
+                styleAttr='Normal'
+              />
+            </View>
           )}
       </MinhaView>
     )

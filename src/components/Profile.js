@@ -1,5 +1,17 @@
 import React, { PureComponent as Component } from 'react';
-import { View, Text, StatusBar, FlatList, Dimensions, Animated, Easing, ProgressBarAndroid, Linking, Clipboard } from 'react-native';
+import {
+  View,
+  Text,
+  StatusBar,
+  FlatList,
+  Dimensions,
+  Animated,
+  Easing,
+  ProgressBarAndroid,
+  Linking,
+  Clipboard
+} from 'react-native';
+
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 import { connect } from 'react-redux';
