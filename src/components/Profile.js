@@ -68,10 +68,17 @@ class Profile extends Component {
       startScroll: 0,
       messageSocialMedia: '',
       animatedValueToBioView: new Animated.Value(45),
+      animatedValueToTransform: new Animated.Value(0),
+      animatedValueToProfileHeader: new Animated.Value(0),
+      animatedValueToContainerView: new Animated.Value(0),
       animatedValueToProfileImage: new Animated.Value(120),
       animatedValueToBottomNotificationFollowing: new Animated.Value(0),
-      animatedValueToNotificationErrorOrWhatsappNumber: new Animated.Value(0)
+      animatedValueToNotificationErrorOrWhatsappNumber: new Animated.Value(0),
     };
+  }
+
+  componentWillMount() {
+    this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
   }
   componentDidMount() {
     const config = {
@@ -97,7 +104,10 @@ class Profile extends Component {
           following,
           loading: false,
           animatedValueToBioView: new Animated.Value(tamBio)
+        }, () => {
+          this.animateContainerView(true);
         });
+
       }).catch(err => {
         console.log(err);
       });
@@ -192,6 +202,41 @@ class Profile extends Component {
       )
     ]).start();
   }
+
+  animateContainerView(arg) {
+    let value = arg ? 1 : 0;
+
+    Animated.sequence([
+      Animated.delay(100),
+      Animated.timing(
+        this.state.animatedValueToContainerView,
+        {
+          toValue: value,
+          duration: 100,
+          useNativeDriver: true,
+          easing: Easing.ease
+        }
+      ),
+      Animated.timing(
+        this.state.animatedValueToProfileHeader,
+        {
+          toValue: value,
+          duration: 200,
+          useNativeDriver: true,
+          easing: Easing.ease
+        }
+      ),
+      Animated.timing(
+        this.state.animatedValueToTransform,
+        {
+          toValue: value,
+          duration: 300,
+          easing: Easing.ease
+        }
+      )
+    ]).start()
+  }
+
   socialMedia(arg) {
 
 
@@ -274,32 +319,59 @@ class Profile extends Component {
     });
   }
 
+  _goBack() {
+    this.animFeedContainer(true);
+    this.props.navigation.goBack();
+  }
+
   render() {
     console.disableYellowBox = true;
-    console.log(this.state.user.socialMedia, ' SOCIAL MEDIA');
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
-          <View style={{ backgroundColor: '#E8E8E8', flex: 1, alignItems: 'center' }}>
-            <HeaderProfile
-              user_id={this.state.user._id}
-              my_user_id={this.props.account.user._id}
-              bio={this.state.user.bio}
-              firstName={this.state.user.name.first}
-              lastName={this.state.user.name.last}
-              nickname={this.state.user.name.nickname}
-              thumbnail={this.state.user.photo.thumbnail}
-              goBack={this.props.navigation.goBack}
-              settings={this.props.navigation.navigate}
-              following={this.state.following}
-              follow={this.follow.bind(this)}
-              clickSocialMedia={this.socialMedia.bind(this)}
-              socialMedia={this.state.user.socialMedia}
-              animatedValueToBioView={this.state.animatedValueToBioView}
-              animatedValueToProfileImage={this.state.animatedValueToProfileImage}
-            />
-
+          <Animated.View
+            style={{
+              flex: 1,
+              backgroundColor: '#E8E8E8',
+              alignItems: 'center',
+              transform: [{
+                translateX: this.state.animatedValueToContainerView.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [Dimensions.get('window').width, 0]
+                })
+              }]
+            }}
+          >
+            <Animated.View
+              style={{
+                transform: [{
+                  translateY: this.state.animatedValueToProfileHeader.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-Dimensions.get('window').height, 0]
+                  })
+                }]
+              }}
+            >
+              <HeaderProfile
+                user_id={this.state.user._id}
+                my_user_id={this.props.account.user._id}
+                bio={this.state.user.bio}
+                firstName={this.state.user.name.first}
+                lastName={this.state.user.name.last}
+                nickname={this.state.user.name.nickname}
+                thumbnail={this.state.user.photo.thumbnail}
+                goBack={this._goBack.bind(this)}
+                settings={this.props.navigation.navigate}
+                following={this.state.following}
+                follow={this.follow.bind(this)}
+                clickSocialMedia={this.socialMedia.bind(this)}
+                socialMedia={this.state.user.socialMedia}
+                animatedValueToBioView={this.state.animatedValueToBioView}
+                animatedValueToProfileImage={this.state.animatedValueToProfileImage}
+                animatedValueToTransform={this.state.animatedValueToTransform}
+              />
+            </Animated.View>
             <FlatList
               onScrollBeginDrag={e => this.momentumScroll(e)}
               onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
@@ -368,14 +440,15 @@ class Profile extends Component {
             >
               <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
             </Animated.View>
-          </View>
+          </Animated.View>
         ) : (
-            <ProgressBarAndroid
-              indeterminate={true}
-              color={'#FFF'}
-              styleAttr='Horizontal'
-              style={{ width: Dimensions.get('window').width, height: 10 }}
-            />
+            <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
+              <ProgressBarAndroid
+                indeterminate={true}
+                color={'#08F'}
+                styleAttr='Normal'
+              />
+            </View>
           )
         }
       </MinhaView>

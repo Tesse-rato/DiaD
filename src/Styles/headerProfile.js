@@ -115,25 +115,43 @@ export const HeaderProfile = props => (
         height: props.animatedValueToProfileImage,
         borderRadius: 4,
         marginTop: 20,
-        marginBottom: 10
+        marginBottom: 10,
+        transform: [{
+          translateX: props.animatedValueToTransform.interpolate({
+            inputRange: [0, 1],
+            outputRange: [Dimensions.get('window').width, 0]
+          })
+        }]
       }}
       resizeMode='cover'
       source={{ uri: props.thumbnail }}
     />
 
-    <Text style={{ textAlign: 'center', fontSize: 28, color: '#333' }}>{`${props.firstName} ${props.lastName}`}</Text>
-    <Text style={{ textAlign: 'center', fontSize: 16, color: '#333' }}>@{props.nickname}</Text>
+    <Animated.View
+      style={{
+        alignItems: 'center',
+        transform: [{
+          translateY: props.animatedValueToTransform.interpolate({
+            inputRange: [0, 1],
+            outputRange: [Dimensions.get('window').height * 2, 0]
+          })
+        }]
+      }}
+    >
+      <Text style={{ textAlign: 'center', fontSize: 28, color: '#333' }}>{`${props.firstName} ${props.lastName}`}</Text>
+      <Text style={{ textAlign: 'center', fontSize: 16, color: '#333' }}>@{props.nickname}</Text>
 
-    <Separator />
+      <Separator />
 
-    <Animated.View style={{ height: props.animatedValueToBioView, alignItems: 'center' }}>
+      <Animated.View style={{ height: props.animatedValueToBioView, alignItems: 'center' }}>
 
-      <SocialMedia
-        clickSocialMedia={props.clickSocialMedia}
-        socialMedia={props.socialMedia}
-      />
+        <SocialMedia
+          clickSocialMedia={props.clickSocialMedia}
+          socialMedia={props.socialMedia}
+        />
 
-      <BioHeaderProfile bio={props.bio} />
+        <BioHeaderProfile bio={props.bio} />
+      </Animated.View>
     </Animated.View>
 
     <View style={{ width: Dimensions.get('window').width, height: 3, backgroundColor: '#E8E8E8' }} />

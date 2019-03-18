@@ -8,7 +8,8 @@ import {
   Animated,
   TouchableOpacity,
   Share,
-  Linking
+  Linking,
+  Easing
 } from 'react-native'
 
 // import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
@@ -55,7 +56,8 @@ class Feed extends Component {
         postId: '',
         content: '',
       },
-      valueToAnimatedView: new Animated.Value(0)
+      valueToAnimatedView: new Animated.Value(0),
+      valueToAnimatedContainerView: new Animated.Value(0),
     };
   }
   componentWillMount() {
@@ -67,7 +69,9 @@ class Feed extends Component {
 
     Api.get(this.props.url, config).then(({ data: posts }) => {
       decreasePostsUserName(posts).then(posts => {
-        this.setState({ posts, loading: false });
+        this.setState({ posts, loading: false }, () => {
+          this.animeContainerView(true);
+        });
       });
     });
   }
@@ -85,13 +89,31 @@ class Feed extends Component {
     ]).start(() => this.setState({ loading: false }));
   }
 
+  animeContainerView(arg) {
+    let value = arg ? 1 : 0;
+
+    Animated.sequence([
+      Animated.delay(100),
+      Animated.timing(
+        this.state.valueToAnimatedContainerView,
+        {
+          toValue: value,
+          duration: 200,
+          useNativeDriver: true,
+          easing: Easing.in(Easing.ease)
+        }
+      )
+    ]).start();
+  }
+
   debug(e) {
     console.log(e.nativeEvent.contentOffset.y);
   }
 
   clickImageProfile(_id) {
+    this.animeContainerView(false);
     this.props.setProfileId(_id);
-    this.props.navigation.navigate('Profile');
+    this.props.navigation.navigate('Profile', { animFeedContainer: this.animeContainerView.bind(this) });
   }
 
   handleRefresh() {
@@ -136,7 +158,18 @@ class Feed extends Component {
       <MinhaView style={{ justifyContent: 'center' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
-          <View style={{ flex: 1, alignItems: 'center' }}>
+          <Animated.View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              transform: [{
+                translateX: this.state.valueToAnimatedContainerView.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [Dimensions.get('window').width, 0]
+                })
+              }]
+            }}
+          >
             <Header
               placeholder='Id/Apelido'
               source={{ uri: this.props.account.user.photo.thumbnail }}
@@ -196,7 +229,7 @@ class Feed extends Component {
                 )
               }}
             />
-          </View>
+          </Animated.View>
         ) : (
             <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
               <ProgressBarAndroid
