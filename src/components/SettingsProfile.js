@@ -8,7 +8,9 @@ import {
   Easing,
   StatusBar,
   Dimensions,
-  AsyncStorage
+  AsyncStorage,
+  FlatList,
+  ProgressBarAndroid
 } from 'react-native';
 
 import ImagePicker from 'react-native-image-picker';
@@ -21,6 +23,10 @@ import Api from '../api';
 
 import { MinhaView } from "../styles/standard";
 import { HeaderSettingsProfile, SettingsSocialMedia } from '../styles/settingsProfile';
+import { PostProfile } from '../styles/postProfile';
+
+import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
+import FlameRedIco from '../assets/FlameRedDiaD.svg';
 
 class SettingsProfile extends Component {
   static navigationOptions = {
@@ -59,6 +65,18 @@ class SettingsProfile extends Component {
         show: false,
         message: '',
       },
+      commentController: {
+        edit: false,
+        upload: false,
+        commentId: '',
+        newComment: false,
+        tempCommentContent: '',
+      },
+      newComment: {
+        postId: '',
+        content: '',
+      },
+      loading: true,
       change: false,
       dataImage: '',
       oldNickname: '',
@@ -75,6 +93,7 @@ class SettingsProfile extends Component {
 
   async componentDidMount() {
     const currentPassword = await AsyncStorage.getItem('password');
+    const posts = await this.props.navigation.getParam('posts');
 
     // const config = {
     //   headers: {
@@ -93,7 +112,13 @@ class SettingsProfile extends Component {
 
     // })
 
-    this.setState({ user: { ...this.state.user, ...this.props.account.user }, currentPassword, oldNickname: this.props.account.user.name.nickname });
+    this.setState({
+      posts,
+      loading: false,
+      currentPassword,
+      user: { ...this.state.user, ...this.props.account.user },
+      oldNickname: this.props.account.user.name.nickname
+    });
   }
 
   showOrHideOtherSettings() {
@@ -335,7 +360,7 @@ class SettingsProfile extends Component {
       done: {
         ok: true,
         show: true,
-        message: 'Sua conta foi atualizada c:'
+        message: 'Seu perfil foi atualizada c:'
       }
     }, () => {
       this.animeBoxDoneMessage();
@@ -440,24 +465,72 @@ class SettingsProfile extends Component {
     this.scrollViewRef = ref;
   }
 
+  clickImageProfile() { }
+  editOrNewComment() { }
+  newComment() { }
+  _pushPost() { }
+  sharePost() { }
+  debug() { }
+
   render() {
     console.disableYellowBox = true;
     return (
       <MinhaView style={{ justifyContent: 'flex-start' }} >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
-        <HeaderSettingsProfile
-          firstName={this.state.user.name.first}
-          lastName={this.state.user.name.last}
-          nickname={this.state.user.name.nickname}
-          bio={this.state.user.bio}
-          thumbnail={this.state.user.photo.thumbnail}
-          goBack={this.props.navigation.goBack}
-          showOrHiddenOtherSettings={this.showOrHideOtherSettings.bind(this)}
-          selectImage={this.selectImage.bind(this)}
-          done={this.done.bind(this)}
-          setUser={this.setUser.bind(this)}
-        />
-
+        {!this.state.loading ? (
+          <View>
+            <HeaderSettingsProfile
+              firstName={this.state.user.name.first}
+              lastName={this.state.user.name.last}
+              nickname={this.state.user.name.nickname}
+              bio={this.state.user.bio}
+              thumbnail={this.state.user.photo.thumbnail}
+              goBack={this.props.navigation.goBack}
+              showOrHiddenOtherSettings={this.showOrHideOtherSettings.bind(this)}
+              selectImage={this.selectImage.bind(this)}
+              done={this.done.bind(this)}
+              setUser={this.setUser.bind(this)}
+            />
+            <FlatList
+              data={this.state.posts}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={item => item._id}
+              renderItem={({ item }) => {
+                const datePost = item.createdAt.split('T')[0].split('-').reverse();
+                const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                const ico = pushed ? FlameRedIco : FlameBlueIco;
+                return (
+                  <View style={{ backgroundColor: '#E8E8E8' }}>
+                    <PostProfile
+                      push_ico={ico}
+                      post_id={item._id}
+                      user_id={this.props.account.user._id}
+                      datePost={datePost}
+                      pushTimes={item.pushes.times}
+                      comments={item.comments}
+                      content={item.content}
+                      commentController={this.state.commentController}
+                      clickImageProfile={this.clickImageProfile}
+                      editOrNewComment={this.editOrNewComment}
+                      newComment={this.newComment}
+                      pushPost={this._pushPost.bind(this)}
+                      sharePost={this.sharePost.bind(this)}
+                      debug={this.debug.bind(this)}
+                    />
+                  </View>
+                )
+              }}
+            />
+          </View>
+        ) : (
+            <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
+              <ProgressBarAndroid
+                indeterminate={true}
+                color={'#08F'}
+                styleAttr='Normal'
+              />
+            </View>
+          )}
         {this.state.settingsSocialMedia ? (
           <Animated.View
             style={{

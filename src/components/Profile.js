@@ -318,6 +318,11 @@ class Profile extends Component {
       });
     });
   }
+  goSttings() {
+    this.props.navigation.navigate('SettingsProfile', {
+      posts: this.state.posts
+    });
+  }
 
   _goBack() {
     this.animFeedContainer(true);
@@ -362,7 +367,7 @@ class Profile extends Component {
                 nickname={this.state.user.name.nickname}
                 thumbnail={this.state.user.photo.thumbnail}
                 goBack={this._goBack.bind(this)}
-                settings={this.props.navigation.navigate}
+                settings={this.goSttings.bind(this)}
                 following={this.state.following}
                 follow={this.follow.bind(this)}
                 clickSocialMedia={this.socialMedia.bind(this)}

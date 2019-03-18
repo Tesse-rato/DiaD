@@ -75,7 +75,7 @@ const GoBackOrConfigOrFollow = props => (
       <GoBackIco width={32} height={32} />
     </TouchableOpacity>
     {props.user_id.toString() == props.my_user_id.toString() ? (
-      <TouchableOpacity onPress={() => props.settings('SettingsProfile')}>
+      <TouchableOpacity onPress={() => props.settings()}>
         <ConfigIco width={32} height={32} />
       </TouchableOpacity>
     ) : props.following ? (

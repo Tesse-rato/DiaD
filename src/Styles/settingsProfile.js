@@ -91,13 +91,14 @@ export const HeaderSettingsProfile = props => (
 
 const ContainerSettingsSocialMediaEndCity = styled.View`
   position: absolute;
+  top: 20px;
   width: ${Dimensions.get('window').width};
   height: ${Dimensions.get('window').height - 280};
-  background-color: #FFF;
   align-items: center;
   justify-content: center;
-  top: 20px;
   border-radius: 10px;
+  padding: 20px;
+  background-color: #FFF;
 `;
 
 const ContainerSettings = styled.View`
@@ -135,7 +136,7 @@ export const SettingsSocialMedia = props => (
       </ContainerDone>
     </TouchableOpacity>
 
-    <ScrollView ref={ref => props.getRef(ref)} >
+    <ScrollView ref={ref => props.getRef(ref)} showsVerticalScrollIndicator={false} >
       <View style={{ flex: 1, margin: 20, padding: 10, borderRadius: 10, backgroundColor: '#FFF' }}>
         <Text style={{ color: '#08F', fontSize: 14, textAlign: 'center' }}>{props.stateToUpdate.message}</Text>
       </View>
