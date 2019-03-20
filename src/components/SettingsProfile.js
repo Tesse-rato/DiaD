@@ -94,6 +94,7 @@ class SettingsProfile extends Component {
   async componentDidMount() {
     const currentPassword = await AsyncStorage.getItem('password');
     const posts = await this.props.navigation.getParam('posts');
+    this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
 
     // const config = {
     //   headers: {
@@ -467,7 +468,16 @@ class SettingsProfile extends Component {
 
   logOut() {
     AsyncStorage.clear();
+    this.props.setUser({ token: '', user: '' });
     this.props.navigation.navigate('Login');
+  }
+  _goBack() {
+    if (!this.state.change) {
+      this.props.navigation.goBack();
+    } else {
+      this.animFeedContainer(true);
+      this.props.navigation.navigate('Geral');
+    }
   }
   clickImageProfile() { }
   editOrNewComment() { }
@@ -489,7 +499,7 @@ class SettingsProfile extends Component {
               nickname={this.state.user.name.nickname}
               bio={this.state.user.bio}
               thumbnail={this.state.user.photo.thumbnail}
-              goBack={this.props.navigation.goBack}
+              goBack={this._goBack.bind(this)}
               showOrHiddenOtherSettings={this.showOrHideOtherSettings.bind(this)}
               selectImage={this.selectImage.bind(this)}
               done={this.done.bind(this)}

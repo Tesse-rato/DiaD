@@ -254,7 +254,7 @@ class Profile extends Component {
 
     let url = this.state.user.socialMedia[arg];
 
-    Linking.openURL('https://' + url).catch(err => {
+    Linking.openURL(url).catch(err => {
       this.setState({ messageSocialMedia: 'Algum problema com o link :/' });
       this.animateMessageSocialMedia()
     });
@@ -323,7 +323,8 @@ class Profile extends Component {
   }
   goSttings() {
     this.props.navigation.navigate('SettingsProfile', {
-      posts: this.state.posts
+      posts: this.state.posts,
+      animFeedContainer: this.animFeedContainer.bind(this)
     });
   }
 
@@ -420,7 +421,7 @@ class Profile extends Component {
                     comesse configurando seu perfil,
                     adicionando suas redes sociais,
                     adicionando uma breve biografia
-                    e faça uma postagem de boas vindas
+                    e faça uma postagem de boas vindas.
                   </Text>
                 </View>
               )}
