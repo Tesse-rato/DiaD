@@ -12,11 +12,7 @@ import YouTubeIco from '../assets/YouTube.svg';
 import EmailIco from '../assets/EmailBlackDiaD.svg';
 import PasswordIco from '../assets/PassWordBlackDiaD.svg';
 import NicknameIco from '../assets/UserBlackDiaD.svg';
-<<<<<<< HEAD
 import LogOutIco from '../assets/LogOut.svg';
-=======
-import UserIco from '../assets/UserBlackDiaD.svg';
->>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
 
 const ContainerHeaderSettingsProfile = styled.View`
   width: ${Dimensions.get('window').width};
