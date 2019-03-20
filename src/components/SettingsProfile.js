@@ -465,6 +465,10 @@ class SettingsProfile extends Component {
     this.scrollViewRef = ref;
   }
 
+  logOut() {
+    AsyncStorage.clear();
+    this.props.navigation.navigate('Login');
+  }
   clickImageProfile() { }
   editOrNewComment() { }
   newComment() { }
@@ -559,6 +563,7 @@ class SettingsProfile extends Component {
               setUser={this.setUser.bind(this)}
               changePassword={this.animeBoxChangePassword.bind(this)}
               getRef={this.getRefToScrollViewSettingsProfile.bind(this)}
+              logOut={this.logOut.bind(this)}
             />
           </Animated.View>
         ) : null}

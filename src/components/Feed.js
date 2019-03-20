@@ -153,7 +153,6 @@ class Feed extends Component {
 
   render() {
     console.disableYellowBox = true;
-    console.log(this.props.account.user);
     return (
       <MinhaView style={{ justifyContent: 'center' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />

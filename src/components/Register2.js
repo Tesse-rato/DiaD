@@ -91,10 +91,15 @@ export class Register2 extends Component {
 
       const url = `/users/profilePhoto/${data.user._id}`;
 
-      Api.patch(url, this.state.dataFormImage, config).then(() => {
-        this.props.navigation.navigate('Geral');
+      if (this.state.dataFormImage) {
+        Api.patch(url, this.state.dataFormImage, config).then(() => {
+          this.props.navigation.navigate('Geral');
 
-      }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
+        }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
+      } else {
+        this.props.navigation.navigate('Geral');
+      }
+
     }).catch(err => {
       err.response.data.error == 'Nickname already exists' ? this.setState({ error: 'Apelido já está em uso' }) : null;
     });

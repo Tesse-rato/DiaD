@@ -24,7 +24,8 @@ export const StandardButton = styled.TouchableOpacity`
 
 export const StandardInput = styled.TextInput`
   width: ${Dimensions.get('window').width - 85};
-  height: ${Dimensions.get('window').height - 600};
+  /* height: ${Dimensions.get('window').height - 600}; */
+  height: 60px;
   background-color: transparent;
   border-radius: 8px;
   padding: 10px;

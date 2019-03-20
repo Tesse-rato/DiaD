@@ -12,6 +12,7 @@ import YouTubeIco from '../assets/YouTube.svg';
 import EmailIco from '../assets/EmailBlackDiaD.svg';
 import PasswordIco from '../assets/PassWordBlackDiaD.svg';
 import NicknameIco from '../assets/UserBlackDiaD.svg';
+import UserIco from '../assets/UserBlackDiaD.svg';
 
 const ContainerHeaderSettingsProfile = styled.View`
   width: ${Dimensions.get('window').width};
@@ -171,8 +172,13 @@ export const SettingsSocialMedia = props => (
       <TouchableOpacity onPress={() => props.changePassword()}>
         <ContainerSettings>
           <PasswordIco width={24} height={24} />
-          <Text>Alterar Senha</Text>
-          {/* <MeuTextInput value={props.user.password} onChangeText={e => props.setUser('password', e)} placeholder='Senha' /> */}
+          <Text style={{ marginLeft: 4 }}>Alterar Senha</Text>
+        </ContainerSettings>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => props.logOut()}>
+        <ContainerSettings>
+          <UserIco width={24} height={24} />
+          <Text style={{ marginLeft: 4 }}>LogOut</Text>
         </ContainerSettings>
       </TouchableOpacity>
       <ContainerSettings>

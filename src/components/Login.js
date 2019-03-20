@@ -73,6 +73,7 @@ class Login extends Component {
         this.props.setUser(user);
 
         this.props.navigation.navigate('Geral');
+        this.setState({ automaticLogin: false });
 
       }).catch(async (err) => {
 
@@ -88,10 +89,13 @@ class Login extends Component {
             AsyncStorage.setItem('_id', data.user._id);
 
             this.props.navigation.navigate('Geral');
+            this.setState({ automaticLogin: false });
 
           }).catch(err => {
             this.setState({ error: 'Verifique sua conexão', automaticLogin: false });
           });
+        } else {
+          this.setState({ automaticLogin: false });
         }
       });
     } else {
@@ -126,7 +130,9 @@ class Login extends Component {
 
     }).catch(err => {
 
-      if (!err.response.data) return alert('Verifique sua conexão com a internet');
+      console.log(err.response);
+
+      // if (!err.response.data) return alert('Verifique sua conexão com a internet');
 
       if (err.response.data.error === 'Invalid password') {
         return this.setState({ error: 'Senha incorreta' });

@@ -332,11 +332,11 @@ export function decreasePostsUserName(posts) {
         post.comments.map(comment => {
           let { assignedTo: { name: { first, last } } } = comment
 
-          if (first.length >= 23) {
+          if (first.length >= 21) {
 
             newName = [...first]
 
-            while (newName.length > 23) {
+            while (newName.length > 18) {
               newName.pop()
             }
 
@@ -344,10 +344,10 @@ export function decreasePostsUserName(posts) {
             comment.assignedTo.name.first = newName.reduce((acm, cur) => acm + cur) + '...';
 
           }
-          else if (first.length + last.length > 23) {
+          else if (first.length + last.length > 21) {
             let newName = [...last];
 
-            while (first.length + newName.length > 21) {
+            while (first.length + newName.length > 18) {
               newName.pop()
             }
 

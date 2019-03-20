@@ -9,7 +9,8 @@ import {
   Easing,
   ProgressBarAndroid,
   Linking,
-  Clipboard
+  Clipboard,
+  BackHandler
 } from 'react-native';
 
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -81,6 +82,7 @@ class Profile extends Component {
     this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
   }
   componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -93,7 +95,7 @@ class Profile extends Component {
 
     Api.get(url, config).then(({ data: user }) => {
 
-      const tamBio = (Dimensions.get('window').height - 580) + (Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 45));
+      const tamBio = Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 55);
       const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
       decreasePostsUserName(user.posts).then(posts => {
