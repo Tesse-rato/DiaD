@@ -3,6 +3,7 @@ import Action from '../actions/types';
 
 const INITIAL_STATE_ACCOUNT = {
   token: '',
+  profileId: '',
   user: {
     _id: '',
     createdAt: '',
@@ -19,6 +20,13 @@ const INITIAL_STATE_ACCOUNT = {
       originalPhoto: '',
       thumbnail: '',
     },
+    socialMedia: {
+      facebook: '',
+      linkedin: '',
+      tumblr: '',
+      whatsapp: '',
+      youtube: ''
+    }
   },
 };
 
@@ -54,6 +62,9 @@ function account(state = INITIAL_STATE_ACCOUNT, action) {
     }
     case Action.SET_TOKEN: {
       return { ...state, token: action.payload.newValue }
+    }
+    case Action.SET_PROFILE_ID: {
+      return { ...state, profileId: action.payload.newValue }
     }
     default: {
       return state

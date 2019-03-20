@@ -1,5 +1,19 @@
 import React, { Component } from 'react'
-import { View, StatusBar, FlatList, ProgressBarAndroid, Dimensions } from 'react-native'
+import {
+  View,
+  StatusBar,
+  FlatList,
+  ProgressBarAndroid,
+  Dimensions,
+  Animated,
+  TouchableOpacity,
+  Share,
+  Linking,
+  Easing,
+  BackHandler
+} from 'react-native'
+
+// import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
@@ -9,9 +23,12 @@ import Api from '../api';
 
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
+import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
+
+import { editOrNewComment, newComment, pushPost, decreasePostsUserName } from "../funcs";
 
 class Feed extends Component {
   static navigationOptions = {
@@ -21,17 +38,75 @@ class Feed extends Component {
   constructor() {
     super();
 
+    this.editOrNewComment = editOrNewComment.bind(this);
+    this.newComment = newComment.bind(this);
+    this.pushPost = pushPost.bind(this);
+
     this.state = {
       posts: [],
+      onFeed: true,
       loading: true,
-      atualizar: false,
+      refresh: false,
+      commentController: {
+        edit: false,
+        upload: false,
+        commentId: '',
+        newComment: false,
+        tempCommentContent: '',
+      },
+      newComment: {
+        postId: '',
+        content: '',
+      },
+      valueToAnimatedView: new Animated.Value(0),
+      valueToAnimatedContainerView: new Animated.Value(0),
     };
   }
-
   componentWillMount() {
-    this.setState({ posts: this.props.data }, () => {
-      this.setState({ loading: false });
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+
+    Api.get(this.props.url, config).then(({ data: posts }) => {
+      decreasePostsUserName(posts).then(posts => {
+        this.setState({ posts, loading: false }, () => {
+          this.animeContainerView(true);
+        });
+      });
     });
+  }
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
+    // this.setState({ loading: false });
+    Animated.sequence([
+      Animated.delay(100),
+      Animated.timing(
+        this.state.valueToAnimatedView,
+        {
+          toValue: Dimensions.get('window').height,
+          duration: 500,
+        }
+      )
+    ]).start(() => this.setState({ loading: false }));
+  }
+
+  animeContainerView(arg) {
+    let value = arg ? 1 : 0;
+
+    Animated.sequence([
+      Animated.delay(100),
+      Animated.timing(
+        this.state.valueToAnimatedContainerView,
+        {
+          toValue: value,
+          duration: 200,
+          useNativeDriver: true,
+          easing: Easing.in(Easing.ease)
+        }
+      )
+    ]).start(() => this.setState({ onFeed: arg }));
   }
 
   debug(e) {
@@ -39,128 +114,139 @@ class Feed extends Component {
   }
 
   clickImageProfile(_id) {
-    console.log('Clicoi em aqi oh - ', _id);
+    this.animeContainerView(false);
+    this.props.setProfileId(_id);
+    this.props.navigation.navigate('Profile', { animFeedContainer: this.animeContainerView.bind(this) });
   }
 
-  pushPost(_id) {
-
-    const config = {
-      headers: {
-        authorization: `Bearer ${this.props.account.token}`
-      }
-    }
-
-    const payload = {
-      assignedTo: this.props.account._id,
-      postId: _id
-    }
-
-    Api.patch('/posts/push', payload, config).then(() => {
-
-      const posts = this.state.posts;
-
-      posts.map(post => {
-        if (post._id == _id) {
-          post.pushes.times++
-          post.pushes.users.push(this.props.account._id);
+  handleRefresh() {
+    this.setState({ refreshing: true }, () => {
+      const config = {
+        headers: {
+          authorization: `Bearer ${this.props.account.token}`
         }
-      });
+      }
 
-      this.setState({ posts });
+      Api.get(this.props.url, config).then(({ data: posts }) => {
+        this.setState({ posts, refreshing: false });
 
-    }).catch(err => {
-
-      Api.delete('/posts/push', { data: payload, headers: { authorization: `Bearer ${this.props.account.token}` } }).then(() => {
-        const posts = this.state.posts;
-
-        posts.map(post => {
-          if (post._id == _id) {
-            post.pushes.times--
-            post.pushes.users = post.pushes.users.filter(user => user != this.props.account._id);
-          }
-        });
-
-        this.setState({ posts });
       }).catch(err => {
-        console.log(err, 'ERROR');
-        console.log(err.response, 'ERROR');
+        alert('Nao foi possivel atualzar');
+        this.setState({ refreshing: false });
       });
     });
-  }
-  newComment(_id) {
-    console.log('New Comente - ', _id);
-  }
-  editComment(commentId, postId) {
-    console.log(commentId, ' COMMENT ID');
-    console.log(postId, ' POST ID');
   }
 
   sharePost(_id) {
     console.log('SHARE POST - ', _id);
+    Linking.openURL('https://www.facebook.com').catch(err => {
+      alert('Erro');
+    })
+  }
+  scrollTo() {
+    this.flatListRef.scrollToOffset({ animated: true, offset: 0, duration: 1000 });
+  }
+  _pushPost(postId) {
+    this.pushPost(postId).then(posts => {
+      this.setState({ posts });
+    }).catch(err => {
+      console.log(err);
+    });
+  }
+
+  _goBack() {
+    if (this.state.onFeed) {
+      BackHandler.exitApp();
+      return false;
+    }
+    return true;
   }
 
   render() {
     console.disableYellowBox = true;
     return (
-      //style={{ width: Dimensions.get('window').width, height: this.state.valueToAnimatedView, opacity: this.state.valueToOpacity, backgroundColor: '#E8E8E8', alignItems: 'center', justifyContent: 'center' }}
-      <MinhaView style={{ justifyContent: 'center' }} >
-        <StatusBar barStyle='dark-content' backgroundColor='#FFF' />
-        <Header
-          placeholder='Id/Apelido'
-          source={{ uri: this.props.account.photo.thumbnail }}
-          clickImageProfile={this.clickImageProfile.bind(this)}
-
-        />
+      <MinhaView style={{ justifyContent: 'center' }}>
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
-          <FlatList
-            onMomentumScrollEnd={(e) => this.debug(e)}
-            data={this.state.posts}
-            extraData={this.state.posts}
-            keyExtractor={item => item._id}
-            renderItem={({ item }) => {
-              let ico;
-              const pushed = item.pushes.users.find(id => id.toString() == this.props.account._id)
-              if (pushed) {
-                ico = FlameRedIco;
-                console.log('Vermelho');
-              } else {
-                ico = FlameBlueIco;
-                console.log('Azul');
-              }
-
-
-              return (
-                <Post
-                  key={item._id}
-                  ico={ico}
-                  user_id={this.props.account._id}
-                  post_id={item._id}
-                  assignedTo_id={item.assignedTo._id}
-                  firstName={item.assignedTo.name.first}
-                  lastName={item.assignedTo.name.last}
-                  nickname={item.assignedTo.name.nickname}
-                  thumbnail={item.assignedTo.photo.thumbnail}
-                  pushTimes={item.pushes.times}
-                  pushAssignedTo={pushed}
-                  content={item.content}
-                  comments={item.comments}
-                  clickImageProfile={this.clickImageProfile.bind(this)}
-                  pushPost={this.pushPost.bind(this)}
-                  newComment={this.newComment.bind(this)}
-                  editComment={this.editComment.bind(this)}
-                  sharePost={this.sharePost.bind(this)}
-                  debug={this.debug.bind(this)}
-                />
-              )
+          <Animated.View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              transform: [{
+                translateX: this.state.valueToAnimatedContainerView.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [Dimensions.get('window').width, 0]
+                })
+              }]
             }}
-          />
+          >
+            <Header
+              placeholder='Id/Apelido'
+              source={{ uri: this.props.account.user.photo.thumbnail }}
+              clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+            />
+            <FlatList
+              ref={(ref) => this.flatListRef = ref}
+              onRefresh={() => this.handleRefresh()}
+              refreshing={this.state.refresh}
+              onMomentumScrollEnd={(e) => this.debug(e)}
+              ListFooterComponent={() => (
+                <View style={{ alignItems: 'center', padding: 5 }}>
+                  <TouchableOpacity
+                    style={{
+                      alignItems: 'center',
+                      width: Dimensions.get('window').width - 20,
+                      height: Dimensions.get('window').height - 540,
+                      padding: 10,
+                      borderRadius: 60,
+                      backgroundColor: '#FFF'
+                    }}
+                    onPress={() => this.scrollTo()}
+                  >
+                    <ScrolltoUpIco width={32} height={32} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              data={this.state.posts}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={item => item._id}
+              renderItem={({ item }) => {
+                const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                const ico = pushed ? FlameRedIco : FlameBlueIco;
+                return (
+                  <Post
+                    key={item._id}
+                    push_ico={ico}
+                    user_id={this.props.account.user._id}
+                    post_id={item._id}
+                    assignedTo_id={item.assignedTo._id}
+                    firstName={item.assignedTo.name.first}
+                    lastName={item.assignedTo.name.last}
+                    nickname={item.assignedTo.name.nickname}
+                    thumbnail={item.assignedTo.photo.thumbnail}
+                    pushTimes={item.pushes.times}
+                    pushAssignedTo={pushed}
+                    content={item.content}
+                    comments={item.comments}
+                    commentController={this.state.commentController}
+                    clickImageProfile={this.clickImageProfile.bind(this)}
+                    pushPost={this._pushPost.bind(this)}
+                    newComment={this.newComment.bind(this)}
+                    editOrNewComment={this.editOrNewComment.bind(this)}
+                    sharePost={this.sharePost.bind(this)}
+                    debug={this.debug.bind(this)}
+                  />
+                )
+              }}
+            />
+          </Animated.View>
         ) : (
-            <View style={{ width: Dimensions.get('window').width, flex: 1, justifyContent: 'center' }} >
+            <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
               <ProgressBarAndroid
                 indeterminate={true}
-                color={'#FFF'}
-                styleAttr='Horizontal'
-                style={{ width: Dimensions.get('window').width, height: 10 }} />
+                color={'#08F'}
+                styleAttr='Normal'
+              />
             </View>
           )}
       </MinhaView>

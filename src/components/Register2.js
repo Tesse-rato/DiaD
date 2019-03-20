@@ -25,6 +25,7 @@ export class Register2 extends Component {
       error: '',
       imageUri: '',
       dataFormImage: '',
+      loadedImage: false,
       selectedCity: 'Tupaciguara'
     }
   }
@@ -41,9 +42,7 @@ export class Register2 extends Component {
       if (response.didCancel) {
         console.log('User cancelled photo picker');
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ error: 'Ouve um erro ao carregar a imagem da galeria' });
       }
       else {
         let data = new FormData()
@@ -55,6 +54,7 @@ export class Register2 extends Component {
         this.setState({
           imageUri: { uri: 'data:image/jpeg;base64,' + response.data },
           dataFormImage: data,
+          loadedImage: true
         });
       }
     });
@@ -66,6 +66,7 @@ export class Register2 extends Component {
     if (!last) return this.setState({ error: 'Preencha o campo Sobrenome' });
     if (!nickname) return this.setState({ error: 'Preencha o campo Apelido' });
 
+    this.setState({ error: '' });
     this.registerUser();
 
   }
@@ -78,9 +79,21 @@ export class Register2 extends Component {
       password,
     } = this.props.account.user
 
-    Api.post('/users/create', { name, email, password, city: this.state.selectedCity, confirmPassword: this.props.account.user.password }).then(({ data }) => {
+    const data = {
+      name,
+      email,
+      password,
+      city: this.state.selectedCity,
+      confirmPassword: this.props.account.user.password
+    }
 
-      this.props.setUser(data);
+    Api.post('/users/create', data).then(({ data }) => {
+
+      this.props.setUser({ token: data.token, user: data.user });
+
+      AsyncStorage.setItem('email', email);
+      AsyncStorage.setItem('password', password);
+      AsyncStorage.setItem('_id', data.user._id);
       AsyncStorage.setItem('token', data.token);
 
       const config = {
@@ -91,11 +104,28 @@ export class Register2 extends Component {
 
       const url = `/users/profilePhoto/${data.user._id}`;
 
-      Api.patch(url, this.state.dataFormImage, config).then(() => {
-        this.props.navigation.navigate('Geral');
+      if (this.state.loadedImage) {
+        console.log('Vai registrar imagem');
+        Api.patch(url, this.state.dataFormImage, config).then(({ data: { photo } }) => {
 
-      }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
+          this.props.setUser({
+            token: data.token,
+            user: {
+              ...this.props.account.user,
+              photo
+            }
+          });
+
+          this.props.navigation.navigate('Geral');
+
+        }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
+      } else {
+        console.log('Nao registrou imagem');
+        this.props.navigation.navigate('Geral');
+      }
+
     }).catch(err => {
+      console.log(err.response);
       err.response.data.error == 'Nickname already exists' ? this.setState({ error: 'Apelido já está em uso' }) : null;
     });
   }
@@ -120,9 +150,9 @@ export class Register2 extends Component {
 
         <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 12, color: '#F00' }}>{this.state.error}</Text>
-          <MeuInput value={this.props.account.user.name.first} onChangeText={this.props.setFirstName} placeholder='Nome' ico={UserIco} />
-          <MeuInput value={this.props.account.user.name.last} onChangeText={this.props.setLastName} placeholder='Sobrenome' ico={UserIco} />
-          <MeuInput value={this.props.account.user.name.nickname} onChangeText={this.props.setNickname} placeholder='Apelido' ico={UserIco} />
+          <MeuInput textContentType='name' value={this.props.account.user.name.first} onChangeText={this.props.setFirstName} placeholder='Nome' ico={UserIco} />
+          <MeuInput textContentType='nameSuffix' value={this.props.account.user.name.last} onChangeText={this.props.setLastName} placeholder='Sobrenome' ico={UserIco} />
+          <MeuInput textContentType='nickname' value={this.props.account.user.name.nickname} onChangeText={this.props.setNickname} placeholder='Apelido' ico={UserIco} />
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8E8E8', borderRadius: 25, margin: 5 }}>
             <CityIco width={25} height={25} margin={10} />
             <Picker style={{ width: 285, height: 50, color: '#FFF', fontSize: 12, backgroundColor: 'transparent' }} mode='dialog' selectedValue={this.state.selectedCity} onValueChange={(value) => this.setState({ selectedCity: value })} >

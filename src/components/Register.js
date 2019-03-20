@@ -76,9 +76,9 @@ class Register extends Component {
 
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
-          <MeuInput onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
-          <MeuInput value={this.state.confirmPassword} onChangeText={(e) => this.setState({ confirmPassword: e })} placeholder='Confirme Senha' ico={PasswordIco} />
+          <MeuInput textContentType='emailAddress' onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+          <MeuInput textContentType='password' onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
+          <MeuInput textContentType='password' value={this.state.confirmPassword} onChangeText={(e) => this.setState({ confirmPassword: e })} placeholder='Confirme Senha' ico={PasswordIco} />
         </View>
 
         <View style={{ flex: 0.5, justifyContent: 'center', alignItems: 'center', flexDirection: 'row-reverse' }}>
