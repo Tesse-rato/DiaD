@@ -421,7 +421,11 @@ class Profile extends Component {
                     comesse configurando seu perfil,
                     adicionando suas redes sociais,
                     adicionando uma breve biografia
+<<<<<<< HEAD
                     e faça uma postagem de boas vindas.
+=======
+                  e faça uma postagem de boas vindas.
+>>>>>>> a0556385721f011b829ef12d13dff5aad19c8545
                   </Text>
                 </View>
               )}

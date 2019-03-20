@@ -3,7 +3,11 @@ package com.diad;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+<<<<<<< HEAD
+import com.bitgo.randombytes.RandomBytesPackage;
+=======
 import net.rhogan.rnsecurerandom.RNSecureRandomPackage;
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
 import com.imagepicker.ImagePickerPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.horcrux.svg.SvgPackage;
@@ -27,7 +31,11 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+<<<<<<< HEAD
+            new RandomBytesPackage(),
+=======
             new RNSecureRandomPackage(),
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
             new ImagePickerPackage(),
             new RNGestureHandlerPackage(),
             new SvgPackage()
