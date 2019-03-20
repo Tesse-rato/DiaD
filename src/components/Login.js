@@ -74,6 +74,7 @@ class Login extends Component {
 
         this.props.navigation.navigate('Geral');
         this.setState({ automaticLogin: false });
+        console.log('Login Automatico');
 
       }).catch(async (err) => {
 
@@ -90,16 +91,19 @@ class Login extends Component {
 
             this.props.navigation.navigate('Geral');
             this.setState({ automaticLogin: false });
+            console.log('Login com email e senha do AsyncStorage');
 
           }).catch(err => {
             this.setState({ error: 'Verifique sua conexão', automaticLogin: false });
           });
         } else {
           this.setState({ automaticLogin: false });
+          console.log('Login Manual');
         }
       });
     } else {
       this.setState({ automaticLogin: false });
+      console.log('Login Manual');
     }
   }
 

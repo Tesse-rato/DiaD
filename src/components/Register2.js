@@ -25,6 +25,7 @@ export class Register2 extends Component {
       error: '',
       imageUri: '',
       dataFormImage: '',
+      loadedImage: false,
       selectedCity: 'Tupaciguara'
     }
   }
@@ -41,9 +42,7 @@ export class Register2 extends Component {
       if (response.didCancel) {
         console.log('User cancelled photo picker');
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ error: 'Ouve um erro ao carregar a imagem da galeria' });
       }
       else {
         let data = new FormData()
@@ -55,6 +54,7 @@ export class Register2 extends Component {
         this.setState({
           imageUri: { uri: 'data:image/jpeg;base64,' + response.data },
           dataFormImage: data,
+          loadedImage: true
         });
       }
     });
@@ -66,6 +66,7 @@ export class Register2 extends Component {
     if (!last) return this.setState({ error: 'Preencha o campo Sobrenome' });
     if (!nickname) return this.setState({ error: 'Preencha o campo Apelido' });
 
+    this.setState({ error: '' });
     this.registerUser();
 
   }
@@ -78,9 +79,21 @@ export class Register2 extends Component {
       password,
     } = this.props.account.user
 
-    Api.post('/users/create', { name, email, password, city: this.state.selectedCity, confirmPassword: this.props.account.user.password }).then(({ data }) => {
+    const data = {
+      name,
+      email,
+      password,
+      city: this.state.selectedCity,
+      confirmPassword: this.props.account.user.password
+    }
+
+    Api.post('/users/create', data).then(({ data }) => {
 
       this.props.setUser({ token: data.token, user: data.user });
+
+      AsyncStorage.setItem('email', email);
+      AsyncStorage.setItem('password', password);
+      AsyncStorage.setItem('_id', data.user._id);
       AsyncStorage.setItem('token', data.token);
 
       const config = {
@@ -91,16 +104,28 @@ export class Register2 extends Component {
 
       const url = `/users/profilePhoto/${data.user._id}`;
 
-      if (this.state.dataFormImage) {
-        Api.patch(url, this.state.dataFormImage, config).then(() => {
+      if (this.state.loadedImage) {
+        console.log('Vai registrar imagem');
+        Api.patch(url, this.state.dataFormImage, config).then(({ data: { photo } }) => {
+
+          this.props.setUser({
+            token: data.token,
+            user: {
+              ...this.props.account.user,
+              photo
+            }
+          });
+
           this.props.navigation.navigate('Geral');
 
         }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
       } else {
+        console.log('Nao registrou imagem');
         this.props.navigation.navigate('Geral');
       }
 
     }).catch(err => {
+      console.log(err.response);
       err.response.data.error == 'Nickname already exists' ? this.setState({ error: 'Apelido já está em uso' }) : null;
     });
   }

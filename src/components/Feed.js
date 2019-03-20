@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   Share,
   Linking,
-  Easing
+  Easing,
+  BackHandler
 } from 'react-native'
 
 // import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
@@ -43,6 +44,7 @@ class Feed extends Component {
 
     this.state = {
       posts: [],
+      onFeed: true,
       loading: true,
       refresh: false,
       commentController: {
@@ -76,6 +78,7 @@ class Feed extends Component {
     });
   }
   componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
     // this.setState({ loading: false });
     Animated.sequence([
       Animated.delay(100),
@@ -103,7 +106,7 @@ class Feed extends Component {
           easing: Easing.in(Easing.ease)
         }
       )
-    ]).start();
+    ]).start(() => this.setState({ onFeed: arg }));
   }
 
   debug(e) {
@@ -149,6 +152,14 @@ class Feed extends Component {
     }).catch(err => {
       console.log(err);
     });
+  }
+
+  _goBack() {
+    if (this.state.onFeed) {
+      BackHandler.exitApp();
+      return false;
+    }
+    return true;
   }
 
   render() {

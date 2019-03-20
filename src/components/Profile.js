@@ -95,7 +95,8 @@ class Profile extends Component {
 
     Api.get(url, config).then(({ data: user }) => {
 
-      const tamBio = Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 55);
+      const tamBio = user.bio ? Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 55) : 55;
+
       const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
       decreasePostsUserName(user.posts).then(posts => {
@@ -379,38 +380,50 @@ class Profile extends Component {
                 animatedValueToTransform={this.state.animatedValueToTransform}
               />
             </Animated.View>
-            <FlatList
-              onScrollBeginDrag={e => this.momentumScroll(e)}
-              onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
-              data={this.state.posts}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={item => item._id}
-              renderItem={({ item }) => {
-                const datePost = item.createdAt.split('T')[0].split('-').reverse();
-                const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                const ico = pushed ? FlameRedIco : FlameBlueIco;
-                return (
-                  <View style={{ backgroundColor: '#E8E8E8' }}>
-                    <PostProfile
-                      push_ico={ico}
-                      post_id={item._id}
-                      user_id={this.props.account.user._id}
-                      datePost={datePost}
-                      pushTimes={item.pushes.times}
-                      comments={item.comments}
-                      content={item.content}
-                      commentController={this.state.commentController}
-                      clickImageProfile={this.clickImageProfile}
-                      editOrNewComment={this.editOrNewComment}
-                      newComment={this.newComment}
-                      pushPost={this._pushPost.bind(this)}
-                      sharePost={this.sharePost.bind(this)}
-                      debug={this.debug.bind(this)}
-                    />
-                  </View>
-                )
-              }}
-            />
+            {this.state.posts.length ? (
+              <FlatList
+                onScrollBeginDrag={e => this.momentumScroll(e)}
+                onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
+                data={this.state.posts}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={item => item._id}
+                renderItem={({ item }) => {
+                  const datePost = item.createdAt.split('T')[0].split('-').reverse();
+                  const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                  const ico = pushed ? FlameRedIco : FlameBlueIco;
+                  return (
+                    <View style={{ backgroundColor: '#E8E8E8' }}>
+                      <PostProfile
+                        push_ico={ico}
+                        post_id={item._id}
+                        user_id={this.props.account.user._id}
+                        datePost={datePost}
+                        pushTimes={item.pushes.times}
+                        comments={item.comments}
+                        content={item.content}
+                        commentController={this.state.commentController}
+                        clickImageProfile={this.clickImageProfile}
+                        editOrNewComment={this.editOrNewComment}
+                        newComment={this.newComment}
+                        pushPost={this._pushPost.bind(this)}
+                        sharePost={this.sharePost.bind(this)}
+                        debug={this.debug.bind(this)}
+                      />
+                    </View>
+                  )
+                }}
+              />
+            ) : (
+                <View style={{ flex: 1, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+                  <Text style={{ color: '#08F', fontSize: 16, textAlign: 'center' }}>
+                    Parece que é sua primeira vez,
+                    comesse configurando seu perfil,
+                    adicionando suas redes sociais,
+                    adicionando uma breve biografia
+                    e faça uma postagem de boas vindas
+                  </Text>
+                </View>
+              )}
             <Animated.View
               style={{
                 width: Dimensions.get('window').width, height: 30,
