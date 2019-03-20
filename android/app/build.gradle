@@ -145,7 +145,11 @@ android {
 }
 
 dependencies {
+<<<<<<< HEAD
     implementation project(':react-native-randombytes')
+=======
+    implementation project(':react-native-securerandom')
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
     implementation project(':react-native-image-picker')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-svg')

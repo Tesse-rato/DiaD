@@ -421,7 +421,7 @@ class Profile extends Component {
                     comesse configurando seu perfil,
                     adicionando suas redes sociais,
                     adicionando uma breve biografia
-                    e faça uma postagem de boas vindas.
+                  e faça uma postagem de boas vindas.
                   </Text>
                 </View>
               )}

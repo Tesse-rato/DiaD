@@ -98,7 +98,11 @@ export const Comment = props => (
               onChangeText={e => props.editOrNewComment('editContent', comment._id, props.post_id, e)}
               onEndEditing={() => props.editOrNewComment('done', comment._id, props.post_id)}
               value={props.commentController.tempCommentContent}
+<<<<<<< HEAD
               style={{ borderRadius: 30, backgroundColor: '#F1F1F1' }}
+=======
+              style={{ borderRadius: 10, backgroundColor: '#F1F1F1' }}
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
             />
           ) : (
               <Text>{comment.content}</Text>

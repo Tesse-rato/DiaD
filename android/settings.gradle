@@ -1,6 +1,11 @@
 rootProject.name = 'diad'
+<<<<<<< HEAD
 include ':react-native-randombytes'
 project(':react-native-randombytes').projectDir = new File(rootProject.projectDir, '..\\node_modules\\react-native-randombytes\\android')
+=======
+include ':react-native-securerandom'
+project(':react-native-securerandom').projectDir = new File(rootProject.projectDir, '..\\node_modules\\react-native-securerandom\\android')
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
 include ':react-native-image-picker'
 project(':react-native-image-picker').projectDir = new File(rootProject.projectDir, '..\\node_modules\\react-native-image-picker\\android')
 include ':react-native-gesture-handler'

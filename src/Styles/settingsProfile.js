@@ -12,7 +12,11 @@ import YouTubeIco from '../assets/YouTube.svg';
 import EmailIco from '../assets/EmailBlackDiaD.svg';
 import PasswordIco from '../assets/PassWordBlackDiaD.svg';
 import NicknameIco from '../assets/UserBlackDiaD.svg';
+<<<<<<< HEAD
 import LogOutIco from '../assets/LogOut.svg';
+=======
+import UserIco from '../assets/UserBlackDiaD.svg';
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
 
 const ContainerHeaderSettingsProfile = styled.View`
   width: ${Dimensions.get('window').width};
@@ -83,7 +87,11 @@ export const HeaderSettingsProfile = props => (
     <ButtonSettingsMediaSocialAndCity showOrHiddenOtherSettings={props.showOrHiddenOtherSettings} />
 
     <ScrollView>
+<<<<<<< HEAD
       <TextInput placeholder='Bio' onChangeText={e => props.setUser('bio', e)} value={props.bio} multiline style={{ textAlign: 'center' }} />
+=======
+      <TextInput onChangeText={e => props.setUser('bio', e)} value={props.bio} multiline style={{ textAlign: 'center' }} />
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
     </ScrollView>
 
   </ContainerHeaderSettingsProfile>
@@ -176,9 +184,15 @@ export const SettingsSocialMedia = props => (
         </ContainerSettings>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => props.logOut()}>
+<<<<<<< HEAD
         <ContainerSettings style={{ paddingLeft: 12 }}>
           <LogOutIco width={24} height={24} />
           <Text style={{ marginLeft: 4 }}>Sair</Text>
+=======
+        <ContainerSettings>
+          <UserIco width={24} height={24} />
+          <Text style={{ marginLeft: 4 }}>LogOut</Text>
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
         </ContainerSettings>
       </TouchableOpacity>
       <ContainerSettings>

@@ -94,7 +94,10 @@ class SettingsProfile extends Component {
   async componentDidMount() {
     const currentPassword = await AsyncStorage.getItem('password');
     const posts = await this.props.navigation.getParam('posts');
+<<<<<<< HEAD
     this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
+=======
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
 
     // const config = {
     //   headers: {
@@ -286,6 +289,7 @@ class SettingsProfile extends Component {
     } else {
       this.showOrHideOtherSettings();
     }
+<<<<<<< HEAD
   }
 
   verifyNickname() {
@@ -420,6 +424,142 @@ class SettingsProfile extends Component {
 
   }
 
+=======
+  }
+
+  verifyNickname() {
+
+    if (this.state.user.name.nickname != this.state.oldNickname) {
+      const config = {
+        headers: {
+          authorization: `Bearer ${this.props.account.token}`
+        }
+      }
+
+      const url = '/users/nicknameExists/' + this.state.user.name.nickname;
+
+      Api.get(url, config).then(() => {
+        this.upToApi();
+
+      }).catch(err => {
+        this.setState({ done: { ok: false, show: true, message: 'Esse apelido já está em uso' } }, () => {
+          this.animeBoxDoneMessage();
+        });
+      });
+    } else {
+      this.upToApi();
+    }
+  }
+
+  upToApi() {
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+
+
+
+    const data = {
+      userId: this.state.user._id,
+      name: this.state.user.name,
+      socialMedia: this.state.user.socialMedia,
+      bio: this.state.user.bio,
+      photo: this.state.user.photo,
+      email: this.state.user.email,
+      password: this.state.user.password
+    }
+
+    Api.put('/users/edit', data, config).then(() => {
+
+      if (this.state.dataImage) {
+        const config = {
+          headers: {
+            authorization: `Bearer ${this.props.account.token}`
+          }
+        }
+
+        Api.patch(`/users/profilePhoto/${this.state.user._id}`, this.state.dataImage, config).then(() => {
+          this.success();
+
+        }).catch(() => {
+          this.failed();
+        });
+
+      } else {
+        this.success();
+      }
+
+    }).catch(err => {
+      this.failed();
+    });
+  }
+
+  success() {
+    this.setState({
+      done: {
+        ok: true,
+        show: true,
+        message: 'Seu perfil foi atualizada c:'
+      }
+    }, () => {
+      this.animeBoxDoneMessage();
+    });
+  }
+
+  failed() {
+    this.setState({
+      done: {
+        ok: false,
+        show: true,
+        message: 'Verifique sua internet'
+      }
+    }, () => this.animeBoxDoneMessage());
+  }
+  done() {
+    if (!this.state.change) {
+      this.props.navigation.goBack();
+
+    } else if (!this.state.user.password) {
+
+      this.setState({
+        user: {
+          ...this.state.user,
+          password: this.state.currentPassword
+        }
+      }, () => {
+        this.verifyNickname();
+      });
+    } else {
+      this.verifyNickname();
+    }
+  }
+
+  setOtherSettingsValue(arg, value) {
+    const obj = this.state;
+
+    obj.change = true;
+    obj.user.socialMedia[arg] = value;
+
+    this.setState(obj);
+  }
+
+  setUser(arg, value) {
+    const obj = this.state.user;
+
+    if (arg == 'first' || arg == 'last' || arg == 'nickname') {
+      obj.name[arg] = value;
+    }
+    else {
+      obj[arg] = value;
+    }
+
+    obj.change = true;
+    this.setState(obj);
+
+  }
+
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
 
   selectImage() {
     const options = {
@@ -468,6 +608,7 @@ class SettingsProfile extends Component {
 
   logOut() {
     AsyncStorage.clear();
+<<<<<<< HEAD
     this.props.setUser({ token: '', user: '' });
     this.props.navigation.navigate('Login');
   }
@@ -479,6 +620,10 @@ class SettingsProfile extends Component {
       this.props.navigation.navigate('Geral');
     }
   }
+=======
+    this.props.navigation.navigate('Login');
+  }
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
   clickImageProfile() { }
   editOrNewComment() { }
   newComment() { }
@@ -499,7 +644,11 @@ class SettingsProfile extends Component {
               nickname={this.state.user.name.nickname}
               bio={this.state.user.bio}
               thumbnail={this.state.user.photo.thumbnail}
+<<<<<<< HEAD
               goBack={this._goBack.bind(this)}
+=======
+              goBack={this.props.navigation.goBack}
+>>>>>>> d8748495e31e88bcbd7e134e3a266236dbd943ae
               showOrHiddenOtherSettings={this.showOrHideOtherSettings.bind(this)}
               selectImage={this.selectImage.bind(this)}
               done={this.done.bind(this)}
