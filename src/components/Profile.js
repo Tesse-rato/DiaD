@@ -99,17 +99,17 @@ class Profile extends Component {
 
       const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
+      this.setState({
+        user: { ...this.state.user, ...user },
+        posts: user.posts,
+        tamBio,
+        following,
+        loading: false,
+        animatedValueToBioView: new Animated.Value(tamBio)
+      }, () => {
+        this.animateContainerView(true);
+      });
       decreasePostsUserName(user.posts).then(posts => {
-        this.setState({
-          user: { ...this.state.user, ...user },
-          posts,
-          tamBio,
-          following,
-          loading: false,
-          animatedValueToBioView: new Animated.Value(tamBio)
-        }, () => {
-          this.animateContainerView(true);
-        });
 
       }).catch(err => {
         console.log(err);

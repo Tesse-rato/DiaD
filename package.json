@@ -13,7 +13,6 @@
     "react-native-circular-progress": "^1.1.0",
     "react-native-gesture-handler": "^1.1.0",
     "react-native-image-picker": "^0.28.0",
-    "react-native-securerandom": "^0.3.0",
     "react-native-svg": "^9.2.4",
     "react-native-svg-transformer": "^0.12.1",
     "react-navigation": "^3.3.2",

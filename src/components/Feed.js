@@ -30,6 +30,7 @@ import { Post } from '../styles/postFeed';
 
 import { editOrNewComment, newComment, pushPost, decreasePostsUserName } from "../funcs";
 
+import Debug from '../funcs/debug';
 class Feed extends Component {
   static navigationOptions = {
     header: null
@@ -43,6 +44,7 @@ class Feed extends Component {
     this.pushPost = pushPost.bind(this);
 
     this.state = {
+      erro: '',
       posts: [],
       onFeed: true,
       loading: true,
@@ -63,19 +65,30 @@ class Feed extends Component {
     };
   }
   componentWillMount() {
+    const debug = new Debug();
+
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
       }
     }
 
-    Api.get(this.props.url, config).then(({ data: posts }) => {
-      decreasePostsUserName(posts).then(posts => {
+    Api.get(this.props.url, config).then(({ data }) => {
+
+      debug.post({ post: 'api return' });
+      decreasePostsUserName(data).then(posts => {
+
         this.setState({ posts, loading: false }, () => {
           this.animeContainerView(true);
         });
-      });
-    });
+
+        debug.post({ message: 'SUCCESS =========================================================' })
+      }).catch(err => {
+        debug.post({ message: 'FAILED ==========================================================' })
+      })
+    }).catch(err => {
+      alert(err.response.data.error);
+    })
   }
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
@@ -106,7 +119,10 @@ class Feed extends Component {
           easing: Easing.in(Easing.ease)
         }
       )
-    ]).start(() => this.setState({ onFeed: arg }));
+    ]).start(() => {
+      alert('Final da animacaa');
+      this.setState({ onFeed: arg })
+    });
   }
 
   debug(e) {

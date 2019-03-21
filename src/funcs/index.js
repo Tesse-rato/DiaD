@@ -297,7 +297,12 @@ export function pushPost(_id) {
     });
   });
 }
+
+import Debug from './debug';
+
 export function decreasePostsUserName(posts) {
+  const debug = new Debug();
+
   return new Promise((resolve, reject) => {
     let newPosts = posts;
 
@@ -332,6 +337,8 @@ export function decreasePostsUserName(posts) {
         post.comments.map(comment => {
           let { assignedTo: { name: { first, last } } } = comment
 
+          debug.post({ message: 'COMMENT ' + comment._id });
+
           if (first.length >= 21) {
 
             newName = [...first]
@@ -345,7 +352,13 @@ export function decreasePostsUserName(posts) {
 
           }
           else if (first.length + last.length > 21) {
+
+            debug.post({ message: 'BEFORE REST' });
+            debug.post({ message: 'BEFORE REST' });
+            debug.post({ message: 'BEFORE REST' });
+            debug.post({ message: 'BEFORE REST' });
             let newName = [...last];
+            debug.post({ message: 'AFTER REST' });
 
             while (first.length + newName.length > 18) {
               newName.pop()
@@ -361,6 +374,7 @@ export function decreasePostsUserName(posts) {
       resolve(newPosts);
 
     } catch (err) {
+      debug.post({ error: err });
       reject(err);
     }
   });
