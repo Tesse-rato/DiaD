@@ -26,7 +26,7 @@ import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeIm
 import { MinhaView } from "../styles/standard";
 import { HeaderProfile } from "../styles/headerProfile";
 import { PostProfile } from '../styles/postProfile';
-import { EditPost } from '../styles/editPost';
+import { EditOrNewPost } from '../styles/editOrNewPost';
 
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
@@ -656,7 +656,7 @@ class Profile extends Component {
                   top: 0
                 }}
               >
-                <EditPost
+                <EditOrNewPost
                   contentPost={this.state.postController.post.content}
                   photoPost={this.state.postController.post.photo}
                   post_id={this.state.postController.post._id}
@@ -665,7 +665,21 @@ class Profile extends Component {
                   cancelEditPost={this.cancelEditPost.bind(this)}
                   doneEditPost={this.doneEditPost.bind(this)}
                   deletePost={this.deletePost.bind(this)}
+
+                  // FAKE
+                  push_ico={FlameBlueIco}
+                  post_id='-'
+                  thumbnail={this.state.posts[0].assignedTo.photo.thumbnail}
+                  firstName={this.state.posts[0].assignedTo.name.first}
+                  lastName={this.state.posts[0].assignedTo.name.last}
+                  nickname={this.state.posts[0].assignedTo.name.nickname}
+                  pushTimes={this.state.postController.post.pushes.times}
+                  assignedTo_id='-'
+                  clickImageProfile={() => null}
+                  pushPost={() => null}
+                // FAKE
                 />
+                {Debug.post({ post: this.state.posts[0] })}
               </Animated.View>
             ) : null}
           </Animated.View>

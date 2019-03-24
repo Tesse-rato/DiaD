@@ -100,14 +100,12 @@ export const Post = props => (
   <ContainerPost>
     <HeaderPost
       push_ico={props.push_ico}
-      user_id={props.user_id}
       post_id={props.post_id}
       thumbnail={props.thumbnail}
       firstName={props.firstName}
       lastName={props.lastName}
       nickname={props.nickname}
       pushTimes={props.pushTimes}
-      pushAssignedTo={props.pushAssignedTo}
       assignedTo_id={props.assignedTo_id}
       clickImageProfile={props.clickImageProfile}
       pushPost={props.pushPost}

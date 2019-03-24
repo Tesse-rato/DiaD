@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32.565" height="27.964" viewBox="0 0 32.565 27.964">
-  <path id="DoneGreenDiaD" d="M5.67,17.007c.284.345,11.11,16.036,11.11,16.036L37.236,6.08" transform="translate(-5.17 -5.58)" fill="none" stroke="lime" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<svg id="DoneGreenDiaD" xmlns="http://www.w3.org/2000/svg" width="18.387" height="18.387" viewBox="0 0 18.387 18.387">
+  <path id="Caminho_281" data-name="Caminho 281" d="M0,18.387V0H18.387V18.387Z" fill="none"/>
+  <g id="Agrupar_119" data-name="Agrupar 119" transform="translate(0.735 0.735)">
+    <path id="Caminho_282" data-name="Caminho 282" d="M16.138,7.68a8.47,8.47,0,1,0,7.121,3.9l-.5.595a7.759,7.759,0,1,1-1.421-1.735l.481-.568A8.425,8.425,0,0,0,16.138,7.68ZM22.844,9.8l-7.106,8.385-2.991-2.79-.5.538L15.8,19.244l7.6-8.973Z" transform="translate(-7.68 -7.68)" fill="#5c5"/>
+  </g>
 </svg>

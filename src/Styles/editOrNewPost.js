@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Dimensions, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
 
 import styled from 'styled-components/native';
+
+import { HeaderPost } from '../styles/postFeed';
 
 import BackIco from '../assets/GoBackDiaD.svg';
 import DoneIco from '../assets/DoneGreenDiaD.svg'
@@ -19,9 +21,8 @@ const ContainerEditPost = styled.View`
 const ContainerBackDoneOrDelete = styled.View`
   width: ${Dimensions.get('window').width};
   padding: 10px;
-  align-items: center;
-  justify-content: space-between;
   flex-direction: row;
+  justify-content: space-between;
 `;
 const ContainerContentPost = styled.View`
   flex: 1;
@@ -33,12 +34,7 @@ const BackDoneOrDelete = props => (
     <TouchableOpacity onPress={() => props.cancelEditPost()}>
       <BackIco width={20} height={20} />
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => props.doneEditPost()}>
-      <DoneIco width={20} height={20} />
-    </TouchableOpacity>
-    <TouchableOpacity onPress={() => props.deletePost()}>
-      <DeleteIco width={20} height={20} />
-    </TouchableOpacity>
+
   </ContainerBackDoneOrDelete>
 );
 
@@ -56,7 +52,7 @@ const ContentPost = props => (
         </View>
       ) : null}
       {props.photoPost ? (
-        <View style={{ paddingBottom: 5 }}>
+        <View>
           <TouchableOpacity onPress={() => props.loadImageOnEditPost(props.post_id)}>
             <Image
               style={{
@@ -77,7 +73,7 @@ const ContentPost = props => (
     </ScrollView>
   </ContainerContentPost>
 );
-export const EditPost = props => (
+export const EditOrNewPost = props => (
   <ContainerEditPost>
     <BackDoneOrDelete
       cancelEditPost={props.cancelEditPost}
@@ -86,12 +82,65 @@ export const EditPost = props => (
       post_id={props.post_id}
     />
 
+    <HeaderPost
+      push_ico={props.push_ico}
+      post_id={props.post_id}
+      thumbnail={props.thumbnail}
+      firstName={props.firstName}
+      lastName={props.lastName}
+      nickname={props.nickname}
+      pushTimes={props.pushTimes}
+      assignedTo_id={props.assignedTo_id}
+      clickImageProfile={props.clickImageProfile}
+      pushPost={props.pushPost}
+    />
+
     <ContentPost
       loadImageOnEditPost={props.loadImageOnEditPost}
       editContentPost={props.editContentPost}
       contentPost={props.contentPost}
       photoPost={props.photoPost}
     />
+
+    <View
+      style={{
+        width: Dimensions.get('window').width,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        position: 'absolute',
+        bottom: 0,
+        padding: 20,
+      }}
+    >
+      <TouchableOpacity onPress={() => props.deletePost()}>
+        <View
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 32,
+            backgroundColor: '#F1F1F1',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <DeleteIco width={20} height={20} />
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => props.doneEditPost()}>
+        <View
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 32,
+            backgroundColor: '#F1F1F1',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <DoneIco width={20} height={20} />
+        </View>
+      </TouchableOpacity>
+    </View>
 
   </ContainerEditPost>
 );

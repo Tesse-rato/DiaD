@@ -1,6 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="30.515" height="30.515" viewBox="0 0 30.515 30.515">
-  <g id="DeleteDiaD" transform="translate(0.207 0.207)">
-    <line id="Linha_25" data-name="Linha 25" x2="29.101" y2="29.101" transform="translate(0.5 0.5)" fill="none" stroke="red" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_26" data-name="Linha 26" x1="29.101" y2="29.101" transform="translate(0.5 0.5)" fill="none" stroke="red" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<svg id="DeleteDiaD" xmlns="http://www.w3.org/2000/svg" width="18.456" height="18.456" viewBox="0 0 18.456 18.456">
+  <path id="Caminho_279" data-name="Caminho 279" d="M0,18.456V0H18.456V18.456Z" fill="none"/>
+  <g id="Agrupar_118" data-name="Agrupar 118" transform="translate(2.566)">
+    <g id="surface1">
+      <path id="Caminho_280" data-name="Caminho 280" d="M31.881,0a1.113,1.113,0,0,0-1.107,1.107v.738H27.89a.372.372,0,0,0-.138,0h-.7a.37.37,0,1,0,.035.738h.4l1.327,14.95a1.017,1.017,0,0,0,1,.923H36.9a1.017,1.017,0,0,0,1-.923l1.327-14.95h.4a.369.369,0,1,0,0-.738H35.941V1.107A1.113,1.113,0,0,0,34.834,0Zm0,.738h2.953a.364.364,0,0,1,.369.369v.738H31.512V1.107a.364.364,0,0,1,.369-.369ZM28.224,2.584H38.49L37.164,17.476a.291.291,0,0,1-.265.242H29.816a.291.291,0,0,1-.265-.242Zm2.884,1.1a.432.432,0,0,0-.046.012.37.37,0,0,0-.288.369V16.242a.369.369,0,1,0,.738,0V4.06a.37.37,0,0,0-.4-.381Zm2.215,0a.432.432,0,0,0-.046.012.37.37,0,0,0-.288.369V16.242a.369.369,0,1,0,.738,0V4.06a.37.37,0,0,0-.4-.381Zm2.215,0a.432.432,0,0,0-.046.012.37.37,0,0,0-.288.369V16.242a.369.369,0,1,0,.738,0V4.06a.37.37,0,0,0-.4-.381Z" transform="translate(-26.695)" fill="#e34"/>
+    </g>
   </g>
 </svg>
