@@ -14,21 +14,24 @@ import {
 } from 'react-native';
 
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import ImagePicker from 'react-native-image-picker';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../redux/actions'
 
 import Api from '../api';
-import { editOrNewComment, newComment, pushPost, decreasePostsUserName } from '../funcs'
+import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage } from '../funcs'
 
 import { MinhaView } from "../styles/standard";
 import { HeaderProfile } from "../styles/headerProfile";
 import { PostProfile } from '../styles/postProfile';
+import { EditPost } from '../styles/editPost';
 
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
 
+import Debug from '../funcs/debug';
 class Profile extends Component {
   static navigationOptions = {
     header: null
@@ -65,6 +68,13 @@ class Profile extends Component {
         postId: '',
         content: '',
       },
+      postController: {
+        post: {},
+        edit: false,
+        oldContent: '',
+        loadedImage: false,
+        newImage: undefined,
+      },
       tamBio: 0,
       startScroll: 0,
       messageSocialMedia: '',
@@ -73,6 +83,7 @@ class Profile extends Component {
       animatedValueToProfileHeader: new Animated.Value(0),
       animatedValueToContainerView: new Animated.Value(0),
       animatedValueToProfileImage: new Animated.Value(120),
+      animatedValueToEditPostContainer: new Animated.Value(0),
       animatedValueToBottomNotificationFollowing: new Animated.Value(0),
       animatedValueToNotificationErrorOrWhatsappNumber: new Animated.Value(0),
     };
@@ -99,18 +110,17 @@ class Profile extends Component {
 
       const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
-      this.setState({
-        user: { ...this.state.user, ...user },
-        posts: user.posts,
-        tamBio,
-        following,
-        loading: false,
-        animatedValueToBioView: new Animated.Value(tamBio)
-      }, () => {
-        this.animateContainerView(true);
-      });
       decreasePostsUserName(user.posts).then(posts => {
-
+        this.setState({
+          user: { ...this.state.user, ...user },
+          posts,
+          tamBio,
+          following,
+          loading: false,
+          animatedValueToBioView: new Animated.Value(tamBio)
+        }, () => {
+          this.animContainerView(true);
+        });
       }).catch(err => {
         console.log(err);
       });
@@ -124,56 +134,44 @@ class Profile extends Component {
     console.log(e.nativeEvent.contentOffset.x);
   }
 
-  momentumScroll(e) {
-    const { y } = e.nativeEvent.contentOffset;
-    this.setState({ startScroll: y })
-    if (y < 1) {
-      Animated.sequence([
-        Animated.delay(300),
-        Animated.timing(
-          this.state.animatedValueToBioView,
-          {
-            toValue: 0,
-            duration: 500
-          }
-        ),
-        Animated.timing(
-          this.state.animatedValueToProfileImage,
-          {
-            toValue: 60,
-            duration: 1000
-          }
-        )
-      ]).start()
-    }
-  }
-  compareOffset(currentValueScroll) {
+  animatedProfileFrame(currentValueScroll) {
     const { startScroll } = this.state;
     const differenceBettweenValues = Math.abs(startScroll - currentValueScroll);
 
     let valueToBioView = startScroll < currentValueScroll ? 0 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? this.state.tamBio : null;
     let valueToProfileImage = startScroll < currentValueScroll ? 60 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? 120 : 60;
 
-    Animated.sequence([
-      Animated.delay(300),
+    Animated.parallel([
       Animated.timing(
         this.state.animatedValueToBioView,
         {
           toValue: valueToBioView,
-          duration: 500
+          duration: 100,
+          easing: Easing.linear
         }
       ),
-      Animated.timing(this.state.animatedValueToProfileImage,
+      Animated.timing(
+        this.state.animatedValueToProfileImage,
         {
           toValue: valueToProfileImage,
-          duration: 1000
+          duration: 600,
+          easing: Easing.bezier(.2, 1, .995, 1)
         }
       )
     ]).start();
   }
 
   clickImageProfile(_id) {
-    console.log(_id);
+    if (_id == this.state.user._id) return;
+
+    this.props.setProfileId(_id);
+    this.animContainerView(false);
+    this.setState({
+      loading: true,
+      animatedValueToProfileImage: new Animated.Value(120),
+    }, () => {
+      this.componentDidMount();
+    });
   }
 
   sharePost(_id) {
@@ -181,7 +179,7 @@ class Profile extends Component {
     });
   }
 
-  animateMessageSocialMedia() {
+  displayMessageSocialMedia() {
     Animated.sequence([
       Animated.delay(200),
       Animated.timing(
@@ -206,7 +204,7 @@ class Profile extends Component {
     ]).start();
   }
 
-  animateContainerView(arg) {
+  animContainerView(arg) {
     let value = arg ? 1 : 0;
 
     Animated.sequence([
@@ -240,6 +238,21 @@ class Profile extends Component {
     ]).start()
   }
 
+  displayEditPost() {
+    Animated.sequence([
+      Animated.delay(200),
+      Animated.timing(
+        this.state.animatedValueToEditPostContainer,
+        {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+          easing: Easing.ease
+        }
+      )
+    ]).start();
+  }
+
   socialMedia(arg) {
 
 
@@ -248,7 +261,7 @@ class Profile extends Component {
       Clipboard.setString(this.state.user.socialMedia.whatsapp);
 
       return this.setState({ messageSocialMedia: 'O numero foi copiado c:' }, () => {
-        this.animateMessageSocialMedia();
+        this.displayMessageSocialMedia();
       });
     }
 
@@ -256,11 +269,168 @@ class Profile extends Component {
 
     Linking.openURL(url).catch(err => {
       this.setState({ messageSocialMedia: 'Algum problema com o link :/' });
-      this.animateMessageSocialMedia()
+      this.displayMessageSocialMedia()
     });
   }
 
+  editPost(_id) {
+    let payload;
 
+    this.state.posts.forEach((post, index) => {
+      if (post._id.toString() == _id) {
+        payload = post;
+        this.indexOfPost = index;
+      }
+    })
+
+    this.setState({
+      postController: {
+        post: payload,
+        edit: true,
+        oldContent: payload.content,
+      }
+    }, () => this.displayEditPost(true));
+  }
+  editContentPost(newValue) {
+    this.setState({
+      postController: {
+        ...this.state.postController,
+        post: {
+          ...this.state.postController.post,
+          content: newValue
+        }
+      }
+    });
+  }
+  doneEditPost() {
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      }
+    }
+
+    const payload = this.state.posts;
+    payload[this.indexOfPost] = this.state.postController.post;
+
+    if (this.state.postController.post.content != this.state.postController.oldContent) {
+      const data = {
+        userId: this.props.account.user._id,
+        postId: this.state.postController.post._id,
+        content: this.state.postController.post.content,
+      }
+
+      Api.put('/posts/edit', data, config).then(() => {
+        this.setState({ posts: payload }, () => this.oculteEditPost());
+
+      }).catch(err => {
+        Debug.post({ erro: err.response.data.error });
+      })
+    }
+
+    if (this.state.postController.loadedImage) {
+
+      const url = `/posts/postPhoto/${this.state.postController.post._id}`;
+
+      const data = this.state.postController.newImage
+
+      Api.patch(url, data, config).then(({ data }) => {
+
+        payload[this.indexOfPost].photo.post = data;
+        this.setState({ posts: payload }, () => this.oculteEditPost());
+
+      }).catch(err => Debug.post({ post: err.response.data.error }));
+    }
+  }
+  deletePost(_id) {
+    const config = {
+      headers: {
+        authorization: `Bearer ${this.props.account.token}`
+      },
+      data: {
+        id: this.state.postController.post._id.toString()
+      }
+    }
+
+    Api.delete('/posts/delete', config).then(() => {
+
+      const payload = this.state.posts.filter(post => post._id.toString() != this.state.postController.post._id);
+
+      this.setState({ posts: payload });
+
+    }).catch(err => {
+      Debug.post({ err: err.response.data.error });
+    });
+  }
+  oculteEditPost() {
+    Animated.sequence([
+      Animated.timing(
+        this.state.animatedValueToEditPostContainer,
+        {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+          easing: Easing.ease
+        }
+      )
+    ]).start(() => {
+    })
+    this.setState({
+      postController: {
+        post: {},
+        edit: false,
+        newContent: '',
+        newImage: undefined
+      }
+    })
+  }
+  cancelEditPost() {
+    this.oculteEditPost();
+  }
+  loadImageOnEditPost() {
+    const options = {
+      quality: 1.0,
+      storageOptions: {
+        skipBackup: true,
+      },
+    };
+
+    ImagePicker.showImagePicker(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled photo picker');
+      } else if (response.error) {
+        this.setState({ error: 'Ouve um erro ao carregar a imagem da galeria' });
+      }
+      else {
+        let data = new FormData()
+        data.append('file', {
+          name: response.fileName,
+          type: response.type,
+          uri: response.uri,
+        });
+
+        const photo = resizeImage({
+          width: response.width,
+          height: response.height,
+          content: 'data:image/jpeg;base64,' + response.data
+        });
+
+        console.log(photo);
+
+        this.setState({
+          postController: {
+            ...this.state.postController,
+            post: {
+              ...this.state.postController.post,
+              photo,
+            },
+            newImage: data,
+            loadedImage: true
+          },
+          // imageUri: { uri: 'data:image/jpeg;base64,' + response.data },
+        });
+      }
+    });
+  }
   _pushPost(postId) {
     this.pushPost(postId).then(posts => {
       this.setState({ posts, force: !this.state.force });
@@ -382,38 +552,47 @@ class Profile extends Component {
               />
             </Animated.View>
             {this.state.posts.length ? (
-              <FlatList
-                onScrollBeginDrag={e => this.momentumScroll(e)}
-                onMomentumScrollEnd={e => this.compareOffset(e.nativeEvent.contentOffset.y)}
-                data={this.state.posts}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={item => item._id}
-                renderItem={({ item }) => {
-                  const datePost = item.createdAt.split('T')[0].split('-').reverse();
-                  const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                  const ico = pushed ? FlameRedIco : FlameBlueIco;
-                  return (
-                    <View style={{ backgroundColor: '#E8E8E8' }}>
-                      <PostProfile
-                        push_ico={ico}
-                        post_id={item._id}
-                        user_id={this.props.account.user._id}
-                        datePost={datePost}
-                        pushTimes={item.pushes.times}
-                        comments={item.comments}
-                        content={item.content}
-                        commentController={this.state.commentController}
-                        clickImageProfile={this.clickImageProfile}
-                        editOrNewComment={this.editOrNewComment}
-                        newComment={this.newComment}
-                        pushPost={this._pushPost.bind(this)}
-                        sharePost={this.sharePost.bind(this)}
-                        debug={this.debug.bind(this)}
-                      />
-                    </View>
-                  )
-                }}
-              />
+              <View style={{ flex: 1, backgroundColor: '#E8E8E8' }}>
+                <FlatList
+                  ref={ref => this.flatListRef = ref}
+                  onScrollBeginDrag={({ nativeEvent: { contentOffset: { y } } }) => this.setState({ startScroll: y })}
+                  onMomentumScrollEnd={({ nativeEvent: { contentOffset: { y } } }) => this.animatedProfileFrame(y)}
+                  data={this.state.posts}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={item => item._id}
+                  renderItem={({ item }) => {
+                    const datePost = item.createdAt.split('T')[0].split('-').reverse();
+                    const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                    const ico = pushed ? FlameRedIco : FlameBlueIco;
+                    if (item.photo) item.photo = resizeImage(item.photo);
+
+                    return (
+                      <View style={{ backgroundColor: '#E8E8E8' }}>
+                        <PostProfile
+                          push_ico={ico}
+                          post_id={item._id}
+                          user_id={this.props.account.user._id}
+                          post_user_id={item.assignedTo._id}
+                          datePost={datePost}
+                          pushTimes={item.pushes.times}
+                          comments={item.comments}
+                          content={item.content}
+                          postPhoto={item.photo}
+                          commentController={this.state.commentController}
+                          editOrNewComment={this.editOrNewComment}
+                          newComment={this.newComment}
+                          pushPost={this._pushPost.bind(this)}
+                          sharePost={this.sharePost.bind(this)}
+                          editPost={this.editPost.bind(this)}
+                          debug={this.debug.bind(this)}
+                          clickImageProfile={this.clickImageProfile.bind(this)}
+                        />
+                      </View>
+                    )
+                  }}
+                />
+
+              </View>
             ) : (
                 <View style={{ flex: 1, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
                   <Text style={{ color: '#08F', fontSize: 16, textAlign: 'center' }}>
@@ -461,6 +640,34 @@ class Profile extends Component {
             >
               <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
             </Animated.View>
+            {this.state.postController.edit ? (
+              <Animated.View
+                style={{
+                  width: Dimensions.get('window').width,
+                  height: Dimensions.get('window').height,
+                  transform: [{
+                    translateY: this.state.animatedValueToEditPostContainer.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-Dimensions.get('window').height, 0]
+                    }),
+                  }],
+                  backgroundColor: '#FFF',
+                  position: 'absolute',
+                  top: 0
+                }}
+              >
+                <EditPost
+                  contentPost={this.state.postController.post.content}
+                  photoPost={this.state.postController.post.photo}
+                  post_id={this.state.postController.post._id}
+                  loadImageOnEditPost={this.loadImageOnEditPost.bind(this)}
+                  editContentPost={this.editContentPost.bind(this)}
+                  cancelEditPost={this.cancelEditPost.bind(this)}
+                  doneEditPost={this.doneEditPost.bind(this)}
+                  deletePost={this.deletePost.bind(this)}
+                />
+              </Animated.View>
+            ) : null}
           </Animated.View>
         ) : (
             <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>

@@ -89,7 +89,7 @@ export const Comment = props => (
           ) : null
           }
         </View>
-        <View style={{ margin: 10 }}>
+        <View style={{ marginTop: 10 }}>
           {props.commentController.edit && props.commentController.commentId == comment._id.toString() ? (
             <TextInput
               multiline

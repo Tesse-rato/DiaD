@@ -120,7 +120,7 @@ export const HeaderProfile = props => (
           translateX: props.animatedValueToTransform.interpolate({
             inputRange: [0, 1],
             outputRange: [Dimensions.get('window').width, 0]
-          })
+          }),
         }]
       }}
       resizeMode='cover'

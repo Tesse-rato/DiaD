@@ -28,7 +28,7 @@ import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
 
-import { editOrNewComment, newComment, pushPost, decreasePostsUserName } from "../funcs";
+import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage } from "../funcs";
 
 import Debug from '../funcs/debug';
 class Feed extends Component {
@@ -65,8 +65,6 @@ class Feed extends Component {
     };
   }
   componentWillMount() {
-    const debug = new Debug();
-
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -74,17 +72,13 @@ class Feed extends Component {
     }
 
     Api.get(this.props.url, config).then(({ data }) => {
-
-      debug.post({ post: 'api return' });
       decreasePostsUserName(data).then(posts => {
-
         this.setState({ posts, loading: false }, () => {
           this.animeContainerView(true);
         });
 
-        debug.post({ message: 'SUCCESS =========================================================' })
       }).catch(err => {
-        debug.post({ message: 'FAILED ==========================================================' })
+        alert('Confira sua conexao');
       })
     }).catch(err => {
       alert(err.response.data.error);
@@ -119,10 +113,7 @@ class Feed extends Component {
           easing: Easing.in(Easing.ease)
         }
       )
-    ]).start(() => {
-      alert('Final da animacaa');
-      this.setState({ onFeed: arg })
-    });
+    ]).start(() => this.setState({ onFeed: arg }));
   }
 
   debug(e) {
@@ -229,6 +220,8 @@ class Feed extends Component {
               renderItem={({ item }) => {
                 const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
                 const ico = pushed ? FlameRedIco : FlameBlueIco;
+                if (item.photo) item.photo = resizeImage(item.photo);
+
                 return (
                   <Post
                     key={item._id}
@@ -243,6 +236,7 @@ class Feed extends Component {
                     pushTimes={item.pushes.times}
                     pushAssignedTo={pushed}
                     content={item.content}
+                    postPhoto={item.photo}
                     comments={item.comments}
                     commentController={this.state.commentController}
                     clickImageProfile={this.clickImageProfile.bind(this)}

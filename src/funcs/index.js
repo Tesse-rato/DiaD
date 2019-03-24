@@ -1,4 +1,5 @@
 import Api from '../api';
+import { Dimensions } from 'react-native';
 
 export function editOrNewComment(arg, commentId, postId, newContent) {
   /**
@@ -297,11 +298,7 @@ export function pushPost(_id) {
     });
   });
 }
-
-import Debug from './debug';
-
 export function decreasePostsUserName(posts) {
-  const debug = new Debug();
 
   return new Promise((resolve, reject) => {
     let newPosts = posts;
@@ -313,10 +310,10 @@ export function decreasePostsUserName(posts) {
 
         if (first.length >= 16) {
 
-          newName = [...first]
+          newName = [];
 
-          while (newName.length > 13) {
-            newName.pop()
+          for (let i = 0; first.length < 13; i++) {
+            newName.push(first[i]);
           }
 
           post.assignedTo.name.last = ''
@@ -324,10 +321,10 @@ export function decreasePostsUserName(posts) {
 
         }
         else if (first.length + last.length > 16) {
-          let newName = [...last];
+          let newName = [];
 
-          while (first.length + newName.length > 14) {
-            newName.pop()
+          for (let i = 0; first.length + newName.length < 13; i++) {
+            newName.push(last[i]);
           }
 
           post.assignedTo.name.last = newName.reduce((acm, cur) => acm + cur) + '...';
@@ -337,14 +334,13 @@ export function decreasePostsUserName(posts) {
         post.comments.map(comment => {
           let { assignedTo: { name: { first, last } } } = comment
 
-          debug.post({ message: 'COMMENT ' + comment._id });
 
           if (first.length >= 21) {
 
-            newName = [...first]
+            newName = [];
 
-            while (newName.length > 18) {
-              newName.pop()
+            for (let i = 0; first.length < 18; i++) {
+              newName.push(first[i]);
             }
 
             comment.assignedTo.name.last = ''
@@ -353,15 +349,10 @@ export function decreasePostsUserName(posts) {
           }
           else if (first.length + last.length > 21) {
 
-            debug.post({ message: 'BEFORE REST' });
-            debug.post({ message: 'BEFORE REST' });
-            debug.post({ message: 'BEFORE REST' });
-            debug.post({ message: 'BEFORE REST' });
-            let newName = [...last];
-            debug.post({ message: 'AFTER REST' });
+            let newName = [];
 
-            while (first.length + newName.length > 18) {
-              newName.pop()
+            for (let i = 0; first.length + newName.length < 18; i++) {
+              newName.push(last[i]);
             }
 
             comment.assignedTo.name.last = newName.reduce((acm, cur) => acm + cur) + '...';
@@ -374,8 +365,16 @@ export function decreasePostsUserName(posts) {
       resolve(newPosts);
 
     } catch (err) {
-      debug.post({ error: err });
       reject(err);
     }
   });
+}
+export function resizeImage(photo) {
+  const width = parseInt(photo.width);
+  const height = parseInt(photo.height);
+  const porcent = ((width - Dimensions.get('window').width) / width) * 100;
+  photo.width = Dimensions.get('window').width;
+  photo.height = height - ((porcent * height) / 100);
+
+  return photo;
 }

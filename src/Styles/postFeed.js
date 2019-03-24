@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Image, Text, Dimensions, TouchableOpacity } from 'react-native';
 
 import styled from 'styled-components/native';
 
@@ -14,14 +14,14 @@ const ContainerPost = styled.View`
   align-items: center;
   background-color: #FFF;
   border-radius: 15px;
-  margin-top: 1px;
+  margin-top: 2px;
 `;
 const ContainerHeader = styled.View`
   flex-direction: row;
   padding: 10px;
 `;
 const ContainerContentPost = styled.View`
-  margin: 10px;
+  margin: 5px;
 `;
 const ContainerHeaderPost = styled.View`
   width: ${Dimensions.get('window').width - 70};
@@ -64,9 +64,24 @@ export const HeaderPost = props => (
 );
 export const ContentPost = props => (
   <ContainerContentPost>
-    <Text style={{ textAlign: 'center' }}>{props.content}</Text>
+    {props.postPhoto ? (
+      <Image
+        style={{
+          width: props.postPhoto.width,
+          height: props.postPhoto.height,
+        }}
+        resizeMode='contain'
+        source={{ uri: props.postPhoto.content }}
+      />
+    ) : null}
+    {props.content ? (
+      <View style={{ paddingLeft: 15, paddingRight: 15 }}>
+        <Text style={{ textAlign: 'left' }}>{props.content}</Text>
+      </View>
+    ) : null}
   </ContainerContentPost>
 );
+
 export const FooterPost = props => (
   <ContainerFooterPost>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -98,9 +113,10 @@ export const Post = props => (
       pushPost={props.pushPost}
     />
 
-    <ContentPost content={props.content} />
-
-
+    <ContentPost
+      content={props.content}
+      postPhoto={props.postPhoto}
+    />
 
     <Comment
       user_id={props.user_id}

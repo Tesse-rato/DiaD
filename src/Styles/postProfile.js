@@ -1,20 +1,21 @@
 import React from 'react';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native'
+import { View, Image, Text, Dimensions, TouchableOpacity } from 'react-native'
 
 import styled from 'styled-components/native';
 import CommentIco from '../assets/CommentDiaD.svg';
 import ShareIco from '../assets/ShareDiaD.svg';
+import EditIco from '../assets/EditDiaD.svg';
 
 import { Comment } from './comment';
 
 
 const ContainerPostProfile = styled.View`
-  width: ${Dimensions.get('window').width - 13};
+  width: ${Dimensions.get('window').width};
   background-color: #FFF;
   border-radius: 12px;
   align-items: center;
   padding: 10px;
-  margin-top: 10px;
+  margin-top: 2px;
 `;
 const ContainerHeaderPostProfile = styled.View`
   width: ${Dimensions.get('window').width - 23};
@@ -26,6 +27,7 @@ const ContainerHeaderPostProfile = styled.View`
 const ContainerContentPostProfile = styled.View`
   width: ${Dimensions.get('window').width - 30};
   padding: 10px;
+  align-items: center;
 `;
 const ContainerFooterPost = styled.View`
   width: ${Dimensions.get('window').width - 13};
@@ -38,17 +40,35 @@ const ContainerFooterPost = styled.View`
 const HeaderPostProfile = props => (
   <ContainerHeaderPostProfile>
     <Text>{`${props.datePost[0]} ${props.datePost[1]} ${props.datePost[2]}`}</Text>
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text style={{ fontSize: 12, marginRight: 5 }}>{props.pushTimes}</Text>
-      <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
-        <props.push_ico width={24} height={24} />
+    {props.user_id == props.post_user_id ? (
+      <TouchableOpacity onPress={() => props.editPost(props.post_id)}>
+        <EditIco width={24} height={24} />
       </TouchableOpacity>
-    </View>
+    ) : (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ fontSize: 12, marginRight: 5 }}>{props.pushTimes}</Text>
+          <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
+            <props.push_ico width={24} height={24} />
+          </TouchableOpacity>
+        </View>
+      )}
   </ContainerHeaderPostProfile>
 );
 const ContentPostProfile = props => (
   <ContainerContentPostProfile>
-    <Text style={{ textAlign: 'center' }}>{props.content}</Text>
+    {props.postPhoto ? (
+      <Image
+        style={{
+          width: props.postPhoto.width,
+          height: props.postPhoto.height,
+        }}
+        resizeMode='contain'
+        source={{ uri: props.postPhoto.content }}
+      />
+    ) : null}
+    {props.content ? (
+      <Text style={{ textAlign: 'left' }}>{props.content}</Text>
+    ) : null}
   </ContainerContentPostProfile>
 );
 export const FooterPost = props => (
@@ -72,9 +92,15 @@ export const PostProfile = props => (
       pushPost={props.pushPost}
       datePost={props.datePost}
       pushTimes={props.pushTimes}
+      user_id={props.user_id}
+      post_user_id={props.post_user_id}
+      editPost={props.editPost}
     />
 
-    <ContentPostProfile content={props.content} />
+    <ContentPostProfile
+      content={props.content}
+      postPhoto={props.postPhoto}
+    />
 
     <Comment
       user_id={props.user_id}
