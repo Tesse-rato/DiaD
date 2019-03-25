@@ -406,17 +406,17 @@ class SettingsProfile extends Component {
   }
 
   setUser(arg, value) {
-    const obj = this.state.user;
+    const obj = this.state;
 
     if (arg == 'first' || arg == 'last' || arg == 'nickname') {
-      obj.name[arg] = value;
+      obj.user.name[arg] = value;
     }
     else {
-      obj[arg] = value;
+      obj.user[arg] = value;
     }
 
     obj.change = true;
-    this.setState({ user: obj });
+    this.setState(obj);
 
   }
 
