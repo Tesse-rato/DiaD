@@ -416,7 +416,7 @@ class SettingsProfile extends Component {
     }
 
     obj.change = true;
-    this.setState(obj);
+    this.setState({ user: obj });
 
   }
 
