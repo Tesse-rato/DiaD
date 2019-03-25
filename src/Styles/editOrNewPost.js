@@ -10,9 +10,11 @@ import DoneIco from '../assets/DoneGreenDiaD.svg'
 import DeleteIco from '../assets/DeleteDiaD.svg';
 import LoadImageIco from '../assets/LoadImageDiaD.svg';
 
+import Debug from '../funcs/debug';
+
 const ContainerEditPost = styled.View`
   width: ${Dimensions.get('window').width};
-  height: ${Dimensions.get('window').height};
+  height: ${props => props.newPost ? Dimensions.get('window').height - 50 : Dimensions.get('window').height};
   align-items: center;
   border-radius: 10px;
   background-color: #FFF;
@@ -26,7 +28,6 @@ const ContainerBackDoneOrDelete = styled.View`
 `;
 const ContainerContentPost = styled.View`
   flex: 1;
-  align-items: center;
   justify-content: center;
 `;
 const BackDoneOrDelete = props => (
@@ -41,16 +42,18 @@ const BackDoneOrDelete = props => (
 const ContentPost = props => (
   <ContainerContentPost>
     <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-      {props.contentPost ? (
-        <View style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <TextInput
-            multiline
-            maxLength={400}
-            onChangeText={e => props.editContentPost(e)}
-            value={props.contentPost}
-          />
-        </View>
-      ) : null}
+      <View style={{ paddingLeft: 10, paddingRight: 10 }}>
+        <TextInput
+          style={{
+            width: Dimensions.get('window').width - 20
+          }}
+          multiline
+          maxLength={400}
+          placeholder='Conteudo'
+          onChangeText={e => props.editContentPost(e)}
+          value={props.contentPost}
+        />
+      </View>
       {props.photoPost ? (
         <View>
           <TouchableOpacity onPress={() => props.loadImageOnEditPost(props.post_id)}>
@@ -74,7 +77,7 @@ const ContentPost = props => (
   </ContainerContentPost>
 );
 export const EditOrNewPost = props => (
-  <ContainerEditPost>
+  <ContainerEditPost newPost={props.newPost}>
     <BackDoneOrDelete
       cancelEditPost={props.cancelEditPost}
       doneEditPost={props.doneEditPost}

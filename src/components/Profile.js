@@ -77,7 +77,11 @@ class Profile extends Component {
         content: '',
       },
       postController: {
-        post: {},
+        post: {
+          _id: '_id',
+          content: '',
+          photo: undefined,
+        },
         edit: false,
         oldContent: '',
         loadedImage: false,
@@ -371,6 +375,8 @@ class Profile extends Component {
       const payload = this.state.posts.filter(post => post._id.toString() != this.state.postController.post._id);
 
       this.setState({ posts: payload });
+
+      this.oculteEditPost();
 
     }).catch(err => {
       Debug.post({ err: err.response.data.error });
@@ -715,11 +721,13 @@ class Profile extends Component {
                   // FAKE
                   push_ico={FlameBlueIco}
                   post_id='-'
-                  thumbnail={this.state.posts[0].assignedTo.photo.thumbnail}
-                  firstName={this.state.posts[0].assignedTo.name.first}
-                  lastName={this.state.posts[0].assignedTo.name.last}
-                  nickname={this.state.posts[0].assignedTo.name.nickname}
-                  pushTimes={this.state.postController.post.pushes.times}
+                  thumbnail={this.props.account.user.photo.thumbnail}
+                  firstName={this.props.account.user.name.first}
+                  lastName={''}
+                  nickname={this.props.account.user.name.nickname}
+                  pushTimes={
+                    this.state.postController.post.pushes.times ? this.state.postController.post.pushes.times : 0
+                  }
                   assignedTo_id='-'
                   clickImageProfile={() => null}
                   pushPost={() => null}

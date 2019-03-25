@@ -18,6 +18,7 @@ import {
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
+import { NavigationActions } from "react-navigation";
 
 import Api from '../api';
 
@@ -28,7 +29,7 @@ import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 import { MinhaView, Header } from "../styles/standard";
 import { Post } from '../styles/postFeed';
 
-import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage } from "../funcs";
+import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage, decreaseUserName } from "../funcs";
 
 import Debug from '../funcs/debug';
 class Feed extends Component {
@@ -70,16 +71,14 @@ class Feed extends Component {
         authorization: `Bearer ${this.props.account.token}`
       }
     }
-    console.log('ANTES DE API FEED')
+
     Api.get(this.props.url, config).then(({ data }) => {
       decreasePostsUserName(data).then(posts => {
-        console.log('DECREASE API FEED')
         this.setState({ posts, loading: false }, () => {
           this.animeContainerView(true);
         });
 
       }).catch(err => {
-        console.log('CATCH API FEED')
         alert('Confira sua conexao');
       })
     }).catch(err => {
@@ -87,6 +86,8 @@ class Feed extends Component {
     })
   }
   componentDidMount() {
+
+    this.props.navigation.addListener('didFocus', () => this.handleRefresh());
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
     // this.setState({ loading: false });
     Animated.sequence([
@@ -117,7 +118,6 @@ class Feed extends Component {
       )
     ]).start(() => this.setState({ onFeed: arg }));
   }
-
   debug(e) {
     console.log(e.nativeEvent.contentOffset.y);
   }
@@ -137,8 +137,9 @@ class Feed extends Component {
       }
 
       Api.get(this.props.url, config).then(({ data: posts }) => {
-        this.setState({ posts, refreshing: false });
-
+        decreasePostsUserName(posts).then(posts => {
+          this.setState({ posts, refreshing: false });
+        })
       }).catch(err => {
         alert('Nao foi possivel atualzar');
         this.setState({ refreshing: false });
