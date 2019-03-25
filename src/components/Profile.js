@@ -91,12 +91,10 @@ class Profile extends Component {
       startScroll: 0,
       tamFrameProfile: 240,
       messageSocialMedia: '',
-      animatedValueToBioView: new Animated.Value(45),
       animatedValueToTransform: new Animated.Value(0),
       animatedValueFromScrollY: new Animated.Value(0),
       animatedValueToProfileHeader: new Animated.Value(0),
       animatedValueToContainerView: new Animated.Value(0),
-      animatedValueToProfileImage: new Animated.Value(120),
       animatedValueToEditPostContainer: new Animated.Value(0),
       animatedValueToBottomNotificationFollowing: new Animated.Value(0),
       animatedValueToNotificationErrorOrWhatsappNumber: new Animated.Value(0),
@@ -145,41 +143,6 @@ class Profile extends Component {
   debug(e) {
     console.log(e.nativeEvent.contentOffset.x);
   }
-
-  animatedProfileFrame(currentValueScroll) {
-    // const { startScroll } = this.state;
-    // const differenceBettweenValues = Math.abs(startScroll - currentValueScroll);
-
-    // let valueToBioView = startScroll < currentValueScroll ? 0 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? this.state.tamBio : null;
-    // let valueToProfileImage = startScroll < currentValueScroll ? 60 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? 120 : 60;
-    // Animated.parallel([
-    //   Animated.timing(
-    //     this.state.animatedValueToBioView,
-    //     {
-    //       toValue: valueToBioView,
-    //       duration: 100,
-    //       easing: Easing.linear
-    //     }
-    //   ),
-    //   Animated.timing(
-    //     this.state.animatedValueToProfileImage,
-    //     {
-    //       toValue: valueToProfileImage,
-    //       duration: 600,
-    //       easing: Easing.bezier(.2, 1, .995, 1)
-    //     }
-    //   )
-    // ]).start(); 
-
-    Animated.timing(
-      this.state.animatedValueFromScrollY,
-      {
-        toValue: Math.floor(currentValueScroll),
-        duration: 1000,
-      }
-    ).start();
-  }
-
   clickImageProfile(_id) {
     if (_id == this.state.user._id) return;
 
@@ -523,18 +486,6 @@ class Profile extends Component {
     this.animFeedContainer(true);
     this.props.navigation.goBack();
   }
-
-  animFrameProfile() {
-
-    return this.animateMap({
-      nativeEvent: {
-        contentOffset: {
-          y: this.state.animatedValueFromScrollY - .1
-        }
-      }
-    });
-  }
-
   render() {
     console.disableYellowBox = true;
     return (
@@ -559,10 +510,7 @@ class Profile extends Component {
             <View style={{ width: Dimensions.get('window').width, backgroundColor: '#E8E8E8' }}>
               <FlatList
                 ref={ref => this.flatListRef = ref}
-                // onScroll={({ nativeEvent: { contentOffset: { y } } }) => this.animatedProfileFrame(y)}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueFromScrollY } } }])}
-                // onScrollBeginDrag={({ nativeEvent: { contentOffset: { y } } }) => this.setState({ startScroll: y })}
-                // onMomentumScrollEnd={({ nativeEvent: { contentOffset: { y } } }) => this.animatedProfileFrame(y)}
                 data={this.state.posts}
                 showsVerticalScrollIndicator={false}
                 keyExtractor={item => item._id}
@@ -644,8 +592,6 @@ class Profile extends Component {
                   follow={this.follow.bind(this)}
                   clickSocialMedia={this.socialMedia.bind(this)}
                   socialMedia={this.state.user.socialMedia}
-                  animatedValueToBioView={this.state.animatedValueToBioView}
-                  animatedValueToProfileImage={this.state.animatedValueToProfileImage}
                   animatedValueToTransform={this.state.animatedValueToTransform}
                   animatedValueFromScrollY={this.state.animatedValueFromScrollY}
                   tamBio={this.state.tamBio}

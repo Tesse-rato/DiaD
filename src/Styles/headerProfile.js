@@ -157,8 +157,8 @@ export const HeaderProfile = props => (
         textAlign: 'center',
         position: 'absolute',
         top: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100, 300],
-          outputRange: [160, 120, 20],
+          inputRange: [0, 100, 250],
+          outputRange: [160, 140, 20],
           extrapolate: 'clamp'
         }),
         left: props.animatedValueFromScrollY.interpolate({
@@ -186,8 +186,8 @@ export const HeaderProfile = props => (
         textAlign: 'center',
         position: 'absolute',
         top: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100, 300],
-          outputRange: [200, 150, 35],
+          inputRange: [0, 100, 250],
+          outputRange: [200, 170, 35],
           extrapolate: 'clamp'
         }),
         left: props.animatedValueFromScrollY.interpolate({
