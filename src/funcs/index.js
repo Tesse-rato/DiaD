@@ -127,6 +127,21 @@ export function editOrNewComment(arg, commentId, postId, newContent) {
         Api.patch('/posts/comment', data, config).then(({ data: comment }) => {
 
           let payload = this.state.posts;
+
+          if (comment.assignedTo.name.first.length > 21) {
+            let newName = [];
+            for (let i = 0; i < 18; i++) {
+              newName.push(comment.assignedTo.name.first[i]);
+            }
+            comment.assignedTo.name.first = newName.reduce((acm, crr) => acm + crr) + '...';
+          } else if (comment.assignedTo.name.first.length + comment.assignedTo.name.last.length > 21) {
+            let newName = [];
+            for (let i = 0; comment.assignedTo.name.first.length + i < 18; i++) {
+              newName.push(comment.assignedTo.name.last[i]);
+            }
+            comment.assignedTo.name.last = newName.reduce((acm, crr) => acm + crr) + '...';
+          }
+
           payload[this.indexOfPost].comments[0] = comment;
 
           this.setState({
@@ -226,26 +241,45 @@ export function newComment(postId) {
    */
   let posts = this.state.posts;
   let commentId = 'NOVO POST';
+  let user = this.props.account.user;
 
-  let comment = {
-    _id: commentId,
-    content: '',
-    assignedTo: {
-      _id: this.props.account.user._id,
-      name: this.props.account.user.name,
-      photo: this.props.account.user.photo
-    },
-  };
+  // if (name.first.length > 21) {
+  //   let newName = [];
+  //   for (let i = 0; i < 18; i++) {
+  //     newName.push(name.first[i]);
+  //   }
+  //   name.first = newName.reduce((acm, crr) => acm + crr) + '...';
+  // } else if (name.first.length + name.last.length > 21) {
+  //   let newName = [];
+  //   for (let i = 0; name.first.length + i < 18; i++) {
+  //     newName.push(name.last[i]);
+  //   }
+  //   name.last = newName.reduce((acm, crr) => acm + crr) + '...';
+  // }
 
-  posts.map((post, index) => post._id.toString() == postId ? this.indexOfPost = index : null);
+  decreaseUserName(user).then(user => {
+    let comment = {
+      _id: commentId,
+      content: '',
+      assignedTo: {
+        _id: this.props.account.user._id,
+        name: user.name,
+        photo: this.props.account.user.photo
+      },
+    };
 
-  let comments = [comment, ...this.state.posts[this.indexOfPost].comments];
+    posts.map((post, index) => post._id.toString() == postId ? this.indexOfPost = index : null);
 
-  posts[this.indexOfPost].comments = comments;
+    let comments = [comment, ...this.state.posts[this.indexOfPost].comments];
 
-  this.setState({ posts, commentController: { newComment: true } }, () => {
-    this.editOrNewComment('editContent', commentId, postId);
-  });
+    posts[this.indexOfPost].comments = comments;
+
+    this.setState({ posts, commentController: { newComment: true } }, () => {
+      this.editOrNewComment('editContent', commentId, postId);
+    });
+
+  })
+
 }
 export function pushPost(_id) {
   /**
