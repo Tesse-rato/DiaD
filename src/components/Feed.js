@@ -70,14 +70,16 @@ class Feed extends Component {
         authorization: `Bearer ${this.props.account.token}`
       }
     }
-
+    console.log('ANTES DE API FEED')
     Api.get(this.props.url, config).then(({ data }) => {
       decreasePostsUserName(data).then(posts => {
+        console.log('DECREASE API FEED')
         this.setState({ posts, loading: false }, () => {
           this.animeContainerView(true);
         });
 
       }).catch(err => {
+        console.log('CATCH API FEED')
         alert('Confira sua conexao');
       })
     }).catch(err => {

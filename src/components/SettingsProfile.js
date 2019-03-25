@@ -468,7 +468,12 @@ class SettingsProfile extends Component {
 
   logOut() {
     AsyncStorage.clear();
-    this.props.setUser({ token: '', user: '' });
+    const user = this.props.account.user;
+
+    user.email = '';
+    user.password = '';
+
+    this.props.setUser({ token: '', user });
     this.props.navigation.navigate('Login');
   }
   _goBack() {

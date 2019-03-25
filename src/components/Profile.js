@@ -10,7 +10,8 @@ import {
   ProgressBarAndroid,
   Linking,
   Clipboard,
-  BackHandler
+  BackHandler,
+  ScrollView
 } from 'react-native';
 
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -21,7 +22,14 @@ import { bindActionCreators } from 'redux';
 import * as Actions from '../redux/actions'
 
 import Api from '../api';
-import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage } from '../funcs'
+import {
+  editOrNewComment,
+  newComment,
+  pushPost,
+  decreasePostsUserName,
+  resizeImage,
+  decreaseUserName
+} from '../funcs'
 
 import { MinhaView } from "../styles/standard";
 import { HeaderProfile } from "../styles/headerProfile";
@@ -77,9 +85,11 @@ class Profile extends Component {
       },
       tamBio: 0,
       startScroll: 0,
+      tamFrameProfile: 240,
       messageSocialMedia: '',
       animatedValueToBioView: new Animated.Value(45),
       animatedValueToTransform: new Animated.Value(0),
+      animatedValueFromScrollY: new Animated.Value(0),
       animatedValueToProfileHeader: new Animated.Value(0),
       animatedValueToContainerView: new Animated.Value(0),
       animatedValueToProfileImage: new Animated.Value(120),
@@ -109,22 +119,20 @@ class Profile extends Component {
       const tamBio = user.bio ? Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 55) : 55;
 
       const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
-
       decreasePostsUserName(user.posts).then(posts => {
-        this.setState({
-          user: { ...this.state.user, ...user },
-          posts,
-          tamBio,
-          following,
-          loading: false,
-          animatedValueToBioView: new Animated.Value(tamBio)
-        }, () => {
-          this.animContainerView(true);
+        decreaseUserName(user).then(user => {
+          this.setState({
+            user: { ...this.state.user, ...user },
+            posts,
+            tamBio,
+            following,
+            loading: false,
+            animatedValueToBioView: new Animated.Value(tamBio)
+          }, () => {
+            this.animContainerView(true);
+          });
         });
-      }).catch(err => {
-        console.log(err);
       });
-
     }).catch(err => {
       console.log(err);
     });
@@ -135,30 +143,37 @@ class Profile extends Component {
   }
 
   animatedProfileFrame(currentValueScroll) {
-    const { startScroll } = this.state;
-    const differenceBettweenValues = Math.abs(startScroll - currentValueScroll);
+    // const { startScroll } = this.state;
+    // const differenceBettweenValues = Math.abs(startScroll - currentValueScroll);
 
-    let valueToBioView = startScroll < currentValueScroll ? 0 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? this.state.tamBio : null;
-    let valueToProfileImage = startScroll < currentValueScroll ? 60 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? 120 : 60;
+    // let valueToBioView = startScroll < currentValueScroll ? 0 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? this.state.tamBio : null;
+    // let valueToProfileImage = startScroll < currentValueScroll ? 60 : differenceBettweenValues > 400 || currentValueScroll <= 1 ? 120 : 60;
+    // Animated.parallel([
+    //   Animated.timing(
+    //     this.state.animatedValueToBioView,
+    //     {
+    //       toValue: valueToBioView,
+    //       duration: 100,
+    //       easing: Easing.linear
+    //     }
+    //   ),
+    //   Animated.timing(
+    //     this.state.animatedValueToProfileImage,
+    //     {
+    //       toValue: valueToProfileImage,
+    //       duration: 600,
+    //       easing: Easing.bezier(.2, 1, .995, 1)
+    //     }
+    //   )
+    // ]).start(); 
 
-    Animated.parallel([
-      Animated.timing(
-        this.state.animatedValueToBioView,
-        {
-          toValue: valueToBioView,
-          duration: 100,
-          easing: Easing.linear
-        }
-      ),
-      Animated.timing(
-        this.state.animatedValueToProfileImage,
-        {
-          toValue: valueToProfileImage,
-          duration: 600,
-          easing: Easing.bezier(.2, 1, .995, 1)
-        }
-      )
-    ]).start();
+    Animated.timing(
+      this.state.animatedValueFromScrollY,
+      {
+        toValue: Math.floor(currentValueScroll),
+        duration: 1000,
+      }
+    ).start();
   }
 
   clickImageProfile(_id) {
@@ -503,6 +518,17 @@ class Profile extends Component {
     this.props.navigation.goBack();
   }
 
+  animFrameProfile() {
+
+    return this.animateMap({
+      nativeEvent: {
+        contentOffset: {
+          y: this.state.animatedValueFromScrollY - .1
+        }
+      }
+    });
+  }
+
   render() {
     console.disableYellowBox = true;
     return (
@@ -522,124 +548,144 @@ class Profile extends Component {
               }]
             }}
           >
-            <Animated.View
-              style={{
-                transform: [{
-                  translateY: this.state.animatedValueToProfileHeader.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-Dimensions.get('window').height, 0]
-                  })
-                }]
-              }}
-            >
-              <HeaderProfile
-                user_id={this.state.user._id}
-                my_user_id={this.props.account.user._id}
-                bio={this.state.user.bio}
-                firstName={this.state.user.name.first}
-                lastName={this.state.user.name.last}
-                nickname={this.state.user.name.nickname}
-                thumbnail={this.state.user.photo.thumbnail}
-                goBack={this._goBack.bind(this)}
-                settings={this.goSttings.bind(this)}
-                following={this.state.following}
-                follow={this.follow.bind(this)}
-                clickSocialMedia={this.socialMedia.bind(this)}
-                socialMedia={this.state.user.socialMedia}
-                animatedValueToBioView={this.state.animatedValueToBioView}
-                animatedValueToProfileImage={this.state.animatedValueToProfileImage}
-                animatedValueToTransform={this.state.animatedValueToTransform}
+
+
+            <View style={{ width: Dimensions.get('window').width, backgroundColor: '#E8E8E8' }}>
+              <FlatList
+                ref={ref => this.flatListRef = ref}
+                // onScroll={({ nativeEvent: { contentOffset: { y } } }) => this.animatedProfileFrame(y)}
+                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueFromScrollY } } }])}
+                // onScrollBeginDrag={({ nativeEvent: { contentOffset: { y } } }) => this.setState({ startScroll: y })}
+                // onMomentumScrollEnd={({ nativeEvent: { contentOffset: { y } } }) => this.animatedProfileFrame(y)}
+                data={this.state.posts}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={item => item._id}
+                ListHeaderComponent={() => (<View style={{ height: this.state.tamFrameProfile + this.state.tamBio + 10 }} />)}
+                renderItem={({ item }) => {
+                  const datePost = item.createdAt.split('T')[0].split('-').reverse();
+                  const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
+                  const ico = pushed ? FlameRedIco : FlameBlueIco;
+                  if (item.photo) item.photo = resizeImage(item.photo);
+
+                  return (
+                    <View style={{ backgroundColor: '#E8E8E8' }}>
+                      <PostProfile
+                        push_ico={ico}
+                        post_id={item._id}
+                        user_id={this.props.account.user._id}
+                        post_user_id={item.assignedTo._id}
+                        datePost={datePost}
+                        pushTimes={item.pushes.times}
+                        comments={item.comments}
+                        content={item.content}
+                        postPhoto={item.photo}
+                        commentController={this.state.commentController}
+                        editOrNewComment={this.editOrNewComment}
+                        newComment={this.newComment}
+                        pushPost={this._pushPost.bind(this)}
+                        sharePost={this.sharePost.bind(this)}
+                        editPost={this.editPost.bind(this)}
+                        debug={this.debug.bind(this)}
+                        clickImageProfile={this.clickImageProfile.bind(this)}
+                      />
+                    </View>
+                  )
+                }}
               />
-            </Animated.View>
-            {this.state.posts.length ? (
-              <View style={{ flex: 1, backgroundColor: '#E8E8E8' }}>
-                <FlatList
-                  ref={ref => this.flatListRef = ref}
-                  onScrollBeginDrag={({ nativeEvent: { contentOffset: { y } } }) => this.setState({ startScroll: y })}
-                  onMomentumScrollEnd={({ nativeEvent: { contentOffset: { y } } }) => this.animatedProfileFrame(y)}
-                  data={this.state.posts}
-                  showsVerticalScrollIndicator={false}
-                  keyExtractor={item => item._id}
-                  renderItem={({ item }) => {
-                    const datePost = item.createdAt.split('T')[0].split('-').reverse();
-                    const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                    const ico = pushed ? FlameRedIco : FlameBlueIco;
-                    if (item.photo) item.photo = resizeImage(item.photo);
-
-                    return (
-                      <View style={{ backgroundColor: '#E8E8E8' }}>
-                        <PostProfile
-                          push_ico={ico}
-                          post_id={item._id}
-                          user_id={this.props.account.user._id}
-                          post_user_id={item.assignedTo._id}
-                          datePost={datePost}
-                          pushTimes={item.pushes.times}
-                          comments={item.comments}
-                          content={item.content}
-                          postPhoto={item.photo}
-                          commentController={this.state.commentController}
-                          editOrNewComment={this.editOrNewComment}
-                          newComment={this.newComment}
-                          pushPost={this._pushPost.bind(this)}
-                          sharePost={this.sharePost.bind(this)}
-                          editPost={this.editPost.bind(this)}
-                          debug={this.debug.bind(this)}
-                          clickImageProfile={this.clickImageProfile.bind(this)}
-                        />
-                      </View>
-                    )
+              {!this.state.posts.length ? (
+                <View
+                  style={{
+                    width: Dimensions.get('window').width,
+                    height: Dimensions.get('window').height,
+                    padding: 20,
+                    position: 'absolute',
+                    backgroundColor: '#FFF',
                   }}
-                />
-
-              </View>
-            ) : (
-                <View style={{ flex: 1, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-                  <Text style={{ color: '#08F', fontSize: 16, textAlign: 'center' }}>
+                >
+                  <View style={{ height: this.state.tamBio + this.state.tamFrameProfile }} />
+                  <Text style={{ color: '#08F', fontSize: 16 }}>
                     Parece que é sua primeira vez,
                     comesse configurando seu perfil,
                     adicionando suas redes sociais,
                     adicionando uma breve biografia
                     e faça uma postagem de boas vindas.
-                  </Text>
+                      </Text>
                 </View>
-              )}
-            <Animated.View
-              style={{
-                width: Dimensions.get('window').width, height: 30,
-                position: 'absolute',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#08F',
-                transform: [{
-                  translateY: this.state.animatedValueToBottomNotificationFollowing.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-30, Dimensions.get('window').height - 30]
-                  })
-                }]
-              }}
-            >
-              <Text style={{ fontSize: 12, color: '#FFF' }}>Seguindo</Text>
-            </Animated.View>
-            <Animated.View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: Dimensions.get('window').width - 50,
-                height: 100,
-                borderRadius: 10,
-                position: 'absolute',
-                backgroundColor: '#FFF',
-                transform: [{
-                  translateY: this.state.animatedValueToNotificationErrorOrWhatsappNumber.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-Dimensions.get('window').height / 2, Dimensions.get('window').height / 2]
-                  })
-                }]
-              }}
-            >
-              <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
-            </Animated.View>
+              ) : null}
+
+              <Animated.View
+                style={{
+                  position: 'absolute',
+                  transform: [{
+                    translateY: this.state.animatedValueToProfileHeader.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-Dimensions.get('window').height, 0]
+                    })
+                  }]
+                }}
+              >
+                <HeaderProfile
+                  user_id={this.state.user._id}
+                  my_user_id={this.props.account.user._id}
+                  bio={this.state.user.bio}
+                  firstName={this.state.user.name.first}
+                  lastName={this.state.user.name.last}
+                  nickname={this.state.user.name.nickname}
+                  thumbnail={this.state.user.photo.thumbnail}
+                  goBack={this._goBack.bind(this)}
+                  settings={this.goSttings.bind(this)}
+                  following={this.state.following}
+                  follow={this.follow.bind(this)}
+                  clickSocialMedia={this.socialMedia.bind(this)}
+                  socialMedia={this.state.user.socialMedia}
+                  animatedValueToBioView={this.state.animatedValueToBioView}
+                  animatedValueToProfileImage={this.state.animatedValueToProfileImage}
+                  animatedValueToTransform={this.state.animatedValueToTransform}
+                  animatedValueFromScrollY={this.state.animatedValueFromScrollY}
+                  tamBio={this.state.tamBio}
+                  tamFrameProfile={this.state.tamFrameProfile + this.state.tamBio}
+                />
+              </Animated.View>
+
+
+
+              <Animated.View
+                style={{
+                  width: Dimensions.get('window').width, height: 30,
+                  position: 'absolute',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#08F',
+                  transform: [{
+                    translateY: this.state.animatedValueToBottomNotificationFollowing.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-30, Dimensions.get('window').height - 30]
+                    })
+                  }]
+                }}
+              >
+                <Text style={{ fontSize: 12, color: '#FFF' }}>Seguindo</Text>
+              </Animated.View>
+              <Animated.View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: Dimensions.get('window').width - 50,
+                  height: 100,
+                  borderRadius: 10,
+                  position: 'absolute',
+                  backgroundColor: '#FFF',
+                  transform: [{
+                    translateY: this.state.animatedValueToNotificationErrorOrWhatsappNumber.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [-Dimensions.get('window').height / 2, Dimensions.get('window').height / 2]
+                    })
+                  }]
+                }}
+              >
+                <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
+              </Animated.View>
+            </View>
             {this.state.postController.edit ? (
               <Animated.View
                 style={{

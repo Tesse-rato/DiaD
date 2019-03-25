@@ -1,5 +1,6 @@
 import Api from '../api';
 import { Dimensions } from 'react-native';
+import Debug from './debug';
 
 export function editOrNewComment(arg, commentId, postId, newContent) {
   /**
@@ -359,7 +360,6 @@ export function decreasePostsUserName(posts) {
 
           }
         })
-
       });
 
       resolve(newPosts);
@@ -377,4 +377,32 @@ export function resizeImage(photo) {
   photo.height = height - ((porcent * height) / 100);
 
   return photo;
+}
+export function decreaseUserName(user) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (user.name.first.length > 18) {
+        let first = [];
+        for (let i = 0; i < 15; i++) {
+          first.push(user.name.first[i]);
+        }
+        user.name.first = first.reduce((acm, crr) => acm + crr) + '...';
+        resolve(user);
+      }
+      else if (user.name.first.length + user.name.last.length > 18) {
+        let last = [];
+        for (let i = 0; user.name.first.length + i < 15; i++) {
+          last.push(user.name.last[i]);
+        }
+        user.name.last = last.reduce((acm, crr) => acm + crr) + '...';
+        resolve(user);
+      }
+      else {
+        resolve(user);
+      }
+    } catch (error) {
+      Debug.post({ error });
+      reject(error)
+    }
+  })
 }
