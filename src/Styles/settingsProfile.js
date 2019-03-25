@@ -70,8 +70,8 @@ export const HeaderSettingsProfile = props => (
     </TouchableOpacity>
 
     <View style={{ height: 50, flexDirection: 'row', alignItems: 'center' }}>
-      <TextInput onChangeText={e => props.setUser('first', e)} value={props.firstName} style={{ fontSize: 28, color: '#333' }} />
-      <TextInput onChangeText={e => props.setUser('last', e)} value={props.lastName} style={{ fontSize: 28, color: '#333' }} />
+      <TextInput placeholder='Nome' onChangeText={e => props.setUser('first', e)} value={props.firstName} style={{ fontSize: 28, color: '#333' }} />
+      <TextInput placeholder='Sobrenome' onChangeText={e => props.setUser('last', e)} value={props.lastName} style={{ fontSize: 28, color: '#333' }} />
     </View>
     <View style={{ height: 45, flexDirection: 'row', alignItems: 'center' }}>
       <Text>@</Text>

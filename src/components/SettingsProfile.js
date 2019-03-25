@@ -28,6 +28,7 @@ import { PostProfile } from '../styles/postProfile';
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
 
+import Debug from '../funcs/debug';
 class SettingsProfile extends Component {
   static navigationOptions = {
     header: null
@@ -319,8 +320,6 @@ class SettingsProfile extends Component {
       }
     }
 
-
-
     const data = {
       userId: this.state.user._id,
       name: this.state.user.name,
@@ -340,10 +339,19 @@ class SettingsProfile extends Component {
           }
         }
 
-        Api.patch(`/users/profilePhoto/${this.state.user._id}`, this.state.dataImage, config).then(() => {
+        Api.patch(`/users/profilePhoto/${this.state.user._id}`, this.state.dataImage, config).then(({ data }) => {
+          const user = this.props.account.user;
+          user.photo = data.photo;
+
+          this.props.setUser({
+            token: this.props.account.token,
+            user,
+          })
+
           this.success();
 
-        }).catch(() => {
+        }).catch(err => {
+          Debug.post({ err })
           this.failed();
         });
 
@@ -450,7 +458,8 @@ class SettingsProfile extends Component {
 
         this.setState({
           user: {
-            ...this.state.user, photo: {
+            ...this.state.user,
+            photo: {
               ...this.state.user.photo,
               thumbnail: 'data:image/jpeg;base64,' + response.data
             }
