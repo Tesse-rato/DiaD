@@ -88,6 +88,7 @@ class NewPost extends Component {
     });
   }
   cancelEditPost() {
+    this.deletePost();
     this.props.navigation.goBack();
   }
   doneEditPost() {
