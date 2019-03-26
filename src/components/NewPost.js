@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, ProgressBarAndroid, Dimensions, BackHandler } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
 import { connect } from 'react-redux';
@@ -28,8 +28,12 @@ class NewPost extends Component {
         oldContent: '',
         loadedImage: false,
         newImage: undefined,
-      }
+      },
+      uploading: false
     };
+  }
+  componentWillMount() {
+    BackHandler.addEventListener('hardwareBackPress', () => this.cancelEditPost());
   }
   editContentPost(newValue) {
     this.setState({
@@ -96,6 +100,8 @@ class NewPost extends Component {
       return this.cancelEditPost()
     }
 
+    this.setState({ uploading: true });
+
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -126,6 +132,7 @@ class NewPost extends Component {
               content: '',
             }
           });
+          this.setState({ uploading: false });
           this.cancelEditPost();
 
         }).catch(err => {
@@ -134,6 +141,7 @@ class NewPost extends Component {
         });
 
       } else {
+        this.setState({ uploading: false });
         this.cancelEditPost();
         Debug.post({ msg: 'Tudo Sucesso' });
       }
@@ -187,6 +195,29 @@ class NewPost extends Component {
           pushPost={() => null}
         // FAKE
         />
+        {this.state.uploading ? (
+          <View
+            style={{
+              position: 'absolute',
+              top: 0,
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height,
+              backgroundColor: '#FFF',
+              opacity: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text
+              style={{ color: '#08F', margin: 10 }}
+            >Postando</Text>
+            <ProgressBarAndroid
+              styleAttr='Normal'
+              undefined={true}
+              color='#08F'
+            />
+          </View>
+        ) : null}
       </View>
     );
   }

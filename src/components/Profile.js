@@ -146,12 +146,10 @@ class Profile extends Component {
   clickImageProfile(_id) {
     if (_id == this.state.user._id) return;
 
+    this.state.animatedValueFromScrollY.setValue(0);
     this.props.setProfileId(_id);
     this.animContainerView(false);
-    this.setState({
-      loading: true,
-      animatedValueToProfileImage: new Animated.Value(120),
-    }, () => {
+    this.setState({ loading: true }, () => {
       this.componentDidMount();
     });
   }

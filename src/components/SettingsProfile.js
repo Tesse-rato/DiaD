@@ -537,6 +537,7 @@ class SettingsProfile extends Component {
                       pushTimes={item.pushes.times}
                       comments={item.comments}
                       content={item.content}
+                      postPhoto={item.photo}
                       commentController={this.state.commentController}
                       clickImageProfile={this.clickImageProfile}
                       editOrNewComment={this.editOrNewComment}

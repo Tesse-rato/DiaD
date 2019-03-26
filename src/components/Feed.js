@@ -206,7 +206,7 @@ class Feed extends Component {
                     style={{
                       alignItems: 'center',
                       width: Dimensions.get('window').width - 20,
-                      height: Dimensions.get('window').height - 540,
+                      height: 80,
                       padding: 10,
                       borderRadius: 60,
                       backgroundColor: '#FFF'

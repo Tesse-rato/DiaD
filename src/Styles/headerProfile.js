@@ -218,17 +218,17 @@ export const HeaderProfile = props => (
         position: 'absolute',
         top: props.animatedValueFromScrollY.interpolate({
           inputRange: [0, 100],
-          outputRange: [240, 220],
+          outputRange: [240, 200],
           extrapolate: 'clamp'
         }),
         height: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 120],
+          inputRange: [0, 100],
           outputRange: [props.tamBio, 0],
           extrapolate: 'clamp'
         }),
         opacity: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100, 120],
-          outputRange: [1, 1, 0],
+          inputRange: [0, 50, 80],
+          outputRange: [1, 0, 0],
           extrapolate: 'clamp'
         }),
         transform: [{
