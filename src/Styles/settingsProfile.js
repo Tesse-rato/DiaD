@@ -38,16 +38,13 @@ const ContainerContentSettingsProfile = styled.View`
   width: ${Dimensions.get('window').width - 100};
   background-color: #FFF;
   align-items: center;
-  border-radius: 10px;
-  padding: 10px;
-  margin-top: 10px;
-  border-width: 0.5px;
-  border-color: #08F;
+  justify-content: center;
+  margin: 5px;
 `;
 const ButtonSettingsMediaSocialAndCity = props => (
   <TouchableOpacity onPress={() => props.showOrHiddenOtherSettings()}>
     <ContainerContentSettingsProfile>
-      <Text>Outras configurações</Text>
+      <Text style={{ color: '#08F' }}>Outras configurações</Text>
     </ContainerContentSettingsProfile>
   </TouchableOpacity>
 );
@@ -69,13 +66,13 @@ export const HeaderSettingsProfile = props => (
       <Image style={{ width: 120, height: 120, borderRadius: 60, marginTop: 20, marginBottom: 10 }} source={{ uri: props.thumbnail }} />
     </TouchableOpacity>
 
-    <View style={{ height: 50, flexDirection: 'row', alignItems: 'center' }}>
-      <TextInput placeholder='Nome' onChangeText={e => props.setUser('first', e)} value={props.firstName} style={{ fontSize: 28, color: '#333' }} />
-      <TextInput placeholder='Sobrenome' onChangeText={e => props.setUser('last', e)} value={props.lastName} style={{ fontSize: 28, color: '#333' }} />
+    <View style={{ height: 52, flexDirection: 'row', alignItems: 'center' }}>
+      <TextInput onChangeText={e => props.setUser('first', e)} value={props.firstName} style={{ fontSize: 28, color: '#333', backgroundColor: '#F8F8F8', borderRadius: 5, margin: 1 }} />
+      <TextInput onChangeText={e => props.setUser('last', e)} value={props.lastName} style={{ fontSize: 28, color: '#333', backgroundColor: '#F8F8F8', borderRadius: 5, margin: 1 }} />
     </View>
-    <View style={{ height: 45, flexDirection: 'row', alignItems: 'center' }}>
+    <View style={{ height: 47, flexDirection: 'row', alignItems: 'center' }}>
       <Text>@</Text>
-      <TextInput onChangeText={e => props.setUser('nickname', e)} value={props.nickname} style={{ fontSize: 16, color: '#333' }} />
+      <TextInput onChangeText={e => props.setUser('nickname', e)} value={props.nickname} style={{ fontSize: 16, color: '#333', backgroundColor: '#F8F8F8', borderRadius: 5, margin: 1 }} />
     </View>
 
     <Separator />
@@ -83,7 +80,7 @@ export const HeaderSettingsProfile = props => (
     <ButtonSettingsMediaSocialAndCity showOrHiddenOtherSettings={props.showOrHiddenOtherSettings} />
 
     <ScrollView>
-      <TextInput placeholder='Bio' onChangeText={e => props.setUser('bio', e)} value={props.bio} multiline style={{ textAlign: 'center' }} />
+      <TextInput placeholder='Biografia' onChangeText={e => props.setUser('bio', e)} value={props.bio} multiline style={{ textAlign: 'center', backgroundColor: '#F8F8F8', margin: 2 }} />
     </ScrollView>
 
   </ContainerHeaderSettingsProfile>

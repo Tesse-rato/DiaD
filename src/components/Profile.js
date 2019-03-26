@@ -475,6 +475,7 @@ class Profile extends Component {
   }
   goSttings() {
     this.props.navigation.navigate('SettingsProfile', {
+      user: this.state.user,
       posts: this.state.posts,
       animFeedContainer: this.animFeedContainer.bind(this)
     });

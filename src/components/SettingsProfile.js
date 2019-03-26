@@ -78,7 +78,7 @@ class SettingsProfile extends Component {
         content: '',
       },
       loading: true,
-      change: false,
+      changed: false,
       dataImage: '',
       oldNickname: '',
       currentPassword: '',
@@ -93,33 +93,48 @@ class SettingsProfile extends Component {
   }
 
   async componentDidMount() {
+    // const currentPassword = await AsyncStorage.getItem('password');
+    // const posts = await this.props.navigation.getParam('posts');
+    // this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
+
+    // // const config = {
+    // //   headers: {
+    // //     authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58'
+    // //   }
+    // // }
+
+    // // Api.get('/users/profile/5c87bc1e12458240f471c8fb', config).then(({ data: user }) => {
+
+    // //   this.setState({ user: { ...this.state.user, ...user }, currentPassword, oldNickname: user.name.nickname });
+
+    // //   this.props.setUser({
+    // //     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58',
+    // //     user
+    // //   })
+
+    // // })
+
+    // this.setState({
+    //   posts,
+    //   loading: false,
+    //   currentPassword,
+    //   user: { ...this.state.user, ...this.props.account.user },
+    //   oldNickname: this.props.account.user.name.nickname
+    // });
+    this.setUserData();
+  }
+  async setUserData() {
     const currentPassword = await AsyncStorage.getItem('password');
     const posts = await this.props.navigation.getParam('posts');
+    const user = await this.props.navigation.getParam('user');
     this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
-
-    // const config = {
-    //   headers: {
-    //     authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58'
-    //   }
-    // }
-
-    // Api.get('/users/profile/5c87bc1e12458240f471c8fb', config).then(({ data: user }) => {
-
-    //   this.setState({ user: { ...this.state.user, ...user }, currentPassword, oldNickname: user.name.nickname });
-
-    //   this.props.setUser({
-    //     token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjODdiYzFlMTI0NTgyNDBmNDcxYzhmYiIsImlhdCI6MTU1Mjg0MDAzNSwiZXhwIjoxNTUyOTI2NDM1fQ.ppFUrSlSBiRBoUBQJBoFUqa_Jc00MtbaH7xSs6Edw58',
-    //     user
-    //   })
-
-    // })
 
     this.setState({
       posts,
       loading: false,
       currentPassword,
-      user: { ...this.state.user, ...this.props.account.user },
-      oldNickname: this.props.account.user.name.nickname
+      user: { ...this.state.user, ...user },
+      oldNickname: user.name.nickname
     });
   }
 
@@ -290,6 +305,17 @@ class SettingsProfile extends Component {
   }
 
   verifyNickname() {
+    if (!this.state.user.name.nickname) {
+      return this.setState({
+        done: {
+          ok: true,
+          show: true,
+          message: 'Faltando o campo Apelido'
+        }
+      }, () => {
+        this.animeBoxDoneMessage();
+      });
+    }
 
     if (this.state.user.name.nickname != this.state.oldNickname) {
       const config = {
@@ -314,6 +340,30 @@ class SettingsProfile extends Component {
   }
 
   upToApi() {
+    if (!this.state.user.name.first) {
+      return this.setState({
+        done: {
+          ok: true,
+          show: true,
+          message: 'Faltando o campo nome'
+        }
+      }, () => {
+        this.animeBoxDoneMessage();
+      });
+    }
+    if (!this.state.user.name.last) {
+      return this.setState({
+        done: {
+          ok: true,
+          show: true,
+          message: 'Faltando o campo sobrenome'
+        }
+      }, () => {
+        this.animeBoxDoneMessage();
+      });
+    }
+
+
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -369,7 +419,7 @@ class SettingsProfile extends Component {
       done: {
         ok: true,
         show: true,
-        message: 'Seu perfil foi atualizada c:'
+        message: 'Seu perfil foi atualizado'
       }
     }, () => {
       this.animeBoxDoneMessage();
@@ -386,7 +436,7 @@ class SettingsProfile extends Component {
     }, () => this.animeBoxDoneMessage());
   }
   done() {
-    if (!this.state.change) {
+    if (!this.state.changed) {
       this.props.navigation.goBack();
 
     } else if (!this.state.user.password) {
@@ -407,7 +457,7 @@ class SettingsProfile extends Component {
   setOtherSettingsValue(arg, value) {
     const obj = this.state;
 
-    obj.change = true;
+    obj.changed = true;
     obj.user.socialMedia[arg] = value;
 
     this.setState(obj);
@@ -423,7 +473,7 @@ class SettingsProfile extends Component {
       obj.user[arg] = value;
     }
 
-    obj.change = true;
+    obj.changed = true;
     this.setState(obj);
 
   }
@@ -486,9 +536,11 @@ class SettingsProfile extends Component {
     this.props.navigation.navigate('Login');
   }
   _goBack() {
-    if (!this.state.change) {
+    if (!this.state.changed) {
       this.props.navigation.goBack();
     } else {
+      Debug.post({ post: '_goBack' });
+      this.setUserData();
       this.animFeedContainer(true);
       this.props.navigation.navigate('Geral');
     }
