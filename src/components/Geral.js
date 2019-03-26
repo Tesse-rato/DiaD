@@ -4,7 +4,7 @@ import Feed from './Feed';
 
 export default props => (
   <Feed
-    url='/posts/list'
+    url='/posts/list/general'
     navigation={props.navigation}
   />
 );

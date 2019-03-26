@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, Dimensions, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
+import {
+  View,
+  Dimensions,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  ScrollView,
+  Picker
+} from 'react-native';
 
 import styled from 'styled-components/native';
 
@@ -20,7 +28,7 @@ const ContainerEditPost = styled.View`
   background-color: #FFF;
 `;
 
-const ContainerBackDoneOrDelete = styled.View`
+const ContainerBackOrCategory = styled.View`
   width: ${Dimensions.get('window').width};
   padding: 10px;
   flex-direction: row;
@@ -30,13 +38,26 @@ const ContainerContentPost = styled.View`
   flex: 1;
   justify-content: center;
 `;
-const BackDoneOrDelete = props => (
-  <ContainerBackDoneOrDelete>
+
+const BackOrCategory = props => (
+  <ContainerBackOrCategory>
     <TouchableOpacity onPress={() => props.cancelEditPost()}>
       <BackIco width={20} height={20} />
     </TouchableOpacity>
-
-  </ContainerBackDoneOrDelete>
+    <Picker
+      style={{
+        width: Dimensions.get('window').width - 100,
+        height: 20,
+      }}
+      selectedValue={props.category}
+      onValueChange={value => props.changePostCategory(value)}
+    >
+      <Picker.Item value='general' label='Geral' />
+      <Picker.Item value='justice' label='Justica' />
+      <Picker.Item value='business' label='Negocios' />
+      <Picker.Item value='favorites' label='Favoritos' />
+    </Picker>
+  </ContainerBackOrCategory>
 );
 
 const ContentPost = props => (
@@ -78,11 +99,13 @@ const ContentPost = props => (
 );
 export const EditOrNewPost = props => (
   <ContainerEditPost newPost={props.newPost}>
-    <BackDoneOrDelete
+    <BackOrCategory
+      changePostCategory={props.changePostCategory}
       cancelEditPost={props.cancelEditPost}
       doneEditPost={props.doneEditPost}
       deletePost={props.deletePost}
       post_id={props.post_id}
+      category={props.category}
     />
 
     <HeaderPost

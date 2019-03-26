@@ -205,8 +205,8 @@ class Feed extends Component {
                   <TouchableOpacity
                     style={{
                       alignItems: 'center',
-                      width: Dimensions.get('window').width - 20,
-                      height: 80,
+                      width: Dimensions.get('window').width - 100,
+                      height: 50,
                       padding: 10,
                       borderRadius: 60,
                       backgroundColor: '#FFF'

@@ -22,7 +22,8 @@ class NewPost extends Component {
         post: {
           _id: '_id',
           content: '',
-          photo: undefined
+          photo: undefined,
+          category: 'general',
         },
         edit: false,
         oldContent: '',
@@ -42,6 +43,17 @@ class NewPost extends Component {
         post: {
           ...this.state.postController.post,
           content: newValue,
+        }
+      }
+    });
+  }
+  changePostCategory(category) {
+    this.setState({
+      postController: {
+        ...this.state.postController,
+        post: {
+          ...this.state.postController.post,
+          category
         }
       }
     });
@@ -110,7 +122,8 @@ class NewPost extends Component {
 
     const data = {
       assignedTo: this.props.account.user._id,
-      content: this.state.postController.post.content
+      content: this.state.postController.post.content,
+      category: this.state.postController.post.category,
     }
 
     Api.post('/posts/create', data, config).then(({ data: post }) => {
@@ -146,6 +159,7 @@ class NewPost extends Component {
         Debug.post({ msg: 'Tudo Sucesso' });
       }
     }).catch(err => {
+      this.cancelEditPost();
       Debug.post({ err: err.response.data.error });
     })
   }
@@ -174,9 +188,11 @@ class NewPost extends Component {
         <EditOrNewPost
           newPost
           contentPost={this.state.postController.post.content}
+          category={this.state.postController.post.category}
           photoPost={this.state.postController.post.photo}
           post_id={this.state.postController.post._id}
           loadImageOnEditPost={this.loadImageOnEditPost.bind(this)}
+          changePostCategory={this.changePostCategory.bind(this)}
           editContentPost={this.editContentPost.bind(this)}
           cancelEditPost={this.cancelEditPost.bind(this)}
           doneEditPost={this.doneEditPost.bind(this)}

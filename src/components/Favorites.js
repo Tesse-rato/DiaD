@@ -1,29 +1,17 @@
-import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import React from 'react';
+import Feed from './Feed';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as Actions from '../redux/actions'
 
-class Favorites extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    return (
-      <View>
-        <Text>Favorites</Text>
-      </View>
-    );
-  }
-}
-
-const mapDispatchToProps = dispatch => bindActionCreators(Actions, dispatch);
+const favorites = props => (
+  <Feed
+    url={`/posts/list/favorites/${props.account.user._id}`}
+    navigation={props.navigation}
+  />
+);
 
 const mapStateToProps = state => ({
-  account: state.account,
-});
+  account: state.account
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(Favorites);
+export default connect(mapStateToProps)(favorites);
