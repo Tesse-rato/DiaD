@@ -1,8 +1,5 @@
-import React from 'react';
-import { View } from 'react-native';
-
 import styled from 'styled-components/native';
-import { StandardButton, StandardInput } from './standard';
+import { StandardButton } from './standard';
 
 export const LogIn = styled(StandardButton)`
   background-color: transparent;

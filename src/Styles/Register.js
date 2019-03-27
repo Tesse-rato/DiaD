@@ -1,8 +1,5 @@
-import React from 'react';
-import { View } from 'react-native';
-
 import styled from 'styled-components/native';
-import { StandardInput, StandardButton } from './standard';
+import { StandardButton } from './standard';
 
 export const Continue = styled(StandardButton)`
   width: 150;
