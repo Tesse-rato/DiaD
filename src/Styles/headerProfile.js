@@ -121,22 +121,22 @@ export const HeaderProfile = props => (
         borderRadius: 4,
         position: 'absolute',
         top: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 250],
+          inputRange: [0, props.tamFrameProfile / 2],
           outputRange: [40, 20],
           extrapolate: 'clamp'
         }),
         left: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 200],
+          inputRange: [0, props.tamFrameProfile + 20],
           outputRange: [(Dimensions.get('window').width / 2) - 120 / 2, 60],
           extrapolate: 'clamp'
         }),
         width: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100],
+          inputRange: [0, props.tamFrameProfile / 2],
           outputRange: [120, 60],
           extrapolate: 'clamp'
         }),
         height: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100],
+          inputRange: [0, props.tamFrameProfile / 2],
           outputRange: [120, 60],
           extrapolate: 'clamp'
         }),
@@ -157,12 +157,12 @@ export const HeaderProfile = props => (
         textAlign: 'center',
         position: 'absolute',
         top: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100, 250],
-          outputRange: [160, 140, 20],
+          inputRange: [0, props.tamFrameProfile / 2, props.tamFrameProfile],
+          outputRange: [160, 80, 20],
           extrapolate: 'clamp'
         }),
         left: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 120],
+          inputRange: [0, props.tamFrameProfile / 2],
           outputRange: [0, 125],
           extrapolate: 'clamp'
         }),
@@ -172,7 +172,7 @@ export const HeaderProfile = props => (
           extrapolate: 'clamp'
         }),
         width: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 200],
+          inputRange: [0, props.tamFrameProfile],
           outputRange: [Dimensions.get('window').width, 140],
           extrapolate: 'clamp'
         }),
@@ -186,12 +186,12 @@ export const HeaderProfile = props => (
         textAlign: 'center',
         position: 'absolute',
         top: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100, 250],
-          outputRange: [200, 170, 35],
+          inputRange: [0, props.tamFrameProfile / 2, props.tamFrameProfile],
+          outputRange: [200, 100, 35],
           extrapolate: 'clamp'
         }),
         left: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 120],
+          inputRange: [0, props.tamFrameProfile / 2],
           outputRange: [0, 125],
           extrapolate: 'clamp'
         }),
@@ -201,7 +201,7 @@ export const HeaderProfile = props => (
           extrapolate: 'clamp'
         }),
         width: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 200],
+          inputRange: [0, props.tamFrameProfile],
           outputRange: [Dimensions.get('window').width, 140],
           extrapolate: 'clamp'
         }),
@@ -214,21 +214,22 @@ export const HeaderProfile = props => (
 
     <Animated.View
       style={{
-        alignItems: 'center',
         position: 'absolute',
+        alignItems: 'center',
+        width: Dimensions.get('window').width,
         top: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100],
-          outputRange: [240, 200],
+          inputRange: [0, props.tamBio],
+          outputRange: [240, 190],
           extrapolate: 'clamp'
         }),
         height: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 100],
+          inputRange: [0, props.tamBio + 20],
           outputRange: [props.tamBio, 0],
           extrapolate: 'clamp'
         }),
         opacity: props.animatedValueFromScrollY.interpolate({
-          inputRange: [0, 50, 80],
-          outputRange: [1, 0, 0],
+          inputRange: [0, props.tamBio - 20, props.tamBio],
+          outputRange: [1, 1, 0],
           extrapolate: 'clamp'
         }),
         transform: [{

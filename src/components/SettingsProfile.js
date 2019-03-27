@@ -422,6 +422,7 @@ class SettingsProfile extends Component {
         message: 'Seu perfil foi atualizado'
       }
     }, () => {
+      this.setState({ changed: false });
       this.animeBoxDoneMessage();
     });
   }
