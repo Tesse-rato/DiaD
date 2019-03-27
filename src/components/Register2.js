@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, StatusBar, Image, Picker, AsyncStorage } from 'react-native'
+import { View, Text, TouchableOpacity, StatusBar, Image, Picker, AsyncStorage, ProgressBarAndroid } from 'react-native'
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
 import ImagePicker from 'react-native-image-picker';
@@ -24,6 +24,7 @@ export class Register2 extends Component {
     this.state = {
       error: '',
       imageUri: '',
+      loading: false,
       dataFormImage: '',
       loadedImage: false,
       selectedCity: 'Tupaciguara'
@@ -163,9 +164,17 @@ export class Register2 extends Component {
         </View>
 
         <View style={{ flex: 0.5, alignItems: 'center', flexDirection: 'row-reverse' }}>
-          <Continue onPress={() => this.validateUserInput()} >
-            <Text style={{ fontSize: 16, color: '#08F' }}>Registrar</Text>
-          </Continue>
+          {this.state.loading ? (
+            <ProgressBarAndroid
+              style={{ width: 150 }}
+              styleAttr='Small'
+              indeterminate={true}
+            />
+          ) : (
+              <Continue onPress={() => this.validateUserInput()} >
+                <Text style={{ fontSize: 16, color: '#08F' }}>Registrar</Text>
+              </Continue>
+            )}
           <GoBack onPress={() => this.props.navigation.goBack()}>
             <Text style={{ fontSize: 14, color: '#08F' }}>Voltar</Text>
           </GoBack>

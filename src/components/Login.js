@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StatusBar, AsyncStorage, Animated, Easing } from 'react-native';
+import { View, Text, StatusBar, AsyncStorage, Animated, Easing, ProgressBarAndroid } from 'react-native';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as Actions from '../redux/actions';
@@ -22,7 +22,8 @@ class Login extends Component {
     this.state = {
       error: '',
       automaticLogin: true,
-      valueSpin: new Animated.Value(0)
+      valueSpin: new Animated.Value(0),
+      loading: false,
     }
     this.spinLogo = this.state.valueSpin.interpolate({
       inputRange: [0, 1],
@@ -119,6 +120,8 @@ class Login extends Component {
   }
 
   login() {
+    this.setState({ loading: true });
+
     const { user: { email, password } } = this.props.account
 
     Api.post('/users/auth', { email, password }).then(({ data }) => {
@@ -130,6 +133,7 @@ class Login extends Component {
       AsyncStorage.setItem('token', data.token);
       AsyncStorage.setItem('_id', data.user._id);
 
+      this.setState({ loading: false });
       return this.props.navigation.navigate('Geral');
 
     }).catch(err => {
@@ -160,14 +164,22 @@ class Login extends Component {
 
             <View style={{ flex: 2, justifyContent: 'center', alignItems: 'center' }} >
               <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-              <MeuInput textContentType='emailAddress' value={this.props.account.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
-              <MeuInput textContentType='password' value={this.props.account.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
+              <MeuInput textContentType='emailAddress' value={this.props.account.user.email} onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
+              <MeuInput textContentType='password' value={this.props.account.user.password} onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
             </View>
 
             <View style={{ flex: 1, justifyContent: 'center' }} >
-              <LogIn onPress={() => this.validateUserInput()} >
-                <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
-              </LogIn>
+              {this.state.loading ? (
+                <ProgressBarAndroid
+                  styleAttr='Small'
+                  color='#08F'
+                  indeterminate={true}
+                />
+              ) : (
+                  <LogIn onPress={() => this.validateUserInput()} >
+                    <Text style={{ color: '#08F', fontSize: 14 }}>Logar</Text>
+                  </LogIn>
+                )}
               <Register onPress={() => this.props.navigation.navigate('Register')}>
                 <Text style={{ color: '#08F', fontSize: 14 }}>Cadastrar</Text>
               </Register>
