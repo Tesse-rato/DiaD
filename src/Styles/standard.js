@@ -25,7 +25,7 @@ export const StandardButton = styled.TouchableOpacity`
 export const StandardInput = styled.TextInput`
   width: ${Dimensions.get('window').width - 85};
   /* height: ${Dimensions.get('window').height - 600}; */
-  height: 60px;
+  height: 55px;
   background-color: transparent;
   border-radius: 8px;
   padding: 10px;
@@ -63,4 +63,20 @@ export const Header = props => (
     <Find placeholder='ID/Apelido' onChangeText={props.onChangeText} />
     <Profile clickImageProfile={props.clickImageProfile} source={props.source} />
   </ContainerHeader>
+);
+export const MeuInput = (props) => (
+  <View style={{ flexDirection: 'row', backgroundColor: '#08F', alignItems: 'center', margin: 5, borderRadius: 20 }}>
+    <props.ico width={25} height={25} margin={10} />
+    <StandardInput
+      secureTextEntry={props.secureTextEntry}
+      keyboardAppearance='light'
+      keyboardType={props.keyboardType}
+      textContentType={props.textContentType}
+      value={props.value}
+      onChangeText={props.onChangeText}
+      placeholder={props.placeholder}
+      placeholderTextColor='#FFF'
+      selectionColor='#FFF'
+    />
+  </View>
 );

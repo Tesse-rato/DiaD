@@ -7,8 +7,8 @@ import ImagePicker from 'react-native-image-picker';
 import * as Actions from '../redux/actions';
 import Api from '../api';
 
-import { Continue, GoBack, MeuInput } from "../styles/register";
-import { MinhaView } from "../styles/standard";
+import { Continue, GoBack } from "../styles/register";
+import { MinhaView, MeuInput } from "../styles/standard";
 
 import UserIco from '../assets/UserWhiteDiaD.svg';
 import UserImageIco from '../assets/UserImageDiaD.svg';
@@ -151,9 +151,28 @@ export class Register2 extends Component {
 
         <View style={{ flex: 2, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ fontSize: 12, color: '#F00' }}>{this.state.error}</Text>
-          <MeuInput textContentType='name' value={this.props.account.user.name.first} onChangeText={this.props.setFirstName} placeholder='Nome' ico={UserIco} />
-          <MeuInput textContentType='nameSuffix' value={this.props.account.user.name.last} onChangeText={this.props.setLastName} placeholder='Sobrenome' ico={UserIco} />
-          <MeuInput textContentType='nickname' value={this.props.account.user.name.nickname} onChangeText={this.props.setNickname} placeholder='Apelido' ico={UserIco} />
+          <MeuInput
+            textContentType='name'
+            value={this.props.account.user.name.first}
+            onChangeText={this.props.setFirstName}
+            placeholder='Nome'
+            ico={UserIco}
+          />
+          <MeuInput
+            textContentType='nameSuffix'
+            value={this.props.account.user.name.last}
+            onChangeText={this.props.setLastName}
+            placeholder='Sobrenome'
+            ico={UserIco}
+          />
+          <MeuInput
+            textContentType='nickname'
+            value={this.props.account.user.name.nickname}
+            onChangeText={this.props.setNickname}
+            placeholder='Apelido'
+            ico={UserIco}
+          />
+
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8E8E8', borderRadius: 25, margin: 5 }}>
             <CityIco width={25} height={25} margin={10} />
             <Picker style={{ width: 285, height: 50, color: '#FFF', fontSize: 12, backgroundColor: 'transparent' }} mode='dialog' selectedValue={this.state.selectedCity} onValueChange={(value) => this.setState({ selectedCity: value })} >

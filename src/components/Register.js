@@ -6,8 +6,8 @@ import * as Actions from '../redux/actions';
 
 import Api from '../api';
 
-import { MinhaView } from '../styles/standard';
-import { MeuInput, Continue, GoBack } from '../styles/register';
+import { MeuInput, MinhaView } from '../styles/standard';
+import { Continue, GoBack } from '../styles/register';
 
 import LogoIcoIco from '../assets/Logo.svg';
 import EmailIco from '../assets/EmailWhiteDiaD.svg';
@@ -76,9 +76,30 @@ class Register extends Component {
 
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text style={{ color: '#F00', fontSize: 12 }}>{this.state.error}</Text>
-          <MeuInput textContentType='emailAddress' onChangeText={this.props.setEmail} placeholder='Email' ico={EmailIco} />
-          <MeuInput textContentType='password' onChangeText={this.props.setPassword} placeholder='Senha' ico={PasswordIco} />
-          <MeuInput textContentType='password' value={this.state.confirmPassword} onChangeText={(e) => this.setState({ confirmPassword: e })} placeholder='Confirme Senha' ico={PasswordIco} />
+          <MeuInput
+            keyboardType='email-address'
+            textContentType='emailAddress'
+            value={this.props.account.user.email}
+            onChangeText={this.props.setEmail}
+            placeholder='Email'
+            ico={EmailIco}
+          />
+          <MeuInput
+            secureTextEntry
+            textContentType='password'
+            value={this.props.account.user.password}
+            onChangeText={this.props.setPassword}
+            placeholder='Senha'
+            ico={PasswordIco}
+          />
+          <MeuInput
+            secureTextEntry
+            textContentType='password'
+            value={this.state.confirmPassword}
+            onChangeText={(e) => this.setState({ confirmPassword: e })}
+            placeholder='Confirme Senha'
+            ico={PasswordIco}
+          />
         </View>
 
         <View style={{ flex: 0.5, justifyContent: 'center', alignItems: 'center', flexDirection: 'row-reverse' }}>
