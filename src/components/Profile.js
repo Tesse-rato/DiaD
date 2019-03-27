@@ -519,7 +519,21 @@ class Profile extends Component {
                   const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
                   const ico = pushed ? FlameRedIco : FlameBlueIco;
                   if (item.photo) item.photo = resizeImage(item.photo);
-
+                  let category;
+                  switch (item.category) {
+                    case 'general': {
+                      category = 'Geral'
+                      break;
+                    }
+                    case 'justice': {
+                      category = 'Justiça'
+                      break;
+                    }
+                    case 'business': {
+                      category = 'Negoçios'
+                      break;
+                    }
+                  }
                   return (
                     <View style={{ backgroundColor: '#E8E8E8' }}>
                       <PostProfile
@@ -528,6 +542,7 @@ class Profile extends Component {
                         user_id={this.props.account.user._id}
                         post_user_id={item.assignedTo._id}
                         datePost={datePost}
+                        category={category}
                         pushTimes={item.pushes.times}
                         comments={item.comments}
                         content={item.content}

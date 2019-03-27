@@ -40,6 +40,7 @@ const ContainerFooterPost = styled.View`
 const HeaderPostProfile = props => (
   <ContainerHeaderPostProfile>
     <Text>{`${props.datePost[0]} ${props.datePost[1]} ${props.datePost[2]}`}</Text>
+    <Text>{props.category}</Text>
     {props.user_id == props.post_user_id ? (
       <TouchableOpacity onPress={() => props.editPost(props.post_id)}>
         <EditIco width={24} height={24} />
@@ -91,6 +92,7 @@ export const PostProfile = props => (
       push_ico={props.push_ico}
       pushPost={props.pushPost}
       datePost={props.datePost}
+      category={props.category}
       pushTimes={props.pushTimes}
       user_id={props.user_id}
       post_user_id={props.post_user_id}
