@@ -106,6 +106,7 @@ class NewPost extends Component {
   cancelEditPost() {
     this.deletePost();
     this.props.navigation.goBack();
+    return true;
   }
   doneEditPost() {
     if (!this.state.postController.loadedImage && !this.state.postController.post.content) {

@@ -61,11 +61,10 @@ class Feed extends Component {
         postId: '',
         content: '',
       },
-      valueToAnimatedView: new Animated.Value(0),
       valueToAnimatedContainerView: new Animated.Value(0),
     };
   }
-  componentWillMount() {
+  loadFromApi() {
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -85,28 +84,22 @@ class Feed extends Component {
       alert(err.response.data.error);
     })
   }
-  componentDidMount() {
+  componentWillMount() {
+    this.props.navigation.addListener('didFocus', () => {
+      this.loadFromApi();
+      this.setState({ onFeed: true });
+    });
 
-    this.props.navigation.addListener('didFocus', () => this.handleRefresh());
+    this.props.navigation.addListener('willBlur', () => this.setState({ onFeed: false }));
+
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
-    // this.setState({ loading: false });
-    Animated.sequence([
-      Animated.delay(100),
-      Animated.timing(
-        this.state.valueToAnimatedView,
-        {
-          toValue: Dimensions.get('window').height,
-          duration: 500,
-        }
-      )
-    ]).start(() => this.setState({ loading: false }));
   }
 
   animeContainerView(arg) {
     let value = arg ? 1 : 0;
 
     Animated.sequence([
-      Animated.delay(100),
+      Animated.delay(200),
       Animated.timing(
         this.state.valueToAnimatedContainerView,
         {
@@ -117,9 +110,6 @@ class Feed extends Component {
         }
       )
     ]).start(() => this.setState({ onFeed: arg }));
-  }
-  debug(e) {
-    console.log(e.nativeEvent.contentOffset.y);
   }
 
   clickImageProfile(_id) {
@@ -199,7 +189,6 @@ class Feed extends Component {
               ref={(ref) => this.flatListRef = ref}
               onRefresh={() => this.handleRefresh()}
               refreshing={this.state.refresh}
-              onMomentumScrollEnd={(e) => this.debug(e)}
               ListFooterComponent={() => (
                 <View style={{ alignItems: 'center', padding: 5 }}>
                   <TouchableOpacity
@@ -247,7 +236,6 @@ class Feed extends Component {
                     newComment={this.newComment.bind(this)}
                     editOrNewComment={this.editOrNewComment.bind(this)}
                     sharePost={this.sharePost.bind(this)}
-                    debug={this.debug.bind(this)}
                   />
                 )
               }}

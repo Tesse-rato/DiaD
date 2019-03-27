@@ -64,7 +64,6 @@ export const Comment = props => (
     pagingEnabled={true}
     stickyHeaderIndices={true}
     style={{ width: Dimensions.get('window').width - 40, padding: 2 }}
-    onMomentumScrollEnd={(e) => props.debug(e)}
     snapToAlignment='center'
     snapToInterval={Dimensions.get('window').width - 47}
   >

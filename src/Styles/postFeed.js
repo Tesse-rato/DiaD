@@ -120,7 +120,6 @@ export const Post = props => (
       user_id={props.user_id}
       comments={props.comments}
       commentController={props.commentController}
-      debug={props.debug}
       clickImageProfile={props.clickImageProfile}
       editOrNewComment={props.editOrNewComment}
       post_id={props.post_id}

@@ -64,6 +64,7 @@ class SettingsProfile extends Component {
       done: {
         ok: false,
         show: false,
+        showing: false,
         message: '',
       },
       commentController: {
@@ -127,7 +128,7 @@ class SettingsProfile extends Component {
     const currentPassword = await AsyncStorage.getItem('password');
     const posts = await this.props.navigation.getParam('posts');
     const user = await this.props.navigation.getParam('user');
-    this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
+    //this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
 
     this.setState({
       posts,
@@ -183,23 +184,27 @@ class SettingsProfile extends Component {
     }
   }
   animeBoxDoneMessage() {
+    if (this.state.done.showing) return;
+
+    this.setState({ done: { ...this.state.done, showing: true } });
+
     Animated.sequence([
       Animated.delay(200),
       Animated.timing(
         this.state.animatedValueToDoneMessageOrFailedMessage,
         {
           toValue: 1,
-          duration: 500,
+          duration: 200,
           useNativeDriver: true,
           easing: Easing.bounce
         }
       ),
-      Animated.delay(1000),
+      Animated.delay(4000),
       Animated.timing(
         this.state.animatedValueToDoneMessageOrFailedMessage,
         {
           toValue: 0,
-          duration: 500,
+          duration: 200,
           useNativeDriver: true,
           easing: Easing.circle
         }
@@ -208,7 +213,8 @@ class SettingsProfile extends Component {
       this.setState({
         done: {
           ...this.state.done,
-          show: false
+          show: false,
+          showing: false,
         }
       });
     });
@@ -343,7 +349,7 @@ class SettingsProfile extends Component {
     if (!this.state.user.name.first) {
       return this.setState({
         done: {
-          ok: true,
+          ok: false,
           show: true,
           message: 'Faltando o campo nome'
         }
@@ -354,7 +360,7 @@ class SettingsProfile extends Component {
     if (!this.state.user.name.last) {
       return this.setState({
         done: {
-          ok: true,
+          ok: false,
           show: true,
           message: 'Faltando o campo sobrenome'
         }
@@ -390,13 +396,14 @@ class SettingsProfile extends Component {
         Api.patch(`/users/profilePhoto/${this.state.user._id}`, file, config).then(({ data }) => {
           const user = this.props.account.user;
           user.photo = data.photo;
+          user.name = this.state.user.name;
 
           this.props.setUser({
             token: this.props.account.token,
             user,
           })
 
-          this.success('Perfil e foto atualizada');
+          this.success('Foto atualizada');
 
         }).catch(err => {
           Debug.post({ err });
@@ -404,6 +411,14 @@ class SettingsProfile extends Component {
         });
 
       } else {
+        const user = this.props.account.user;
+        user.name = this.state.user.name;
+        user.bio = this.state.user.bio;
+
+        this.props.setUser({
+          token: this.props.account.token,
+          user,
+        })
         this.success('Perfil atualizado');
       }
 
@@ -536,8 +551,9 @@ class SettingsProfile extends Component {
       this.props.navigation.goBack();
     } else {
       this.setUserData();
-      this.animFeedContainer(true);
-      this.props.navigation.navigate('Geral');
+      // this.animFeedContainer(true);
+      // this.props.navigation.navigate('Geral');
+      this.props.navigation.goBack();
     }
   }
   clickImageProfile() { }

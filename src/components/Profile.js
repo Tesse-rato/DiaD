@@ -81,9 +81,11 @@ class Profile extends Component {
           _id: '_id',
           content: '',
           photo: undefined,
+          category: '',
         },
         edit: false,
         oldContent: '',
+        oldCategory: '',
         loadedImage: false,
         newImage: undefined,
       },
@@ -103,9 +105,12 @@ class Profile extends Component {
 
   componentWillMount() {
     this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
-  }
-  componentDidMount() {
+
+    this.props.navigation.addListener('didFocus', () => this.loadFromApi());
+
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
+  }
+  loadFromApi() {
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -140,9 +145,6 @@ class Profile extends Component {
     });
   }
 
-  debug(e) {
-    console.log(e.nativeEvent.contentOffset.x);
-  }
   clickImageProfile(_id) {
     if (_id == this.state.user._id) return;
 
@@ -150,7 +152,7 @@ class Profile extends Component {
     this.props.setProfileId(_id);
     this.animContainerView(false);
     this.setState({ loading: true }, () => {
-      this.componentDidMount();
+      this.loadFromApi();
     });
   }
 
@@ -268,6 +270,7 @@ class Profile extends Component {
         post: payload,
         edit: true,
         oldContent: payload.content,
+        oldCategory: payload.category
       }
     }, () => this.displayEditPost(true));
   }
@@ -282,6 +285,17 @@ class Profile extends Component {
       }
     });
   }
+  changePostCategory(category) {
+    this.setState({
+      postController: {
+        ...this.state.postController,
+        post: {
+          ...this.state.postController.post,
+          category
+        }
+      }
+    });
+  }
   doneEditPost() {
     const config = {
       headers: {
@@ -292,11 +306,14 @@ class Profile extends Component {
     const payload = this.state.posts;
     payload[this.indexOfPost] = this.state.postController.post;
 
-    if (this.state.postController.post.content != this.state.postController.oldContent) {
+    if (this.state.postController.post.content != this.state.postController.oldContent ||
+      this.state.postController.post.category != this.state.postController.oldCategory) {
+
       const data = {
         userId: this.props.account.user._id,
         postId: this.state.postController.post._id,
         content: this.state.postController.post.content,
+        category: this.state.postController.post.category,
       }
 
       Api.put('/posts/edit', data, config).then(() => {
@@ -484,6 +501,7 @@ class Profile extends Component {
   _goBack() {
     this.animFeedContainer(true);
     this.props.navigation.goBack();
+    return true;
   }
   render() {
     console.disableYellowBox = true;
@@ -553,7 +571,6 @@ class Profile extends Component {
                         pushPost={this._pushPost.bind(this)}
                         sharePost={this.sharePost.bind(this)}
                         editPost={this.editPost.bind(this)}
-                        debug={this.debug.bind(this)}
                         clickImageProfile={this.clickImageProfile.bind(this)}
                       />
                     </View>
@@ -670,9 +687,11 @@ class Profile extends Component {
               >
                 <EditOrNewPost
                   contentPost={this.state.postController.post.content}
+                  category={this.state.postController.post.category}
                   photoPost={this.state.postController.post.photo}
                   post_id={this.state.postController.post._id}
                   loadImageOnEditPost={this.loadImageOnEditPost.bind(this)}
+                  changePostCategory={this.changePostCategory.bind(this)}
                   editContentPost={this.editContentPost.bind(this)}
                   cancelEditPost={this.cancelEditPost.bind(this)}
                   doneEditPost={this.doneEditPost.bind(this)}
@@ -693,7 +712,6 @@ class Profile extends Component {
                   pushPost={() => null}
                 // FAKE
                 />
-                {Debug.post({ post: this.state.posts[0] })}
               </Animated.View>
             ) : null}
           </Animated.View>
