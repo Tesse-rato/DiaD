@@ -194,7 +194,7 @@ class SettingsProfile extends Component {
           easing: Easing.bounce
         }
       ),
-      Animated.delay(3000),
+      Animated.delay(1000),
       Animated.timing(
         this.state.animatedValueToDoneMessageOrFailedMessage,
         {
@@ -363,6 +363,7 @@ class SettingsProfile extends Component {
       });
     }
 
+    this.success('Carregando'); // Só uma mensagem reusando ao funcao
 
     const config = {
       headers: {
@@ -383,13 +384,10 @@ class SettingsProfile extends Component {
     Api.put('/users/edit', data, config).then(() => {
 
       if (this.state.dataImage) {
-        const config = {
-          headers: {
-            authorization: `Bearer ${this.props.account.token}`
-          }
-        }
 
-        Api.patch(`/users/profilePhoto/${this.state.user._id}`, this.state.dataImage, config).then(({ data }) => {
+        const file = this.state.dataImage;
+
+        Api.patch(`/users/profilePhoto/${this.state.user._id}`, file, config).then(({ data }) => {
           const user = this.props.account.user;
           user.photo = data.photo;
 
@@ -398,41 +396,41 @@ class SettingsProfile extends Component {
             user,
           })
 
-          this.success();
+          this.success('Perfil e foto atualizada');
 
         }).catch(err => {
-          Debug.post({ err })
-          this.failed();
+          Debug.post({ err });
+          this.failed('Erro ao atualizar foto');
         });
 
       } else {
-        this.success();
+        this.success('Perfil atualizado');
       }
 
     }).catch(err => {
-      this.failed();
+      Debug.post({ err });
+      this.failed('Erro ao atualizar usuário');
     });
   }
 
-  success() {
+  success(msg) {
     this.setState({
       done: {
         ok: true,
         show: true,
-        message: 'Seu perfil foi atualizado'
+        message: msg
       }
     }, () => {
-      this.setState({ changed: false });
       this.animeBoxDoneMessage();
     });
   }
 
-  failed() {
+  failed(msg) {
     this.setState({
       done: {
         ok: false,
         show: true,
-        message: 'Verifique sua internet'
+        message: msg
       }
     }, () => this.animeBoxDoneMessage());
   }
@@ -490,14 +488,10 @@ class SettingsProfile extends Component {
 
     ImagePicker.showImagePicker(options, response => {
 
-      console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled photo picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
       } else {
 
         const formDataImage = new FormData();
@@ -516,7 +510,7 @@ class SettingsProfile extends Component {
             }
           },
           dataImage: formDataImage,
-          change: true
+          changed: true,
         });
       }
     });
@@ -538,9 +532,9 @@ class SettingsProfile extends Component {
   }
   _goBack() {
     if (!this.state.changed) {
+      this.setState({ changed: false });
       this.props.navigation.goBack();
     } else {
-      Debug.post({ post: '_goBack' });
       this.setUserData();
       this.animFeedContainer(true);
       this.props.navigation.navigate('Geral');

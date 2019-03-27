@@ -139,7 +139,7 @@ class Login extends Component {
     }).catch(err => {
 
       console.log(err.response);
-
+      this.setState({ loading: false });
       // if (!err.response.data) return alert('Verifique sua conexão com a internet');
 
       if (err.response.data.error === 'Invalid password') {

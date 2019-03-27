@@ -74,6 +74,8 @@ export class Register2 extends Component {
 
   registerUser() {
 
+    this.setState({ loading: true });
+
     const {
       name,
       email,
@@ -119,7 +121,7 @@ export class Register2 extends Component {
 
           this.props.navigation.navigate('Geral');
 
-        }).catch(err => { this.setState({ error: 'Verifique sua conexão' }); });
+        }).catch(err => { this.setState({ error: 'Verifique sua conexão', loading: false }); });
       } else {
         console.log('Nao registrou imagem');
         this.props.navigation.navigate('Geral');
@@ -127,7 +129,7 @@ export class Register2 extends Component {
 
     }).catch(err => {
       console.log(err.response);
-      err.response.data.error == 'Nickname already exists' ? this.setState({ error: 'Apelido já está em uso' }) : null;
+      err.response.data.error == 'Nickname already exists' ? this.setState({ error: 'Apelido já está em uso', loading: false }) : null;
     });
   }
 
