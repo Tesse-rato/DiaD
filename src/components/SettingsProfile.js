@@ -93,7 +93,7 @@ class SettingsProfile extends Component {
     };
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     // const currentPassword = await AsyncStorage.getItem('password');
     // const posts = await this.props.navigation.getParam('posts');
     // this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
@@ -391,6 +391,7 @@ class SettingsProfile extends Component {
 
       if (this.state.dataImage) {
 
+        config.headers['Content-Type'] = 'multipart/form-data';
         const file = this.state.dataImage;
 
         Api.patch(`/users/profilePhoto/${this.state.user._id}`, file, config).then(({ data }) => {
@@ -495,7 +496,11 @@ class SettingsProfile extends Component {
 
   selectImage() {
     const options = {
-      quality: 1.0,
+      quality: .5,
+      title: 'Selecione uma Foto',
+      cancelButtonTitle: 'Cancelar',
+      takePhotoButtonTitle: 'Tirar Foto',
+      chooseFromLibraryButtonTitle: 'Escolher da Galeria',
       storageOptions: {
         skipBackup: true,
       },
@@ -504,9 +509,9 @@ class SettingsProfile extends Component {
     ImagePicker.showImagePicker(options, response => {
 
       if (response.didCancel) {
-        console.log('User cancelled photo picker');
+        return;
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
+        return this.failed('Erro ao carregar da galeria');
       } else {
 
         const formDataImage = new FormData();

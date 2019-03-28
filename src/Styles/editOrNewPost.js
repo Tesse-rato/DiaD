@@ -55,7 +55,6 @@ const BackOrCategory = props => (
       <Picker.Item value='general' label='Geral' />
       <Picker.Item value='justice' label='Justica' />
       <Picker.Item value='business' label='Negocios' />
-      <Picker.Item value='favorites' label='Favoritos' />
     </Picker>
   </ContainerBackOrCategory>
 );

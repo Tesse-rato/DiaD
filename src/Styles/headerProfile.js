@@ -142,10 +142,14 @@ export const HeaderProfile = props => (
         }),
         transform: [{
           translateX: props.animatedValueToTransform.interpolate({
-            inputRange: [0, 1],
-            outputRange: [Dimensions.get('window').width / 4, 0]
+            inputRange: [0, .5, 1],
+            outputRange: [20, 20, 0]
           }),
-        }]
+        }],
+        opacity: props.animatedValueToTransform.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1]
+        })
       }}
       resizeMode='cover'
       source={{ uri: props.thumbnail }}
@@ -235,9 +239,9 @@ export const HeaderProfile = props => (
         transform: [{
           translateY: props.animatedValueToTransform.interpolate({
             inputRange: [0, 1],
-            outputRange: [Dimensions.get('window').height * 2, 0]
+            outputRange: [10, 0]
           })
-        }],
+        }]
       }}
     >
 

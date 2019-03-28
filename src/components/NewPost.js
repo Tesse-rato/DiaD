@@ -60,7 +60,11 @@ class NewPost extends Component {
   }
   loadImageOnEditPost() {
     const options = {
-      quality: 1.0,
+      quality: .5,
+      title: 'Selecione uma Foto',
+      cancelButtonTitle: 'Cancelar',
+      takePhotoButtonTitle: 'Tirar Foto',
+      chooseFromLibraryButtonTitle: 'Escolher da Galeria',
       storageOptions: {
         skipBackup: true,
       },
@@ -68,9 +72,9 @@ class NewPost extends Component {
 
     ImagePicker.showImagePicker(options, response => {
       if (response.didCancel) {
-        console.log('User cancelled photo picker');
+        return;
       } else if (response.error) {
-        this.setState({ error: 'Ouve um erro ao carregar a imagem da galeria' });
+        return alert('Erro ao carregar imagem da galeria');
       }
       else {
         let data = new FormData()
@@ -85,8 +89,6 @@ class NewPost extends Component {
           height: response.height,
           content: 'data:image/jpeg;base64,' + response.data
         });
-
-        console.log(photo);
 
         this.setState({
           postController: {
@@ -130,6 +132,8 @@ class NewPost extends Component {
     Api.post('/posts/create', data, config).then(({ data: post }) => {
 
       if (this.state.postController.loadedImage) {
+
+        config.headers['Content-Type'] = 'multipart/form-data';
 
         const url = `/posts/postPhoto/${post._id}`
 

@@ -204,7 +204,7 @@ class Profile extends Component {
         this.state.animatedValueToProfileHeader,
         {
           toValue: value,
-          duration: 200,
+          duration: 300,
           useNativeDriver: true,
           easing: Easing.ease
         }
@@ -213,7 +213,7 @@ class Profile extends Component {
         this.state.animatedValueToTransform,
         {
           toValue: value,
-          duration: 300,
+          duration: 500,
           easing: Easing.ease
         }
       )
@@ -516,10 +516,14 @@ class Profile extends Component {
               alignItems: 'center',
               transform: [{
                 translateX: this.state.animatedValueToContainerView.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [Dimensions.get('window').width, 0]
+                  inputRange: [0, .5, 1],
+                  outputRange: [20, 20, 0]
                 })
-              }]
+              }],
+              opacity: this.state.animatedValueToContainerView.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1]
+              })
             }}
           >
 
@@ -603,10 +607,14 @@ class Profile extends Component {
                   position: 'absolute',
                   transform: [{
                     translateY: this.state.animatedValueToProfileHeader.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [-Dimensions.get('window').height, 0]
+                      inputRange: [0, .5, 1],
+                      outputRange: [-20, -20, 0]
                     })
-                  }]
+                  }],
+                  opacity: this.state.animatedValueToProfileHeader.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 1]
+                  })
                 }}
               >
                 <HeaderProfile

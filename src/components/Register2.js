@@ -33,7 +33,11 @@ export class Register2 extends Component {
 
   selectImage() {
     const options = {
-      quality: 1.0,
+      quality: .5,
+      title: 'Selecione uma Foto',
+      cancelButtonTitle: 'Cancelar',
+      takePhotoButtonTitle: 'Tirar Foto',
+      chooseFromLibraryButtonTitle: 'Escolher da Galeria',
       storageOptions: {
         skipBackup: true,
       },
@@ -41,9 +45,9 @@ export class Register2 extends Component {
 
     ImagePicker.showImagePicker(options, response => {
       if (response.didCancel) {
-        console.log('User cancelled photo picker');
+        return;
       } else if (response.error) {
-        this.setState({ error: 'Ouve um erro ao carregar a imagem da galeria' });
+        return this.setState({ error: 'Ouve um erro ao carregar a imagem da galeria' });
       }
       else {
         let data = new FormData()
@@ -108,8 +112,11 @@ export class Register2 extends Component {
       const url = `/users/profilePhoto/${data.user._id}`;
 
       if (this.state.loadedImage) {
-        console.log('Vai registrar imagem');
-        Api.patch(url, this.state.dataFormImage, config).then(({ data: { photo } }) => {
+
+        config.headers['Content-Type'] = 'multipart/form-data';
+        const file = this.state.dataFormImage;
+
+        Api.patch(url, file, config).then(({ data: { photo } }) => {
 
           this.props.setUser({
             token: data.token,
