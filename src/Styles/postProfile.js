@@ -14,7 +14,6 @@ const ContainerPostProfile = styled.View`
   background-color: #FFF;
   border-radius: 12px;
   align-items: center;
-  padding: 10px;
   margin-top: 2px;
 `;
 const ContainerHeaderPostProfile = styled.View`
@@ -25,8 +24,7 @@ const ContainerHeaderPostProfile = styled.View`
   padding: 5px;
 `;
 const ContainerContentPostProfile = styled.View`
-  width: ${Dimensions.get('window').width - 30};
-  padding: 10px;
+  width: ${Dimensions.get('window').width};
   align-items: center;
 `;
 const ContainerFooterPost = styled.View`
@@ -68,7 +66,9 @@ const ContentPostProfile = props => (
       />
     ) : null}
     {props.content ? (
-      <Text style={{ textAlign: 'left' }}>{props.content}</Text>
+      <View style={{ paddingHorizontal: 25, paddingVertical: 2 }}>
+        <Text style={{ textAlign: 'left' }}>{props.content}</Text>
+      </View>
     ) : null}
   </ContainerContentPostProfile>
 );

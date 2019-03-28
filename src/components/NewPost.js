@@ -161,7 +161,6 @@ class NewPost extends Component {
       } else {
         this.setState({ uploading: false });
         this.cancelEditPost();
-        Debug.post({ msg: 'Tudo Sucesso' });
       }
     }).catch(err => {
       this.cancelEditPost();

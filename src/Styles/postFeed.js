@@ -8,7 +8,6 @@ import ShareIco from '../assets/ShareDiaD.svg';
 
 import { Comment } from './comment';
 
-
 const ContainerPost = styled.View`
   width: ${Dimensions.get('window').width};
   align-items: center;
@@ -19,9 +18,6 @@ const ContainerPost = styled.View`
 const ContainerHeader = styled.View`
   flex-direction: row;
   padding: 10px;
-`;
-const ContainerContentPost = styled.View`
-  margin: 5px;
 `;
 const ContainerHeaderPost = styled.View`
   width: ${Dimensions.get('window').width - 70};
@@ -40,7 +36,6 @@ const ContainerFooterPost = styled.View`
   flex-direction: row;
   padding: 10px;
 `;
-
 
 export const HeaderPost = props => (
   <ContainerHeader>
@@ -63,7 +58,7 @@ export const HeaderPost = props => (
   </ContainerHeader>
 );
 export const ContentPost = props => (
-  <ContainerContentPost>
+  <View>
     {props.postPhoto ? (
       <Image
         style={{
@@ -79,7 +74,7 @@ export const ContentPost = props => (
         <Text style={{ textAlign: 'left' }}>{props.content}</Text>
       </View>
     ) : null}
-  </ContainerContentPost>
+  </View>
 );
 
 export const FooterPost = props => (

@@ -213,7 +213,7 @@ class Profile extends Component {
         this.state.animatedValueToTransform,
         {
           toValue: value,
-          duration: 500,
+          duration: 200,
           easing: Easing.ease
         }
       )

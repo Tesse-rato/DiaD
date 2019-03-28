@@ -39,7 +39,6 @@ const ContainerHeader = styled.View`
   flex-direction: row;
   align-items: center;
   width: ${Dimensions.get('window').width};
-  /* height: ${Dimensions.get('window').height - 535}; */
   height: 60px;
   padding: 5px;
   background-color: #FFF;
@@ -58,10 +57,16 @@ export const Profile = props => (
     <Image style={{ width: 48, height: 48, borderRadius: 24 }} source={props.source} resizeMode='cover' />
   </TouchableOpacity>
 );
-export const Header = props => (
+export const FeedHeader = props => (
   <ContainerHeader>
-    <Find placeholder='ID/Apelido' onChangeText={props.onChangeText} />
-    <Profile clickImageProfile={props.clickImageProfile} source={props.source} />
+    <Find
+      placeholder='ID/Apelido'
+      onChangeText={props.onChangeText}
+    />
+    <Profile
+      clickImageProfile={props.clickImageProfile}
+      source={props.profilePhotoSource}
+    />
   </ContainerHeader>
 );
 export const MeuInput = (props) => (
