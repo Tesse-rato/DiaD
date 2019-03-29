@@ -32,7 +32,7 @@ export const StandardInput = styled.TextInput`
   border: 0px;
   margin: 4px;
   font-size: 14;
-  color: #FFF;
+  color: #333;
 `;
 
 const ContainerHeader = styled.View`
@@ -47,8 +47,14 @@ const ContainerHeader = styled.View`
   padding-left: 5px;
 `;
 export const Find = props => (
-  <View style={{ backgroundColor: '#CCC', borderRadius: 25, marginRight: 15 }}>
-    <StandardInput value={props.value} onChangeText={(e) => props.onChangeText(e)} style={{ height: 35 }} placeholder={props.placeholder} placeholderTextColor='#FFF' selectionColor='#FFF' />
+  <View style={{ backgroundColor: '#E8E8E8', borderRadius: 25, marginRight: 15 }}>
+    <StandardInput
+      style={{ height: 35 }}
+      value={props.value}
+      onChangeText={(e) => props.onChangeText(e)}
+      placeholder={props.placeholder}
+      placeholderTextColor='#333'
+      selectionColor='#333' />
   </View>
 );
 
@@ -60,8 +66,9 @@ export const Profile = props => (
 export const FeedHeader = props => (
   <ContainerHeader>
     <Find
-      placeholder='ID/Apelido'
+      placeholder={props.placeholder}
       onChangeText={props.onChangeText}
+      value={props.value}
     />
     <Profile
       clickImageProfile={props.clickImageProfile}
@@ -69,6 +76,7 @@ export const FeedHeader = props => (
     />
   </ContainerHeader>
 );
+
 export const MeuInput = (props) => (
   <View style={{ flexDirection: 'row', backgroundColor: '#08F', alignItems: 'center', margin: 5, borderRadius: 20 }}>
     <props.ico width={25} height={25} margin={10} />

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {
   View,
+  Text,
   StatusBar,
   FlatList,
   ProgressBarAndroid,
@@ -27,6 +28,7 @@ import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
 import { MinhaView, FeedHeader } from "../styles/standard";
 import { Post } from '../styles/postFeed';
+import UserSearch from './UserSearch';
 
 import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage, decreaseUserName } from "../funcs";
 
@@ -43,12 +45,16 @@ class Feed extends Component {
     this.newComment = newComment.bind(this);
     this.pushPost = pushPost.bind(this);
 
+    this.tamSearchBar = 60;
+    this.tamBottomBar = 50;
+
     this.state = {
       erro: '',
       posts: [],
       onFeed: true,
       loading: true,
       refresh: false,
+      userSearch: '',
       commentController: {
         edit: false,
         upload: false,
@@ -61,6 +67,7 @@ class Feed extends Component {
         content: '',
       },
       valueToAnimatedContainerView: new Animated.Value(0),
+      animatedValueToUserSearchView: new Animated.Value(0),
     };
   }
   componentWillMount() {
@@ -127,6 +134,26 @@ class Feed extends Component {
       )
     ]).start(() => this.setState({ onFeed: arg }));
   }
+  animUserSearchView(arg) {
+    const value = arg ? 1 : 0;
+
+    Animated.timing(
+      this.state.animatedValueToUserSearchView,
+      {
+        toValue: value,
+        duration: 1000,
+        easing: Easing.ease
+      }
+    ).start()
+  }
+  onChangeTextUserSearch(newValue) {
+    this.setState({ userSearch: newValue });
+
+    if (!newValue) return this.animUserSearchView(false);
+
+    this.animUserSearchView(true);
+
+  }
   clickImageProfile(_id) {
     this.animeContainerView(false);
     this.props.setProfileId(_id);
@@ -162,21 +189,26 @@ class Feed extends Component {
       <MinhaView style={{ justifyContent: 'flex-end' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
-          <View style={{ flex: 1 }}>
-            <Animated.View
-              style={{
-                width: Dimensions.get('window').width,
-                height: Dimensions.get('window').height - 100,
-                marginTop: 60,
-                alignItems: 'center',
-                transform: [{
-                  translateX: this.state.valueToAnimatedContainerView.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [Dimensions.get('window').width, 0]
-                  })
-                }]
-              }}
-            >
+          <Animated.View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              transform: [{
+                translateX: this.state.valueToAnimatedContainerView.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [Dimensions.get('window').width, 0]
+                })
+              }]
+            }}
+          >
+            <FeedHeader
+              placeholder='Buscar Usuário'
+              profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
+              clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+              value={this.state.userSearch}
+              onChangeText={this.onChangeTextUserSearch.bind(this)}
+            />
+            <View style={{ flex: 1 }}>
               <FlatList
                 ref={(ref) => this.flatListRef = ref}
                 onRefresh={() => this.handleRefresh()}
@@ -232,22 +264,32 @@ class Feed extends Component {
                   )
                 }}
               />
-            </Animated.View>
-            <View
+            </View>
+
+            <Animated.View
               style={{
                 position: 'absolute',
+                top: 0,
                 width: Dimensions.get('window').width,
-                height: Dimensions.get('window').height,
-                top: 0
+                height: Dimensions.get('window').height - (this.tamBottomBar + this.tamSearchBar),
+                backgroundColor: '#FFF',
+                transform: [{
+                  translateY: this.state.animatedValueToUserSearchView.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [
+                      -Dimensions.get('window').height,
+                      this.tamSearchBar
+                    ]
+                  })
+                }]
               }}
             >
-              <FeedHeader
-                placeholder='Id/Apelido'
-                profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
-                clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+              <UserSearch
+                search={this.state.userSearch}
+                clickImageProfile={this.clickImageProfile.bind(this)}
               />
-            </View>
-          </View>
+            </Animated.View>
+          </Animated.View>
         ) : (
             <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
               <ProgressBarAndroid
