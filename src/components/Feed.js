@@ -66,6 +66,7 @@ class Feed extends Component {
         postId: '',
         content: '',
       },
+      animatedValueToOffsetScroll: new Animated.Value(0),
       valueToAnimatedContainerView: new Animated.Value(0),
       animatedValueToUserSearchView: new Animated.Value(0),
     };
@@ -201,16 +202,20 @@ class Feed extends Component {
               }]
             }}
           >
-            <FeedHeader
-              placeholder='Buscar Usuário'
-              profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
-              clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
-              value={this.state.userSearch}
-              onChangeText={this.onChangeTextUserSearch.bind(this)}
-            />
-            <View style={{ flex: 1 }}>
+
+            <Animated.View
+              style={{
+                flex: 1,
+                top: this.state.animatedValueToOffsetScroll.interpolate({
+                  inputRange: [0, this.tamSearchBar * 15],
+                  outputRange: [60, 0],
+                  extrapolate: 'clamp'
+                })
+              }}
+            >
               <FlatList
                 ref={(ref) => this.flatListRef = ref}
+                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueToOffsetScroll } } }])}
                 onRefresh={() => this.handleRefresh()}
                 refreshing={this.state.refresh}
                 ListFooterComponent={() => (
@@ -264,7 +269,31 @@ class Feed extends Component {
                   )
                 }}
               />
-            </View>
+            </Animated.View>
+
+            <Animated.View
+              style={{
+                position: 'absolute',
+                top: 0,
+                width: Dimensions.get('window').width,
+                height: 60,
+                transform: [{
+                  translateY: this.state.animatedValueToOffsetScroll.interpolate({
+                    inputRange: [0, this.tamSearchBar * 10, this.tamSearchBar * 15],
+                    outputRange: [0, 0, -this.tamSearchBar],
+                    extrapolate: 'clamp'
+                  })
+                }]
+              }}
+            >
+              <FeedHeader
+                placeholder='Buscar Usuário'
+                profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
+                clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+                value={this.state.userSearch}
+                onChangeText={this.onChangeTextUserSearch.bind(this)}
+              />
+            </Animated.View>
 
             <Animated.View
               style={{
