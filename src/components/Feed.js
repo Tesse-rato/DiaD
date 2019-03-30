@@ -26,9 +26,10 @@ import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
 import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
-import { MinhaView, FeedHeader } from "../styles/standard";
+import { MinhaView } from "../styles/standard";
 import { Post } from '../styles/postFeed';
-import UserSearch from './UserSearch';
+
+import FeedHeader from './FeedHeader';
 
 import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage, decreaseUserName } from "../funcs";
 
@@ -54,7 +55,6 @@ class Feed extends Component {
       onFeed: true,
       loading: true,
       refresh: false,
-      userSearch: '',
       commentController: {
         edit: false,
         upload: false,
@@ -68,7 +68,6 @@ class Feed extends Component {
       },
       animatedValueToOffsetScroll: new Animated.Value(0),
       valueToAnimatedContainerView: new Animated.Value(0),
-      animatedValueToUserSearchView: new Animated.Value(0),
     };
   }
   componentWillMount() {
@@ -135,26 +134,8 @@ class Feed extends Component {
       )
     ]).start(() => this.setState({ onFeed: arg }));
   }
-  animUserSearchView(arg) {
-    const value = arg ? 1 : 0;
 
-    Animated.timing(
-      this.state.animatedValueToUserSearchView,
-      {
-        toValue: value,
-        duration: 1000,
-        easing: Easing.ease
-      }
-    ).start()
-  }
-  onChangeTextUserSearch(newValue) {
-    this.setState({ userSearch: newValue });
 
-    if (!newValue) return this.animUserSearchView(false);
-
-    this.animUserSearchView(true);
-
-  }
   clickImageProfile(_id) {
     this.animeContainerView(false);
     this.props.setProfileId(_id);
@@ -206,11 +187,13 @@ class Feed extends Component {
             <Animated.View
               style={{
                 flex: 1,
-                top: this.state.animatedValueToOffsetScroll.interpolate({
-                  inputRange: [0, this.tamSearchBar * 15],
-                  outputRange: [60, 0],
-                  extrapolate: 'clamp'
-                })
+                transform: [{
+                  translateY: this.state.animatedValueToOffsetScroll.interpolate({
+                    inputRange: [0, this.tamSearchBar * 15],
+                    outputRange: [this.tamSearchBar, 0],
+                    extrapolate: 'clamp'
+                  })
+                }]
               }}
             >
               <FlatList
@@ -274,9 +257,8 @@ class Feed extends Component {
             <Animated.View
               style={{
                 position: 'absolute',
-                top: 0,
                 width: Dimensions.get('window').width,
-                height: 60,
+                height: this.tamSearchBar,
                 transform: [{
                   translateY: this.state.animatedValueToOffsetScroll.interpolate({
                     inputRange: [0, this.tamSearchBar * 10, this.tamSearchBar * 15],
@@ -290,34 +272,9 @@ class Feed extends Component {
                 placeholder='Buscar Usuário'
                 profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
                 clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
-                value={this.state.userSearch}
-                onChangeText={this.onChangeTextUserSearch.bind(this)}
               />
             </Animated.View>
 
-            <Animated.View
-              style={{
-                position: 'absolute',
-                top: 0,
-                width: Dimensions.get('window').width,
-                height: Dimensions.get('window').height - (this.tamBottomBar + this.tamSearchBar),
-                backgroundColor: '#FFF',
-                transform: [{
-                  translateY: this.state.animatedValueToUserSearchView.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [
-                      -Dimensions.get('window').height,
-                      this.tamSearchBar
-                    ]
-                  })
-                }]
-              }}
-            >
-              <UserSearch
-                search={this.state.userSearch}
-                clickImageProfile={this.clickImageProfile.bind(this)}
-              />
-            </Animated.View>
           </Animated.View>
         ) : (
             <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>

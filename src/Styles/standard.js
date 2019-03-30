@@ -63,7 +63,7 @@ export const Profile = props => (
     <Image style={{ width: 48, height: 48, borderRadius: 24 }} source={props.source} resizeMode='cover' />
   </TouchableOpacity>
 );
-export const FeedHeader = props => (
+export const FeedHeaderComp = props => (
   <ContainerHeader>
     <Find
       placeholder={props.placeholder}

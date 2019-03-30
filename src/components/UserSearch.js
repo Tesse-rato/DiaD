@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, ProgressBarAndroid, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { connect } from 'react-redux';
 
 import Debug from '../funcs/debug';
@@ -12,33 +12,52 @@ class UserSearch extends Component {
     super();
 
     this.state = {
-      users: []
+      users: [],
+      loading: true,
     };
-  }
-  componentWillReceiveProps(props) {
-    const config = {
+    this.config = {
       headers: {
-        authorization: `Bearer ${this.props.account.token}`
+        authorization: ''
       }
     }
+  }
 
-    const url = `/users/search/${props.search}`;
+  componentWillMount() {
+    this.config.headers.authorization = `Bearer ${this.props.account.token}`
+  }
 
-    Api.get(url, config).then(({ data: users }) => {
-      this.setState({ users });
+  componentWillReceiveProps(receiveProps) {
+    this.setState({ users: [], loading: true }, () => {
 
-    }).catch(() => {
-      this.setState({ users: [] });
-
+      Api.get(`/users/search/${receiveProps.search}`, this.config)
+        .then(({ data: users }) => {
+          this.setState({ users, loading: false });
+        })
+        .catch(() => {
+          this.setState({ users: [], loading: false });
+        });
     });
   }
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <UserSearchComp
-          search={this.state.users}
-          clickImageProfile={this.props.clickImageProfile}
-        />
+        {this.state.loading ? (
+          <View style={{
+            flex: 1,
+            alignItems: 'center',
+            marginTop: 20,
+          }}>
+            <ProgressBarAndroid
+              styleAttr='Small'
+              indeterminate
+            />
+          </View>
+        ) : (
+            <UserSearchComp
+              result={this.state.users}
+              clickImageProfile={this.props.clickImageProfile}
+            />
+          )}
       </View>
     );
   }

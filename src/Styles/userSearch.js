@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, Text, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { ScrollView, View, Text, TouchableOpacity, Image, Dimensions, ProgressBarAndroid } from 'react-native';
 
 import styled from 'styled-components/native';
 
@@ -18,9 +18,9 @@ const ContainerUserResult = styled.View`
 
 const UserSearch = props => (
   <View style={{ flex: 1 }}>
-    {props.search.length ? (
+    {props.result.length ? (
       <ScrollView style={{ flex: 1 }}>
-        {props.search.map(user => (
+        {props.result.map(user => (
           <TouchableOpacity onPress={() => props.clickImageProfile(user._id.toString())}>
             <ContainerUserResult>
               <Image
@@ -40,7 +40,7 @@ const UserSearch = props => (
         ))}
       </ScrollView>
     ) : (
-        <View style={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
+        <View stlyle={{ flex: 1, alignItems: 'center', marginTop: 20 }}>
           <Text style={{ fontSize: 14, color: '#AAA' }}>Sem Resultado</Text>
         </View>
       )}
@@ -51,7 +51,7 @@ export const UserSearchComp = props => (
   <ContainerUserSearch>
 
     <UserSearch
-      search={props.search}
+      result={props.result}
       clickImageProfile={props.clickImageProfile}
     />
 
