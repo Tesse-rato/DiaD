@@ -29,7 +29,7 @@ import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 import { MinhaView } from "../styles/standard";
 import { Post } from '../styles/postFeed';
 
-import FeedHeader from './FeedHeader';
+import FeedHeader from './FeedHeaderComp';
 
 import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage, decreaseUserName } from "../funcs";
 
@@ -55,6 +55,7 @@ class Feed extends Component {
       onFeed: true,
       loading: true,
       refresh: false,
+      userSearch: '',
       commentController: {
         edit: false,
         upload: false,
@@ -66,8 +67,8 @@ class Feed extends Component {
         postId: '',
         content: '',
       },
-      animatedValueToOffsetScroll: new Animated.Value(0),
       valueToAnimatedContainerView: new Animated.Value(0),
+      animatedValueToContentScrollY: new Animated.Value(0),
     };
   }
   componentWillMount() {
@@ -89,7 +90,10 @@ class Feed extends Component {
 
     Api.get(this.props.url, config).then(({ data }) => {
       decreasePostsUserName(data).then(posts => {
-        this.setState({ posts, loading: false }, () => {
+
+        const payload = posts.sort((a, b) => a.pushes.times - b.pushes.times).reverse();
+
+        this.setState({ posts: payload, loading: false }, () => {
           this.animeContainerView(true);
         });
 
@@ -110,7 +114,10 @@ class Feed extends Component {
 
       Api.get(this.props.url, config).then(({ data: posts }) => {
         decreasePostsUserName(posts).then(posts => {
-          this.setState({ posts, refreshing: false });
+
+          const payload = posts.sort((a, b) => a.pushes.times - b.pushes.times).reverse();
+
+          this.setState({ posts: payload, refreshing: false });
         })
       }).catch(err => {
         alert('Nao foi possivel atualzar');
@@ -134,8 +141,6 @@ class Feed extends Component {
       )
     ]).start(() => this.setState({ onFeed: arg }));
   }
-
-
   clickImageProfile(_id) {
     this.animeContainerView(false);
     this.props.setProfileId(_id);
@@ -143,7 +148,10 @@ class Feed extends Component {
   }
   _pushPost(_id) {
     this.pushPost(_id).then(posts => {
-      this.setState({ posts });
+
+      const payload = posts.reverse().sort((a, b) => a.pushes.times - b.pushes.times).reverse();
+
+      this.setState({ posts: payload });
     }).catch(err => {
       console.log(err);
     });
@@ -187,18 +195,16 @@ class Feed extends Component {
             <Animated.View
               style={{
                 flex: 1,
-                transform: [{
-                  translateY: this.state.animatedValueToOffsetScroll.interpolate({
-                    inputRange: [0, this.tamSearchBar * 15],
-                    outputRange: [this.tamSearchBar, 0],
-                    extrapolate: 'clamp'
-                  })
-                }]
+                marginTop: this.state.animatedValueToContentScrollY.interpolate({
+                  inputRange: [0, this.tamSearchBar * 30],
+                  outputRange: [60, 0],
+                  extrapolate: 'clamp'
+                })
               }}
             >
               <FlatList
                 ref={(ref) => this.flatListRef = ref}
-                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueToOffsetScroll } } }])}
+                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueToContentScrollY } } }])}
                 onRefresh={() => this.handleRefresh()}
                 refreshing={this.state.refresh}
                 ListFooterComponent={() => (
@@ -257,22 +263,34 @@ class Feed extends Component {
             <Animated.View
               style={{
                 position: 'absolute',
-                width: Dimensions.get('window').width,
-                height: this.tamSearchBar,
-                transform: [{
-                  translateY: this.state.animatedValueToOffsetScroll.interpolate({
-                    inputRange: [0, this.tamSearchBar * 10, this.tamSearchBar * 15],
-                    outputRange: [0, 0, -this.tamSearchBar],
-                    extrapolate: 'clamp'
-                  })
-                }]
+                top: this.state.animatedValueToContentScrollY.interpolate({
+                  inputRange: [0, this.tamSearchBar * 40, this.tamSearchBar * 50],
+                  outputRange: [0, 0, this.tamSearchBar * -1],
+                  extrapolate: 'clamp'
+                })
               }}
             >
               <FeedHeader
                 placeholder='Buscar Usuário'
                 profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
-                clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+                clickImageProfile={this.clickImageProfile.bind(this)}
               />
+            </Animated.View>
+
+            <Animated.View
+              style={{
+                position: 'absolute',
+                right: 20,
+                bottom: this.state.animatedValueToContentScrollY.interpolate({
+                  inputRange: [0, this.tamSearchBar * 70, this.tamSearchBar * 80],
+                  outputRange: [-this.tamBottomBar, -this.tamBottomBar, 20],
+                  extrapolate: 'clamp'
+                })
+              }}
+            >
+              <TouchableOpacity onPressOut={() => this.scrollTo()}>
+                <ScrolltoUpIco width={50} height={50} />
+              </TouchableOpacity>
             </Animated.View>
 
           </Animated.View>
