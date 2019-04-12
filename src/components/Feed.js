@@ -27,8 +27,9 @@ import FlameRedIco from '../assets/FlameRedDiaD.svg';
 import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
 import { MinhaView } from "../styles/standard";
-import { Post } from '../styles/postFeed';
+// import { Post } from '../styles/postFeed';
 
+import Post from './Post';
 import FeedHeader from './FeedHeaderComp';
 
 import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage, decreaseUserName } from "../funcs";
@@ -146,14 +147,25 @@ class Feed extends Component {
     this.props.setProfileId(_id);
     this.props.navigation.navigate('Profile', { animFeedContainer: this.animeContainerView.bind(this) });
   }
-  _pushPost(_id) {
-    this.pushPost(_id).then(posts => {
+  updateAndSortPosts(_id, post) {
+    return new Promise(resolve => {
+      const posts = this.state.posts;
+      let indexOfPost;
+
+      posts.forEach((post, index) => post._id.toString() == _id ? indexOfPost = index : null);
+
+      Debug.post({
+        _id,
+        indexOfPost,
+        times: post.pushes.times,
+        users: { ...post.pushes.users }
+      })
+
+      posts[indexOfPost] = post;
 
       const payload = posts.reverse().sort((a, b) => a.pushes.times - b.pushes.times).reverse();
 
-      this.setState({ posts: payload });
-    }).catch(err => {
-      console.log(err);
+      this.setState({ posts: payload }, () => resolve());
     });
   }
   sharePost(_id) {
@@ -227,36 +239,14 @@ class Feed extends Component {
                 data={this.state.posts}
                 showsVerticalScrollIndicator={false}
                 keyExtractor={item => item._id}
-                renderItem={({ item }) => {
-                  const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                  const ico = pushed ? FlameRedIco : FlameBlueIco;
-                  if (item.photo) item.photo = resizeImage(item.photo);
-
-                  return (
-                    <Post
-                      key={item._id}
-                      push_ico={ico}
-                      user_id={this.props.account.user._id}
-                      post_id={item._id}
-                      assignedTo_id={item.assignedTo._id}
-                      firstName={item.assignedTo.name.first}
-                      lastName={item.assignedTo.name.last}
-                      nickname={item.assignedTo.name.nickname}
-                      thumbnail={item.assignedTo.photo.thumbnail}
-                      pushTimes={item.pushes.times}
-                      pushAssignedTo={pushed}
-                      content={item.content}
-                      postPhoto={item.photo}
-                      comments={item.comments}
-                      commentController={this.state.commentController}
-                      clickImageProfile={this.clickImageProfile.bind(this)}
-                      pushPost={this._pushPost.bind(this)}
-                      newComment={this.newComment.bind(this)}
-                      editOrNewComment={this.editOrNewComment.bind(this)}
-                      sharePost={this.sharePost.bind(this)}
-                    />
-                  )
-                }}
+                renderItem={({ item }) => (
+                  <Post
+                    post={item}
+                    environment='Feed'
+                    clickImageProfile={this.clickImageProfile.bind(this)}
+                    updateAndSortPosts={this.updateAndSortPosts.bind(this)}
+                  />
+                )}
               />
             </Animated.View>
 

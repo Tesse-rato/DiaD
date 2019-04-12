@@ -171,6 +171,7 @@ class Login extends Component {
                 onChangeText={this.props.setEmail}
                 placeholder='Email'
                 ico={EmailIco}
+                textColor='#FFF'
               />
               <MeuInput
                 secureTextEntry
@@ -179,6 +180,7 @@ class Login extends Component {
                 onChangeText={this.props.setPassword}
                 placeholder='Senha'
                 ico={PasswordIco}
+                textColor='#FFF'
               />
             </View>
 

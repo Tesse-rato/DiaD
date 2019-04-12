@@ -77,6 +77,7 @@ class FeedHeaderComp extends Component {
           profilePhotoSource={this.props.profilePhotoSource}
           onChangeText={this.onChangeSearchText.bind(this)}
           value={this.state.search}
+          textColor='#333'
         />
 
         <Animated.View

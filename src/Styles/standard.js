@@ -32,7 +32,7 @@ export const StandardInput = styled.TextInput`
   border: 0px;
   margin: 4px;
   font-size: 14;
-  color: #333;
+  color: ${props => props.textColor};
 `;
 
 const ContainerHeader = styled.View`
@@ -54,7 +54,10 @@ export const Find = props => (
       onChangeText={(e) => props.onChangeText(e)}
       placeholder={props.placeholder}
       placeholderTextColor='#333'
-      selectionColor='#333' />
+      selectionColor='#333'
+      textColor={props.textColor}
+    />
+
   </View>
 );
 
@@ -69,6 +72,7 @@ export const FeedHeader = props => (
       placeholder={props.placeholder}
       onChangeText={props.onChangeText}
       value={props.value}
+      textColor={props.textColor}
     />
     <Profile
       clickImageProfile={props.clickImageProfile}
@@ -90,6 +94,7 @@ export const MeuInput = (props) => (
       placeholder={props.placeholder}
       placeholderTextColor='#FFF'
       selectionColor='#FFF'
+      textColor={props.textColor}
     />
   </View>
 );

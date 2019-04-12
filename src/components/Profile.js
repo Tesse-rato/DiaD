@@ -21,7 +21,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../redux/actions'
 
-import Api from '../api';
 import {
   editOrNewComment,
   newComment,
@@ -33,13 +32,15 @@ import {
 
 import { MinhaView } from "../styles/standard";
 import { HeaderProfile } from "../styles/headerProfile";
-import { PostProfile } from '../styles/postProfile';
 import { EditOrNewPost } from '../styles/editOrNewPost';
+import Post from './Post';
 
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
 
+import Api from '../api';
 import Debug from '../funcs/debug';
+
 class Profile extends Component {
   static navigationOptions = {
     header: null
@@ -111,6 +112,9 @@ class Profile extends Component {
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
   }
   loadFromApi() {
+
+    if(this.state.posts.length > 0) return;
+
     const config = {
       headers: {
         authorization: `Bearer ${this.props.account.token}`
@@ -256,6 +260,8 @@ class Profile extends Component {
   }
 
   editPost(_id) {
+    Debug.post({msg: 'EditPost Profile'});
+
     let payload;
 
     this.state.posts.forEach((post, index) => {
@@ -304,7 +310,7 @@ class Profile extends Component {
     }
 
     const payload = this.state.posts;
-    payload[this.indexOfPost] = this.state.postController.post;
+    payload[this.indexOfPost].content = this.state.postController.post.content;
 
     if (this.state.postController.post.content != this.state.postController.oldContent ||
       this.state.postController.post.category != this.state.postController.oldCategory) {
@@ -527,8 +533,7 @@ class Profile extends Component {
             }}
           >
 
-
-            <View style={{ width: Dimensions.get('window').width, backgroundColor: '#E8E8E8' }}>
+            <View style={{ flex: 1, width: Dimensions.get('window').width, backgroundColor: '#E8E8E8' }}>
               <FlatList
                 ref={ref => this.flatListRef = ref}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueFromScrollY } } }])}
@@ -536,50 +541,15 @@ class Profile extends Component {
                 showsVerticalScrollIndicator={false}
                 keyExtractor={item => item._id}
                 ListHeaderComponent={() => (<View style={{ height: this.state.tamFrameProfile + this.state.tamBio + 10 }} />)}
-                renderItem={({ item }) => {
-                  const datePost = item.createdAt.split('T')[0].split('-').reverse();
-                  const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                  const ico = pushed ? FlameRedIco : FlameBlueIco;
-                  if (item.photo) item.photo = resizeImage(item.photo);
-                  let category;
-                  switch (item.category) {
-                    case 'general': {
-                      category = 'Geral'
-                      break;
-                    }
-                    case 'justice': {
-                      category = 'Justiça'
-                      break;
-                    }
-                    case 'business': {
-                      category = 'Negoçios'
-                      break;
-                    }
-                  }
-                  return (
-                    <View style={{ backgroundColor: '#E8E8E8' }}>
-                      <PostProfile
-                        push_ico={ico}
-                        post_id={item._id}
-                        user_id={this.props.account.user._id}
-                        post_user_id={item.assignedTo._id}
-                        datePost={datePost}
-                        category={category}
-                        pushTimes={item.pushes.times}
-                        comments={item.comments}
-                        content={item.content}
-                        postPhoto={item.photo}
-                        commentController={this.state.commentController}
-                        editOrNewComment={this.editOrNewComment}
-                        newComment={this.newComment}
-                        pushPost={this._pushPost.bind(this)}
-                        sharePost={this.sharePost.bind(this)}
-                        editPost={this.editPost.bind(this)}
-                        clickImageProfile={this.clickImageProfile.bind(this)}
-                      />
-                    </View>
-                  )
-                }}
+                renderItem={({ item }) => (
+                    <Post 
+                      post={item}
+                      environment='Profile'
+                      clickImageProfile={this.clickImageProfile.bind(this)}
+                      editPost={this.editPost.bind(this)}
+                      updateAndSortPosts={() => null}
+                    />
+                )}
               />
               {!this.state.posts.length ? (
                 <View

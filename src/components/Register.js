@@ -83,6 +83,7 @@ class Register extends Component {
             onChangeText={this.props.setEmail}
             placeholder='Email'
             ico={EmailIco}
+            textColor='#FFF'
           />
           <MeuInput
             secureTextEntry
@@ -91,6 +92,7 @@ class Register extends Component {
             onChangeText={this.props.setPassword}
             placeholder='Senha'
             ico={PasswordIco}
+            textColor='#FFF'
           />
           <MeuInput
             secureTextEntry

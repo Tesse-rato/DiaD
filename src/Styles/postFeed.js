@@ -5,8 +5,8 @@ import styled from 'styled-components/native';
 
 import CommentIco from '../assets/CommentDiaD.svg';
 import ShareIco from '../assets/ShareDiaD.svg';
+import EditIco from '../assets/EditDiaD.svg';
 
-import { Comment } from './comment';
 
 const ContainerPost = styled.View`
   width: ${Dimensions.get('window').width};
@@ -15,11 +15,11 @@ const ContainerPost = styled.View`
   border-radius: 15px;
   margin-top: 2px;
 `;
-const ContainerHeader = styled.View`
+const HeaderContainer = styled.View`
   flex-direction: row;
   padding: 10px;
 `;
-const ContainerHeaderPost = styled.View`
+const PostHeaderContainer = styled.View`
   width: ${Dimensions.get('window').width - 70};
   flex-direction: row;
   align-items: center;
@@ -29,7 +29,7 @@ const ImageHeaderPost = styled.Image`
   height: 60px;
   border-radius: 30px;
 `;
-const ContainerFooterPost = styled.View`
+const PostFooterContainer = styled.View`
   width: ${Dimensions.get('window').width - 13};
   align-items: center;
   justify-content: space-between;
@@ -37,10 +37,10 @@ const ContainerFooterPost = styled.View`
   padding: 10px;
 `;
 
-export const HeaderPost = props => (
-  <ContainerHeader>
-    <ContainerHeaderPost>
-      <TouchableOpacity onPress={() => props.clickImageProfile(props.assignedTo_id)} >
+export const FeedHeaderOfPost = props => (
+  <HeaderContainer>
+    <PostHeaderContainer>
+      <TouchableOpacity onPress={() => props.clickImageProfile(/*props.assignedTo_id*/)} >
         <ImageHeaderPost resizeMode='cover' source={{ uri: props.thumbnail }} />
       </TouchableOpacity>
       <View style={{ marginLeft: 8 }}>
@@ -48,17 +48,40 @@ export const HeaderPost = props => (
         <Text style={{ fontSize: 12 }} >@{props.nickname}</Text>
         <Text style={{ fontSize: 12 }} >email@gmail.com</Text>
       </View>
-    </ContainerHeaderPost>
+    </PostHeaderContainer>
     <View style={{ alignItems: 'center' }}>
-      <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
+      <TouchableOpacity onPress={() => props.pushPost(/*porps.post_id*/)}>
         <props.push_ico width={32} height={32} />
       </TouchableOpacity>
       <Text style={{ color: '#333' }}>{props.pushTimes}</Text>
     </View>
-  </ContainerHeader>
+  </HeaderContainer>
+);
+export const ProfileHeaderOfPost = props => (
+  <HeaderContainer style={{justifyContent: 'space-between'}}>
+    <Text>{`${props.postDate[0]} ${props.postDate[1]} ${props.postDate[2]}`}</Text>
+      <Text>{props.category}</Text>
+      {props.user_id == props.post_user_id ? (
+      <TouchableOpacity onPress={() => props.editPost(props.post_id)}>
+        <EditIco width={24} height={24} />
+      </TouchableOpacity>
+    ) : (
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ fontSize: 12, marginRight: 5 }}>{props.pushTimes}</Text>
+          <TouchableOpacity onPress={() => props.pushPost(props.post_id)}>
+            <props.push_ico width={24} height={24} />
+          </TouchableOpacity>
+        </View>
+      )}
+  </HeaderContainer>
 );
 export const ContentPost = props => (
   <View>
+    {props.content ? (
+      <View style={{ paddingHorizontal: 15 }}>
+        <Text style={{ textAlign: 'left', color: '#333', fontSize: 16 }}>{props.content}</Text>
+      </View>
+    ) : null}
     {props.postPhoto ? (
       <Image
         style={{
@@ -69,62 +92,19 @@ export const ContentPost = props => (
         source={{ uri: props.postPhoto.content }}
       />
     ) : null}
-    {props.content ? (
-      <View style={{ paddingLeft: 15, paddingRight: 15 }}>
-        <Text style={{ textAlign: 'left' }}>{props.content}</Text>
-      </View>
-    ) : null}
   </View>
 );
 
 export const FooterPost = props => (
-  <ContainerFooterPost>
+  <PostFooterContainer>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <TouchableOpacity onPress={() => props.newComment(props.post_id)}>
         <CommentIco width={24} height={24} />
       </TouchableOpacity>
-      <Text style={{ marginLeft: 2 }}>{props.comments.length}</Text>
+      <Text style={{ marginLeft: 2 }}>{props.commentsLength}</Text>
     </View>
     <TouchableOpacity onPress={() => props.sharePost(props.post_id)}>
       <ShareIco width={24} height={24} />
     </TouchableOpacity>
-  </ContainerFooterPost>
-);
-
-export const Post = props => (
-  <ContainerPost>
-    <HeaderPost
-      push_ico={props.push_ico}
-      post_id={props.post_id}
-      thumbnail={props.thumbnail}
-      firstName={props.firstName}
-      lastName={props.lastName}
-      nickname={props.nickname}
-      pushTimes={props.pushTimes}
-      assignedTo_id={props.assignedTo_id}
-      clickImageProfile={props.clickImageProfile}
-      pushPost={props.pushPost}
-    />
-
-    <ContentPost
-      content={props.content}
-      postPhoto={props.postPhoto}
-    />
-
-    <Comment
-      user_id={props.user_id}
-      comments={props.comments}
-      commentController={props.commentController}
-      clickImageProfile={props.clickImageProfile}
-      editOrNewComment={props.editOrNewComment}
-      post_id={props.post_id}
-    />
-
-    <FooterPost
-      comments={props.comments}
-      post_id={props.post_id}
-      newComment={props.newComment}
-      sharePost={props.sharePost}
-    />
-  </ContainerPost >
+  </PostFooterContainer>
 );

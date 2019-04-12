@@ -11,7 +11,7 @@ import {
 
 import styled from 'styled-components/native';
 
-import { HeaderPost } from '../styles/postFeed';
+import { FeedHeaderOfPost } from '../styles/postFeed';
 
 import BackIco from '../assets/GoBackDiaD.svg';
 import DoneIco from '../assets/DoneGreenDiaD.svg'
@@ -107,15 +107,15 @@ export const EditOrNewPost = props => (
       category={props.category}
     />
 
-    <HeaderPost
+    <FeedHeaderOfPost
       push_ico={props.push_ico}
-      post_id={props.post_id}
+      // post_id={props.post_id}
       thumbnail={props.thumbnail}
       firstName={props.firstName}
       lastName={props.lastName}
       nickname={props.nickname}
       pushTimes={props.pushTimes}
-      assignedTo_id={props.assignedTo_id}
+      // assignedTo_id={props.assignedTo_id}
       clickImageProfile={props.clickImageProfile}
       pushPost={props.pushPost}
     />

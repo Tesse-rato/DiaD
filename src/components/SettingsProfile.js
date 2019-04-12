@@ -23,7 +23,8 @@ import Api from '../api';
 
 import { MinhaView } from "../styles/standard";
 import { HeaderSettingsProfile, SettingsSocialMedia } from '../styles/settingsProfile';
-import { PostProfile } from '../styles/postProfile';
+// import { PostProfile } from '../styles/postProfile';
+import Post from './Post';
 
 import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
 import FlameRedIco from '../assets/FlameRedDiaD.svg';
@@ -37,6 +38,7 @@ class SettingsProfile extends Component {
     super(props);
     this.state = {
       user: {
+        posts: [],
         name: {
           first: '',
           last: '',
@@ -93,7 +95,7 @@ class SettingsProfile extends Component {
     };
   }
 
-  componentDidMount() {
+  async componentWillMount() {
     // const currentPassword = await AsyncStorage.getItem('password');
     // const posts = await this.props.navigation.getParam('posts');
     // this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
@@ -122,7 +124,19 @@ class SettingsProfile extends Component {
     //   user: { ...this.state.user, ...this.props.account.user },
     //   oldNickname: this.props.account.user.name.nickname
     // });
-    this.setUserData();
+    // this.setUserData();
+    const currentPassword = await AsyncStorage.getItem('password');
+    const posts = await this.props.navigation.getParam('posts');
+    const user = await this.props.navigation.getParam('user');
+    //this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
+
+    this.setState({
+      posts,
+      loading: false,
+      currentPassword,
+      user: { ...this.state.user, ...user },
+      oldNickname: user.name.nickname
+    });
   }
   async setUserData() {
     const currentPassword = await AsyncStorage.getItem('password');
@@ -587,37 +601,21 @@ class SettingsProfile extends Component {
               done={this.done.bind(this)}
               setUser={this.setUser.bind(this)}
             />
+            <View style={{ flex: 1 }}>
             <FlatList
               data={this.state.posts}
               showsVerticalScrollIndicator={false}
               keyExtractor={item => item._id}
-              renderItem={({ item }) => {
-                const datePost = item.createdAt.split('T')[0].split('-').reverse();
-                const pushed = item.pushes.users.find(id => id.toString() == this.props.account.user._id)
-                const ico = pushed ? FlameRedIco : FlameBlueIco;
-                return (
-                  <View style={{ backgroundColor: '#E8E8E8' }}>
-                    <PostProfile
-                      push_ico={ico}
-                      post_id={item._id}
-                      user_id={this.props.account.user._id}
-                      datePost={datePost}
-                      pushTimes={item.pushes.times}
-                      comments={item.comments}
-                      content={item.content}
-                      postPhoto={item.photo}
-                      commentController={this.state.commentController}
-                      clickImageProfile={this.clickImageProfile}
-                      editOrNewComment={this.editOrNewComment}
-                      newComment={this.newComment}
-                      pushPost={this._pushPost.bind(this)}
-                      sharePost={this.sharePost.bind(this)}
-                      debug={this.debug.bind(this)}
-                    />
-                  </View>
-                )
-              }}
+              renderItem={({ item }) => (
+                <Post 
+                  post={item}
+                  environment='SettingsProfile'
+                  clickImageProfile={() => null}
+                  updateAndSortPosts={() => null}
+                />
+              )}
             />
+            </View>
           </View>
         ) : (
             <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>

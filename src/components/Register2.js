@@ -166,6 +166,7 @@ export class Register2 extends Component {
             onChangeText={this.props.setFirstName}
             placeholder='Nome'
             ico={UserIco}
+            textColor='#FFF'
           />
           <MeuInput
             textContentType='nameSuffix'
@@ -173,6 +174,7 @@ export class Register2 extends Component {
             onChangeText={this.props.setLastName}
             placeholder='Sobrenome'
             ico={UserIco}
+            textColor='#FFF'
           />
           <MeuInput
             textContentType='nickname'
@@ -180,6 +182,7 @@ export class Register2 extends Component {
             onChangeText={this.props.setNickname}
             placeholder='Apelido'
             ico={UserIco}
+            textColor='#FFF'
           />
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8E8E8', borderRadius: 25, margin: 5 }}>
