@@ -27,7 +27,7 @@ import FlameRedIco from '../assets/FlameRedDiaD.svg';
 import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
 import { MinhaView } from "../styles/standard";
-// import { Post } from '../styles/postFeed';
+import { FooterPost } from '../styles/FooterComponent';
 
 import Post from './Post';
 import FeedHeader from './FeedHeaderComp';
@@ -56,7 +56,11 @@ class Feed extends Component {
       onFeed: true,
       loading: true,
       refresh: false,
+      loadingMore: false,
       userSearch: '',
+      limit: 5,
+      page: 0,
+      listComplete: false,
       commentController: {
         edit: false,
         upload: false,
@@ -68,6 +72,7 @@ class Feed extends Component {
         postId: '',
         content: '',
       },
+      animatedValueToFooterPost: new Animated.Value(0),
       valueToAnimatedContainerView: new Animated.Value(0),
       animatedValueToContentScrollY: new Animated.Value(0),
     };
@@ -89,41 +94,59 @@ class Feed extends Component {
       }
     }
 
-    Api.get(this.props.url, config).then(({ data }) => {
-      decreasePostsUserName(data).then(posts => {
+    const { page, limit } = this.state;
+    const url = `/posts/list/general/${page}/${limit}`;
 
-        const payload = posts.sort((a, b) => a.pushes.times - b.pushes.times).reverse();
+    Api.get(url, config).then(({ data }) => {
 
-        this.setState({ posts: payload, loading: false }, () => {
-          this.animeContainerView(true);
+      if (data.posts.length < limit) {
+        this.setState({
+          refresh: false,
+          listComplete: true
         });
-
-      }).catch(err => {
-        alert('Confira sua conexao');
-      })
-    }).catch(err => {
-      alert(err.response.data.error);
-    })
-  }
-  handleRefresh() {
-    this.setState({ refreshing: true }, () => {
-      const config = {
-        headers: {
-          authorization: `Bearer ${this.props.account.token}`
-        }
+        Debug.post({ msg: 'Array Vazio loadFromApi' });
       }
 
-      Api.get(this.props.url, config).then(({ data: posts }) => {
-        decreasePostsUserName(posts).then(posts => {
+      decreasePostsUserName(data.posts).then(_posts => {
 
-          const payload = posts.sort((a, b) => a.pushes.times - b.pushes.times).reverse();
+        let { posts } = this.state;
 
-          this.setState({ posts: payload, refreshing: false });
-        })
+        if (page > 0) {
+          _posts.forEach(post => posts.push(post));
+          this.setState({ posts, loadingMore: false });
+
+        } else {
+          posts = _posts;
+          this.setState({ posts, loading: false, refresh: false }, () => {
+            this.animeContainerView(true);
+          });
+        }
+
+
       }).catch(err => {
-        alert('Nao foi possivel atualzar');
-        this.setState({ refreshing: false });
+        Debug.post({ err, local: 'Feed.js loadFromApi(){ decrasePostUserName() }' });
+        alert('Confira sua conexao');
       });
+
+    }).catch(err => {
+      Debug.post({ err, local: 'Feed.js loadFromApi(){ Api.get() }' });
+    })
+  }
+
+  loadMorePosts() {
+    const { listComplete } = this.state;
+
+    if (listComplete) return;
+
+    this.setState({ page: ++this.state.page, loadingMore: true }, () => {
+      Debug.post({ page: this.state.page });
+      this.loadFromApi();
+    });
+
+  }
+  handleRefresh() {
+    this.setState({ page: 0, refresh: true }, () => {
+      this.loadFromApi();
     });
   }
   animeContainerView(arg) {
@@ -188,7 +211,7 @@ class Feed extends Component {
   render() {
     console.disableYellowBox = true;
     return (
-      <MinhaView style={{ justifyContent: 'flex-end' }}>
+      <MinhaView white style={{ justifyContent: 'flex-end' }}>
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
         {!this.state.loading ? (
           <Animated.View
@@ -208,8 +231,8 @@ class Feed extends Component {
               style={{
                 flex: 1,
                 marginTop: this.state.animatedValueToContentScrollY.interpolate({
-                  inputRange: [0, this.tamSearchBar * 30],
-                  outputRange: [60, 0],
+                  inputRange: [0, this.tamSearchBar * 20, this.tamSearchBar * 30],
+                  outputRange: [this.tamSearchBar, this.tamSearchBar, 0],
                   extrapolate: 'clamp'
                 })
               }}
@@ -217,24 +240,18 @@ class Feed extends Component {
               <FlatList
                 ref={(ref) => this.flatListRef = ref}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueToContentScrollY } } }])}
-                onRefresh={() => this.handleRefresh()}
+                onRefresh={this.handleRefresh.bind(this)}
                 refreshing={this.state.refresh}
+                onEndReached={this.loadMorePosts.bind(this)}
+                onEndReachedThreshold={1}
+                ItemSeparatorComponent={() => (
+                  <View style={{ alignSelf: 'center', height: 1, marginVertical: 25, width: Dimensions.get('window').width * .75, backgroundColor: '#BABABF' }} />
+                )}
                 ListFooterComponent={() => (
-                  <View style={{ alignItems: 'center', padding: 5 }}>
-                    <TouchableOpacity
-                      style={{
-                        alignItems: 'center',
-                        width: Dimensions.get('window').width - 100,
-                        height: 50,
-                        padding: 10,
-                        borderRadius: 60,
-                        backgroundColor: '#FFF'
-                      }}
-                      onPress={() => this.scrollTo()}
-                    >
-                      <ScrolltoUpIco width={32} height={32} />
-                    </TouchableOpacity>
-                  </View>
+                  <FooterPost
+                    animatedValueToFooterPost={this.state.animatedValueToFooterPost}
+                    listComplete={this.state.listComplete}
+                  />
                 )}
                 data={this.state.posts}
                 showsVerticalScrollIndicator={false}

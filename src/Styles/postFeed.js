@@ -44,9 +44,9 @@ export const FeedHeaderOfPost = props => (
         <ImageHeaderPost resizeMode='cover' source={{ uri: props.thumbnail }} />
       </TouchableOpacity>
       <View style={{ marginLeft: 8 }}>
-        <Text style={{ fontSize: 22 }} >{`${props.firstName} ${props.lastName}`}</Text>
-        <Text style={{ fontSize: 12 }} >@{props.nickname}</Text>
-        <Text style={{ fontSize: 12 }} >email@gmail.com</Text>
+        <Text style={{ fontSize: 22, color: '#333', left: -7, top: -2 }} >{`${props.firstName} ${props.lastName}`}</Text>
+        <Text style={{ fontSize: 12, left: -4 }} >@{props.nickname}</Text>
+        <Text style={{ fontSize: 12, left: -10 }} >email@gmail.com</Text>
       </View>
     </PostHeaderContainer>
     <View style={{ alignItems: 'center' }}>
@@ -58,10 +58,10 @@ export const FeedHeaderOfPost = props => (
   </HeaderContainer>
 );
 export const ProfileHeaderOfPost = props => (
-  <HeaderContainer style={{justifyContent: 'space-between'}}>
+  <HeaderContainer style={{ justifyContent: 'space-between' }}>
     <Text>{`${props.postDate[0]} ${props.postDate[1]} ${props.postDate[2]}`}</Text>
-      <Text>{props.category}</Text>
-      {props.user_id == props.post_user_id ? (
+    <Text>{props.category}</Text>
+    {props.user_id == props.post_user_id ? (
       <TouchableOpacity onPress={() => props.editPost(props.post_id)}>
         <EditIco width={24} height={24} />
       </TouchableOpacity>
@@ -79,7 +79,7 @@ export const ContentPost = props => (
   <View>
     {props.content ? (
       <View style={{ paddingHorizontal: 15 }}>
-        <Text style={{ textAlign: 'left', color: '#333', fontSize: 16 }}>{props.content}</Text>
+        <Text style={{ textAlign: 'left', color: '#444', fontSize: 16 }}>{props.content}</Text>
       </View>
     ) : null}
     {props.postPhoto ? (

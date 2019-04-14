@@ -19,6 +19,7 @@ export const ContainerComment = styled.View`
 export const ContainerHeaderComment = styled.View`
   width: ${Dimensions.get('window').width - 100};
   flex-direction: row;
+  align-items: flex-start;
   padding-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
@@ -28,9 +29,6 @@ export const ContainerHeaderComment = styled.View`
 const ContainerDeleteDoneEditComment = styled.View`
   width: 150px;
   height: 50px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-around;
   border-radius: 10px;
   background-color: #FFF;
 `;
@@ -49,10 +47,10 @@ export const CloseDoneToEditComment = props => (
     ) : (
         <ContainerToButtonsCloseEditComment>
           <TouchableOpacity onPress={() => props.editComment('delete', props.comment_id/*, props.post_id*/)} >
-            <DeleteIco width={40} heigth={40} />
+            <DeleteIco width={32} heigth={32} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => props.editComment('done', props.comment_id/*, props.post_id*/)} >
-            <DoneGreenIco width={40} heigth={40} />
+            <DoneGreenIco width={32} heigth={32} />
           </TouchableOpacity>
         </ContainerToButtonsCloseEditComment>
       )}
@@ -63,17 +61,17 @@ export const CommentHeader = props => (
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
     <ContainerHeaderComment>
       <TouchableOpacity onPress={() => props.clickImageProfile(props.assignedTo)}>
-        <Image style={{ width: 40, height: 40, borderRadius: 20 }} resizeMode='cover' source={{ uri: props.thumbnail }} />
+        <Image style={{ width: 30, height: 30, borderRadius: 15 }} resizeMode='cover' source={{ uri: props.thumbnail }} />
       </TouchableOpacity>
       <View style={{ marginLeft: 8 }}>
-        <Text style={{ fontSize: 16 }} >{`${props.firstName} ${props.lastName}`}</Text>
-        <Text style={{ fontSize: 12 }} >@{props.nickname}</Text>
+        <Text style={{ fontSize: 16, color: '#444' }} >{`${props.firstName} ${props.lastName}`}</Text>
+        <Text style={{ fontSize: 12, left: -10 }} >@{props.nickname}</Text>
       </View>
     </ContainerHeaderComment>
     {props.user_id == props.assignedTo ? (
       <View>
-        <TouchableOpacity onPress={() => props.editComment('edit', props.comment_id)} >
-          <EditIco width={32} height={32} />
+        <TouchableOpacity style={{ width: 40, height: 40 }} onPress={() => props.editComment('edit', props.comment_id)} >
+          <EditIco width={24} height={24} />
         </TouchableOpacity>
       </View>
     ) : null

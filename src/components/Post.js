@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import { View, Animated, Dimensions, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 
-import { 
+import {
   ProfileHeaderOfPost,
   FeedHeaderOfPost,
   ContentPost,
   FooterPost,
 } from '../styles/postFeed';
 
-import { 
+import {
   ContainerComment,
   CommentHeader,
   CommentContent,
@@ -130,17 +130,17 @@ class Post extends Component {
         tamPostComment = (Math.ceil(biggestContent / screanWidthConst) * 15) + 85;
       }
 
-      if(this.props.environment == 'Feed'){
+      if (this.props.environment == 'Feed') {
         tamPostHeader = 80;
       }
-      else if(this.props.environment == 'Profile'){
+      else if (this.props.environment == 'Profile') {
         tamPostHeader = 44;
-        
+
         const postDate = this.props.post.createdAt.split('T')[0].split('-').reverse();
         this.props.post.createdAt = postDate;
 
         let category;
-        switch(this.props.post.category){
+        switch (this.props.post.category) {
           case 'general': {
             category = 'Geral'
             break;
@@ -154,14 +154,14 @@ class Post extends Component {
             break;
           }
         }
-        
+
         this.props.post.category = category;
       }
-      else if(this.props.environment == 'SettingsProfile'){
+      else if (this.props.environment == 'SettingsProfile') {
         // Quando na configuracao do perfil, os dados do post como a data ja foi tratada quando estava em Profile
         tamPostHeader = 44;
       }
-      
+
       resolve({
         tamPostHeader,
         tamPostImage,
@@ -214,7 +214,7 @@ class Post extends Component {
       postId: this.state.post._id
     }
 
-    if(environment == 'Feed'){
+    if (environment == 'Feed') {
       var callBack = () => {
         setTimeout(() => {
           this.animPostContainer(0, () => {
@@ -224,7 +224,7 @@ class Post extends Component {
         }, 1000);
       };
     }
-    else if(environment == 'Profile') {
+    else if (environment == 'Profile') {
       var callBack = () => null;
     }
 
@@ -545,10 +545,10 @@ class Post extends Component {
   }
   render() {
     return (
-      <View style={{ backgroundColor: '#FFF' }}>
+      <View>
         <Animated.View
           style={{
-            backgroundColor: '#FFF',
+            backgroundColor: '#FDFDFD',
             opacity: this.state.animatedValueToPostContainer.interpolate({
               inputRange: [this.state.tamPostContainer / 2, this.state.tamPostContainer],
               outputRange: [0, 1],
@@ -558,7 +558,6 @@ class Post extends Component {
             height: this.state.animatedValueToPostContainer
           }}
         >
-          <View style={{ height: 2, width: Dimensions.get('window').width, backgroundColor: '#E8E8E8' }} />
           {this.props.environment == 'Feed' ? (
             <FeedHeaderOfPost
               clickImageProfile={() => this.props.clickImageProfile(this.state.post.assignedTo._id)}
@@ -571,18 +570,18 @@ class Post extends Component {
               pushPost={this.pushPost.bind(this)}
             />
           ) : (
-            <ProfileHeaderOfPost
-              push_ico={this.state.pushed ? RedFlameIco : BlueFlameIco}
-              pushTimes={this.state.post.pushes.times}
-              postDate={this.props.post.createdAt}
-              category={this.state.post.category}
-              post_id={this.state.post._id}
-              user_id={this.props.account.user._id}
-              post_user_id={this.state.post.assignedTo._id}
-              editPost={this.props.editPost}
-              pushPost={this.pushPost.bind(this)}
-            />
-          )}
+              <ProfileHeaderOfPost
+                push_ico={this.state.pushed ? RedFlameIco : BlueFlameIco}
+                pushTimes={this.state.post.pushes.times}
+                postDate={this.props.post.createdAt}
+                category={this.state.post.category}
+                post_id={this.state.post._id}
+                user_id={this.props.account.user._id}
+                post_user_id={this.state.post.assignedTo._id}
+                editPost={this.props.editPost}
+                pushPost={this.pushPost.bind(this)}
+              />
+            )}
 
           <ContentPost
             content={this.state.post.content}
@@ -640,7 +639,7 @@ class Post extends Component {
                     position: 'absolute',
                     left: this.state.animatedValueToDoneDeleteContainer.interpolate({
                       inputRange: [0, .5, 1],
-                      outputRange: [0, 0, Dimensions.get('window').width / 3]
+                      outputRange: [0, 0, Dimensions.get('window').width / 2 - 75]
                     }),
                     opacity: this.state.animatedValueToDoneDeleteContainer.interpolate({
                       inputRange: [0, .4, 1],
@@ -686,7 +685,7 @@ class Post extends Component {
                           top: 5,
                           left: this.state.animatedValueToDoneDeleteContainer.interpolate({
                             inputRange: [0, .5, 1],
-                            outputRange: [0, 0, Dimensions.get('window').width / 3]
+                            outputRange: [0, 0, Dimensions.get('window').width / 2 - 75]
                           }),
                           opacity: this.state.animatedValueToDoneDeleteContainer.interpolate({
                             inputRange: [0, .4, 1],
