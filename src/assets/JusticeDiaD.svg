@@ -1,33 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32.517" height="31.258" viewBox="0 0 32.517 31.258">
-  <g id="JusticeDiaD" transform="translate(-3571.5 -615.5)">
-    <line id="Linha_18" data-name="Linha 18" x2="8.249" transform="translate(3575.281 619.871)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_19" data-name="Linha 19" x2="4.309" transform="translate(3577.457 622.821)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_19-2" data-name="Linha 19-2" x2="4.023" transform="translate(3584.462 622.821)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_19-3" data-name="Linha 19-3" x2="9.372" transform="translate(3590.782 622.821)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_20" data-name="Linha 20" x2="15.102" transform="translate(3582.844 625.772)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_20-2" data-name="Linha 20-2" x2="6.358" transform="translate(3574.83 625.816)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_21" data-name="Linha 21" x2="8.757" transform="translate(3578.288 628.684)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_21-2" data-name="Linha 21-2" x2="2.963" transform="translate(3588.847 628.684)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_22" data-name="Linha 22" x2="8.3" transform="translate(3576.004 631.635)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_22-2" data-name="Linha 22-2" x2="12.431" transform="translate(3585.643 631.635)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_23" data-name="Linha 23" x2="10.476" transform="translate(3582.571 634.592)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_24" data-name="Linha 24" x2="4.594" transform="translate(3578.06 637.517)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_24-2" data-name="Linha 24-2" x2="7.786" transform="translate(3585.198 637.53)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_24-3" data-name="Linha 24-3" x2="2.665" transform="translate(3595.25 637.511)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_25" data-name="Linha 25" x2="13.205" transform="translate(3577.444 640.461)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_25-2" data-name="Linha 25-2" x2="4.182" transform="translate(3592.134 640.461)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_18-2" data-name="Linha 18-2" x2="12.5" transform="translate(3586.88 619.871)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <line id="Linha_21-3" data-name="Linha 21-3" x2="5.305" transform="translate(3593.295 628.684)" fill="none" stroke="#4d4d4d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-    <g id="JusticeDiaD-2" data-name="JusticeDiaD" transform="translate(3574.119 618.158)">
-      <path id="Caminho_171" data-name="Caminho 171" d="M12.043,14.443A1.174,1.174,0,0,1,11,13.174V-6.5a1.022,1.022,0,0,1,.137-.771,1.022,1.022,0,0,1,.643-.447h.038a1.072,1.072,0,0,1,1.269.78,1.047,1.047,0,0,1,0,.444V13.181A1.187,1.187,0,0,1,12.043,14.443Z" transform="translate(1.314 7.74)"/>
-      <path id="Caminho_173" data-name="Caminho 173" d="M14.85,2.916a7.849,7.849,0,0,0,4.556,0c1.231-.286,2.652-.73,3.883-.1.876.463,1.662-.825.78-1.269a6.187,6.187,0,0,0-4.3-.235,15.057,15.057,0,0,1-2.253.451,7.145,7.145,0,0,1-2.259-.279A.793.793,0,0,0,14.3,2a.742.742,0,0,0,.508.914h.032Z" transform="translate(0.106 4.534)"/>
-      <path id="Caminho_174" data-name="Caminho 174" d="M4.784-1.344a6.935,6.935,0,0,1-2.17-.565A12.849,12.849,0,0,1,.792-3.1,6.244,6.244,0,0,0-3.32-4.65a.774.774,0,0,0-.78.742.761.761,0,0,0,.78.742c1.434-.127,2.6.831,3.687,1.605A9.144,9.144,0,0,0,2.1-.494,8.725,8.725,0,0,0,4.377.1.806.806,0,0,0,5.329-.43a.736.736,0,0,0-.076-.56A.736.736,0,0,0,4.8-1.331h0Z" transform="translate(6.822 6.611)"/>
-      <path id="Caminho_175" data-name="Caminho 175" d="M-1.4,7.9a3.5,3.5,0,0,1-3.655,3.331A3.49,3.49,0,0,1-8.39,7.9Z" transform="translate(8.39 2.024)"/>
-      <path id="Caminho_176" data-name="Caminho 176" d="M-4.884-2.723l2.951,6.149H-7.841L-4.884-2.7m0-.787L-8.38,3.73H-1.4L-4.884-3.51Z" transform="translate(8.386 6.194)"/>
-      <path id="Caminho_177" data-name="Caminho 177" d="M30.58,14.19a3.5,3.5,0,0,1-6.98,0Z" transform="translate(-3.301 -0.275)"/>
-      <path id="Caminho_178" data-name="Caminho 178" d="M27.081,3.547l2.957,6.13H24.156l2.957-6.13m0-.787-3.5,7.265h6.98Z" transform="translate(-3.305 3.903)"/>
-      <path id="Caminho_179" data-name="Caminho 179" d="M1.747,28.55H13.168c1.827,0,3.319,1,3.319,2.234v.7H-1.54v-.7C-1.559,29.553-.074,28.55,1.747,28.55Z" transform="translate(5.887 -5.523)"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <g id="JusticeBlackDiaD" transform="translate(-3283 126)">
+    <g id="PostBlackDiaD" transform="translate(186 -0.071)">
+      <g id="CommentsCount" transform="translate(3114 -89.697)">
+        <ellipse id="Elipse_43" data-name="Elipse 43" cx="0.399" cy="0.384" rx="0.399" ry="0.384" stroke-width="0.5" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <ellipse id="Elipse_43-2" data-name="Elipse 43-2" cx="0.399" cy="0.384" rx="0.399" ry="0.384" transform="translate(3.525)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+        <ellipse id="Elipse_43-3" data-name="Elipse 43-3" cx="0.399" cy="0.384" rx="0.399" ry="0.384" transform="translate(7.04)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"/>
+      </g>
+      <g id="Content" transform="translate(3103 -116.17)">
+        <line id="Linha_18" data-name="Linha 18" x2="6.854" transform="translate(0.71)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_19" data-name="Linha 19" x2="3.581" transform="translate(2.912 3.864)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_19-2" data-name="Linha 19-2" x2="4.56" transform="translate(9.975 3.864)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_19-3" data-name="Linha 19-3" x2="7.78" transform="translate(20.401 3.864)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_20" data-name="Linha 20" x2="12.55" transform="translate(13.794 7.209)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_20-2" data-name="Linha 20-2" x2="5.289" transform="translate(0 7.26)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_21" data-name="Linha 21" x2="7.268" transform="translate(4.444 10.752)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_21-2" data-name="Linha 21-2" x2="2.46" transform="translate(15.845 10.752)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_18-2" data-name="Linha 18-2" x2="10.383" transform="translate(17.158)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        <line id="Linha_21-3" data-name="Linha 21-3" x2="4.417" transform="translate(22.477 10.752)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Footer" transform="translate(3100 -123.929)">
+        <path id="Linha_17" data-name="Linha 17" d="M0,0H.048" transform="translate(34.952 2.287)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-width="4"/>
+        <ellipse id="Elipse_40" data-name="Elipse 40" cx="3.001" cy="2.911" rx="3.001" ry="2.911" stroke-width="1" stroke="#bbb" stroke-linecap="round" stroke-linejoin="round" fill="#bbb"/>
+        <path id="Linha_17-2" data-name="Linha 17" d="M0,0H16.161" transform="translate(11.956 2.287)" fill="none" stroke="#bbb" stroke-linecap="round" stroke-width="5"/>
+      </g>
+      <g id="Comments" transform="translate(3107 -102)">
+        <rect id="Retângulo_55" data-name="Retângulo 55" width="21" height="10" rx="2" fill="#bbb"/>
+        <ellipse id="Elipse_40-2" data-name="Elipse 40" cx="1.66" cy="1.61" rx="1.66" ry="1.61" transform="translate(1.283 1.372)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <path id="Linha_17-3" data-name="Linha 17" d="M0,0H8.938" transform="translate(6.896 2.637)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-width="2"/>
+        <path id="Linha_17-4" data-name="Linha 17" d="M0,0H3.729" transform="translate(4.896 5.637)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-width="1"/>
+        <path id="Linha_17-5" data-name="Linha 17" d="M0,0H7.417" transform="translate(10.896 5.637)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-width="1"/>
+        <path id="Linha_17-6" data-name="Linha 17" d="M0,0H7.469" transform="translate(4.896 7.637)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-width="1"/>
+        <path id="Linha_17-7" data-name="Linha 17" d="M2.508,0H0" transform="translate(14.604 7.637)" fill="#fff" stroke="#fff" stroke-linecap="round" stroke-width="1"/>
+      </g>
     </g>
-    <path id="Caminho_170" data-name="Caminho 170" d="M17.725-10.651a1.574,1.574,0,0,1,1.593,1.542V17.11a1.561,1.561,0,0,1-1.58,1.536H-9.668a1.567,1.567,0,0,1-1.6-1.529h0V-9.148a1.574,1.574,0,0,1,1.6-1.517H17.719m0-.444H-9.668A1.992,1.992,0,0,0-11.73-9.2v.07h0V17.122a1.986,1.986,0,0,0,.579,1.408,1.986,1.986,0,0,0,1.407.584H17.725a1.992,1.992,0,0,0,2.062-1.9v-.089h0V-9.148A1.992,1.992,0,0,0,17.8-11.14h-.076Z" transform="translate(3583.73 627.14)" stroke="#000" stroke-width="1"/>
+    <g id="Balance" transform="translate(95 -71.979)">
+      <path id="Caminho_171" data-name="Caminho 171" d="M12.834,20.265c-1.107-.084-1.916-.8-1.82-1.6V-6.17a1,1,0,0,1,.239-.974,1.879,1.879,0,0,1,1.118-.565h.066a1.981,1.981,0,0,1,2.206.985.97.97,0,0,1,0,.561V18.671C14.721,19.468,13.925,20.169,12.834,20.265Z" transform="translate(3195.786 -46.282)" fill="#131313"/>
+      <path id="Caminho_174" data-name="Caminho 174" d="M11.813,4.754a8.675,8.675,0,0,1-2.886-.812A17.023,17.023,0,0,1,6.506,2.226,7.952,7.952,0,0,0,1.038,0,1.069,1.069,0,0,0,0,1.068,1.051,1.051,0,0,0,1.038,2.135c1.907-.182,3.46,1.2,4.9,2.308a12.04,12.04,0,0,0,2.3,1.533,10.908,10.908,0,0,0,3.029.849,1.061,1.061,0,0,0,1.266-.757,1.134,1.134,0,0,0-.1-.805.991.991,0,0,0-.6-.49h0Z" transform="matrix(0.985, -0.174, 0.174, 0.985, 3192.336, -48.24)" fill="#131313" stroke="#131313" stroke-width="1"/>
+      <path id="Caminho_175" data-name="Caminho 175" d="M2.61,7.9a5.608,5.608,0,0,1-5.75,5.494A5.627,5.627,0,0,1-8.39,7.9Z" transform="translate(3196.39 -41.517)" fill="#131313"/>
+      <path id="Caminho_179" data-name="Caminho 179" d="M3.848,28.55H22.571c3,0,5.44,1.98,5.44,4.411V34.34H-1.54V32.961C-1.571,30.53.863,28.55,3.848,28.55Z" transform="translate(3194.839 -48.361)" fill="#131313"/>
+      <path id="Caminho_178" data-name="Caminho 178" d="M26.972,2.76,23.61,9.734h6.7Z" transform="translate(3166.89 -46.391)" fill="none" stroke="#131313" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Caminho_174-2" data-name="Caminho 174" d="M11.813,4.754a8.675,8.675,0,0,1-2.886-.812A17.023,17.023,0,0,1,6.506,2.226,7.952,7.952,0,0,0,1.038,0,1.069,1.069,0,0,0,0,1.068,1.051,1.051,0,0,0,1.038,2.135c1.907-.182,3.46,1.2,4.9,2.308a12.04,12.04,0,0,0,2.3,1.533,10.908,10.908,0,0,0,3.029.849,1.061,1.061,0,0,0,1.266-.757,1.134,1.134,0,0,0-.1-.805.991.991,0,0,0-.6-.49h0Z" transform="matrix(0.985, -0.174, 0.174, 0.985, 3211.407, -43.795)" fill="#131313" stroke="#131313" stroke-width="1"/>
+      <path id="Caminho_175-2" data-name="Caminho 175" d="M-8.39,7.9a5.608,5.608,0,0,0,5.75,5.494A5.627,5.627,0,0,0,2.61,7.9Z" transform="translate(3225.39 -34.24)" fill="#131313"/>
+      <path id="Caminho_178-2" data-name="Caminho 178" d="M26.972,2.76,23.61,9.734h6.7Z" transform="translate(3195.89 -38.142)" fill="none" stroke="#131313" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
   </g>
 </svg>

@@ -145,7 +145,7 @@ class Feed extends Component {
 
   }
   handleRefresh() {
-    this.setState({ page: 0, refresh: true }, () => {
+    this.setState({ page: 0, listComplete: false, refresh: true }, () => {
       this.loadFromApi();
     });
   }

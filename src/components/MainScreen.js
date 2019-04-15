@@ -7,7 +7,7 @@ import NewPost from './NewPost';
 import Bussines from './Bussines';
 import Favorites from './Favorites';
 
-import FeedIco from '../assets/FeedDiaD.svg';
+import FeedIco from '../assets/GeneralDiaD.svg';
 import JusticeIco from '../assets/JusticeDiaD.svg';
 import NewPostIco from '../assets/NewPostDiaD.svg';
 import BussinesIco from '../assets/BussinesDiaD.svg';
