@@ -22,6 +22,7 @@ class Login extends Component {
     this.state = {
       error: '',
       automaticLogin: true,
+      manualLogin: false,
       valueSpin: new Animated.Value(0),
       loading: false,
     }
@@ -30,7 +31,6 @@ class Login extends Component {
       outputRange: ['0deg', '360deg']
     });
   }
-
   spin() {
     this.state.valueSpin.setValue(0);
     Animated.sequence([
@@ -44,15 +44,14 @@ class Login extends Component {
         }
       )
     ]).start(() => {
-      this.spin();
+      if (this.state.automaticLogin) {
+        this.spin();
+      }
     })
   }
-  componentDidMount() {
-    this.spin();
-  }
-
   async componentWillMount() {
 
+    this.spin();
     const token = await AsyncStorage.getItem('token');
 
     if (token) {
@@ -73,8 +72,9 @@ class Login extends Component {
 
         this.props.setUser(user);
 
-        this.props.navigation.navigate('Geral');
-        this.setState({ automaticLogin: false });
+        this.setState({ automaticLogin: false }, () => {
+          this.props.navigation.navigate('MainScreen');
+        });
         console.log('Login Automatico');
 
       }).catch(async (err) => {
@@ -90,24 +90,25 @@ class Login extends Component {
             AsyncStorage.setItem('token', data.token);
             AsyncStorage.setItem('_id', data.user._id);
 
-            this.props.navigation.navigate('Geral');
-            this.setState({ automaticLogin: false });
+            this.setState({ automaticLogin: false }, () => {
+              this.props.navigation.navigate('MainScreen');
+            });
+
             console.log('Login com email e senha do AsyncStorage');
 
           }).catch(err => {
             this.setState({ error: 'Verifique sua conexão', automaticLogin: false });
           });
         } else {
-          this.setState({ automaticLogin: false });
+          this.setState({ automaticLogin: false, manualLogin: true });
           console.log('Login Manual');
         }
       });
     } else {
-      this.setState({ automaticLogin: false });
+      this.setState({ automaticLogin: false, manualLogin: true });
       console.log('Login Manual');
     }
   }
-
   validateUserInput() {
     const { user: { email, password } } = this.props.account;
 
@@ -118,7 +119,6 @@ class Login extends Component {
     this.login();
 
   }
-
   login() {
     this.setState({ loading: true });
 
@@ -134,7 +134,7 @@ class Login extends Component {
       AsyncStorage.setItem('_id', data.user._id);
 
       this.setState({ loading: false });
-      return this.props.navigation.navigate('Geral');
+      return this.props.navigation.navigate('MainScreen');
 
     }).catch(err => {
 
@@ -155,7 +155,7 @@ class Login extends Component {
     return (
       <MinhaView white >
         <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
-        {!this.state.automaticLogin ? (
+        {!this.state.automaticLogin && this.state.manualLogin ? (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
             <View style={{ flex: 2, marginBottom: 20, justifyContent: 'center' }}>

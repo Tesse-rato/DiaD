@@ -71,12 +71,16 @@ class Post extends Component {
       tamPostContainer: 0,
       maxtamPostComment: 0,
       animatedViewToNewComment: new Animated.Value(0),
-      animatedValueToPostContainer: new Animated.Value(0),
+      animatedValueToPostContainer: new Animated.Value(500),
       animatedValueToDoneDeleteContainer: new Animated.Value(0),
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return this.state !== nextState || this.props !== nextProps;
+  }
   componentWillMount() {
+    //Debug.post({ index: this.props.index, length: this.props.length });
 
     this.config.headers.authorization = `Bearer ${this.props.account.token}`;
     const pushed = this.props.post.pushes.users.find(userId => userId.toString() == this.props.account.user._id) ? true : false;
@@ -94,6 +98,9 @@ class Post extends Component {
         maxtamPostComment
       }, () => this.animPostContainer(tamPostContainer));
     });
+  }
+  componentDidMount() {
+    this.props.donePostRender(this.props.index);
   }
   getComponentsSize() {
     return new Promise(resolve => {
@@ -175,13 +182,16 @@ class Post extends Component {
     });
   }
   animPostContainer(tam, cb) {
-    Animated.timing(
-      this.state.animatedValueToPostContainer,
-      {
-        toValue: tam,
-        duration: 500,
-      }
-    ).start(() => cb ? cb() : null);
+    Animated.sequence([
+      Animated.delay(500),
+      Animated.timing(
+        this.state.animatedValueToPostContainer,
+        {
+          toValue: tam,
+          duration: 500,
+        }
+      )
+    ]).start(() => cb ? cb() : null);
   }
   animNewCommentContainer(arg, cb) {
     const value = arg ? 1 : 0;
@@ -505,10 +515,12 @@ class Post extends Component {
   }
   updateTamPostToComment(cb) {
 
-    const { edit, newComment } = this.state.commentController;
-    let tamPostComment = this.state.tamPostComment;
-    let tamPostContainer = this.state.tamPostContainer;
-    let maxtamPostComment = this.state.maxtamPostComment;
+    let {
+      tamPostComment,
+      tamPostContainer,
+      maxtamPostComment,
+      commentController: { edit },
+    } = this.state;
 
     if (edit) {
 

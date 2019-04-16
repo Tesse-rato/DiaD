@@ -22,9 +22,6 @@ import { bindActionCreators } from 'redux';
 import * as Actions from '../redux/actions'
 
 import {
-  editOrNewComment,
-  newComment,
-  pushPost,
   decreasePostsUserName,
   resizeImage,
   decreaseUserName
@@ -48,11 +45,14 @@ class Profile extends Component {
   constructor(props) {
     super(props);
 
-    this.pushPost = pushPost.bind(this);
-    this.newComment = newComment.bind(this);
-    this.editOrNewComment = editOrNewComment.bind(this);
-
     this.state = {
+      page: 0,
+      limit: 5,
+      posts: [],
+      force: true,
+      loading: true,
+      following: false,
+      loadingPosts: true,
       user: {
         socialMedia: {
           tumblr: '',
@@ -62,10 +62,6 @@ class Profile extends Component {
           whatsapp: '',
         }
       },
-      posts: [],
-      force: true,
-      loading: true,
-      following: false,
       commentController: {
         edit: false,
         upload: false,
@@ -105,15 +101,23 @@ class Profile extends Component {
   }
 
   componentWillMount() {
-    this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
+    //this.animFeedContainer = this.props.navigation.getParam('animFeedContainer');
 
-    this.props.navigation.addListener('didFocus', () => this.loadFromApi());
+    //this.props.navigation.addListener('didFocus', () => this.loadFromApi());
+
+    this.animContainerView(true, () => {
+      this.loadFromApi(this.props._id, 'user', () => {
+        this.animProfileComponents(true, () => {
+          this.loadFromApi(this.props._id, 'posts', () => {
+            this.setState({ loadingPosts: false });
+          });
+        });
+      });
+    });
 
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
   }
-  loadFromApi() {
-
-    if(this.state.posts.length > 0) return;
+  loadFromApi(_id, field, cb) {
 
     const config = {
       headers: {
@@ -123,48 +127,62 @@ class Profile extends Component {
     }
 
     // const url = `/users/profile/5c87bcc212458240f471c8fc`;
-    const url = `/users/profile/${this.props.account.profileId}`;
+    // const url = `/users/profile/${this.props.account.profileId}`;
+    const url = `/users/profile/${this.state.page}/${this.state.limit}/${_id}/${field}`;
 
-    Api.get(url, config).then(({ data: user }) => {
+    if (field == 'user') {
+      Api.get(url, config).then(({ data: user }) => {
+        const tamBio = user.bio ? Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 55) : 55;
+        const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
 
-      const tamBio = user.bio ? Math.ceil((Math.ceil(user.bio.length / 45) * 17.2) + 55) : 55;
-
-      const following = this.props.account.user.following.find(id => id.toString() == user._id.toString());
-      decreasePostsUserName(user.posts).then(posts => {
         decreaseUserName(user).then(user => {
           this.setState({
             user: { ...this.state.user, ...user },
-            posts,
             tamBio,
             following,
             loading: false,
             animatedValueToBioView: new Animated.Value(tamBio)
-          }, () => {
-            this.animContainerView(true);
-          });
+          }, cb ? cb : null);
+        });
+
+      }).catch(err => {
+        Debug.post({
+          err,
+          msg: 'Profile.js loadFromApi Api.get(\'user\')',
         });
       });
-    }).catch(err => {
-      console.log(err);
-    });
-  }
+    }
 
+    else if (field == 'posts') {
+      Api.get(url, config).then(({ data }) => {
+        decreasePostsUserName(data).then(posts => {
+          this.setState({ posts, loadingPosts: false }, cb ? cb : null);
+        });
+
+      }).catch(err => {
+        Debug.post({
+          err,
+          msg: 'Profile.js loadFromApi() Api.get(\'posts\')'
+        });
+      });
+    }
+
+  }
   clickImageProfile(_id) {
     if (_id == this.state.user._id) return;
 
     this.state.animatedValueFromScrollY.setValue(0);
-    this.props.setProfileId(_id);
-    this.animContainerView(false);
-    this.setState({ loading: true }, () => {
-      this.loadFromApi();
+    // this.props._id = _id;
+    this.animProfileComponents(false, () => {
+      this.setState({ loading: true }, () => {
+        this.loadFromApi(_id, 'user', () => this.animProfileComponents(true));
+      });
     });
   }
-
   sharePost(_id) {
     Linking.openURL('https://www.facebook.com/').catch(err => {
     });
   }
-
   displayMessageSocialMedia() {
     Animated.sequence([
       Animated.delay(200),
@@ -189,21 +207,24 @@ class Profile extends Component {
       )
     ]).start();
   }
+  animContainerView(arg, cb) {
+    const value = arg ? 1 : 0;
 
-  animContainerView(arg) {
+    Animated.timing(
+      this.state.animatedValueToContainerView,
+      {
+        toValue: value,
+        duration: 500,
+        useNativeDriver: true,
+        easing: Easing.circle
+      }
+    ).start(cb ? cb : null);
+  }
+  animProfileComponents(arg, cb) {
     let value = arg ? 1 : 0;
 
     Animated.sequence([
       Animated.delay(100),
-      Animated.timing(
-        this.state.animatedValueToContainerView,
-        {
-          toValue: value,
-          duration: 100,
-          useNativeDriver: true,
-          easing: Easing.ease
-        }
-      ),
       Animated.timing(
         this.state.animatedValueToProfileHeader,
         {
@@ -221,9 +242,8 @@ class Profile extends Component {
           easing: Easing.ease
         }
       )
-    ]).start()
+    ]).start(cb ? cb : null);
   }
-
   displayEditPost() {
     Animated.sequence([
       Animated.delay(200),
@@ -238,9 +258,7 @@ class Profile extends Component {
       )
     ]).start();
   }
-
   socialMedia(arg) {
-
 
     if (arg == 'whatsapp') {
 
@@ -258,10 +276,7 @@ class Profile extends Component {
       this.displayMessageSocialMedia()
     });
   }
-
   editPost(_id) {
-    Debug.post({msg: 'EditPost Profile'});
-
     let payload;
 
     this.state.posts.forEach((post, index) => {
@@ -436,14 +451,6 @@ class Profile extends Component {
       }
     });
   }
-  _pushPost(postId) {
-    this.pushPost(postId).then(posts => {
-      this.setState({ posts, force: !this.state.force });
-    }).catch(err => {
-      console.log(err);
-    })
-  }
-
   follow(_id) {
     const config = {
       headers: {
@@ -503,150 +510,112 @@ class Profile extends Component {
       animFeedContainer: this.animFeedContainer.bind(this)
     });
   }
-
   _goBack() {
-    this.animFeedContainer(true);
-    this.props.navigation.goBack();
+    this.animProfileComponents(false, () => {
+      this.animContainerView(false, () => {
+        this.props.returnProfileScreen();
+      });
+    });
     return true;
   }
   render() {
     console.disableYellowBox = true;
     return (
-      <MinhaView style={{ justifyContent: 'flex-start' }}>
-        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
-        {!this.state.loading ? (
-          <Animated.View
-            style={{
-              flex: 1,
-              backgroundColor: '#E8E8E8',
-              alignItems: 'center',
-              transform: [{
-                translateX: this.state.animatedValueToContainerView.interpolate({
-                  inputRange: [0, .5, 1],
-                  outputRange: [20, 20, 0]
-                })
-              }],
-              opacity: this.state.animatedValueToContainerView.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 1]
-              })
-            }}
-          >
-
-            <View style={{ flex: 1, width: Dimensions.get('window').width, backgroundColor: '#E8E8E8' }}>
-              <FlatList
-                ref={ref => this.flatListRef = ref}
-                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueFromScrollY } } }])}
-                data={this.state.posts}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={item => item._id}
-                ListHeaderComponent={() => (<View style={{ height: this.state.tamFrameProfile + this.state.tamBio + 10 }} />)}
-                renderItem={({ item }) => (
-                    <Post 
+      <Animated.View
+        style={{
+          width: Dimensions.get('window').width,
+          height: Dimensions.get('window').height,
+          backgroundColor: '#FFF',
+          alignItems: 'center',
+          transform: [{
+            translateX: this.state.animatedValueToContainerView.interpolate({
+              inputRange: [0, .5, 1],
+              outputRange: [20, 20, 0]
+            })
+          }],
+          opacity: this.state.animatedValueToContainerView.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 1]
+          })
+        }}
+      >
+        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden={false} />
+        {!this.state.loadingPosts ? (
+          <View style={{ width: Dimensions.get('window').width, height: (Dimensions.get('window').height - 20), backgroundColor: '#FFF' }}>
+            {!this.state.posts.length ? (
+              <View
+                style={{
+                  width: Dimensions.get('window').width,
+                  height: Dimensions.get('window').height,
+                  position: 'absolute',
+                  backgroundColor: '#FFF',
+                }}
+              >
+                <Text style={{ top: this.state.tamBio + this.state.tamFrameProfile, color: '#08F', fontSize: 16 }}>Nenhum Post</Text>
+              </View>
+            ) : (
+                <FlatList
+                  ref={ref => this.flatListRef = ref}
+                  onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueFromScrollY } } }])}
+                  data={this.state.posts}
+                  showsVerticalScrollIndicator={false}
+                  keyExtractor={item => item._id}
+                  ListHeaderComponent={() => (<View style={{ height: this.state.tamFrameProfile + this.state.tamBio + 10 }} />)}
+                  ItemSeparatorComponent={() => (
+                    <View style={{ alignSelf: 'center', height: 1, marginVertical: 25, width: Dimensions.get('window').width * .75, backgroundColor: '#BABABF' }} />
+                  )}
+                  renderItem={({ item, index }) => (
+                    <Post
                       post={item}
+                      index={index}
+                      donePostRender={() => null}
                       environment='Profile'
                       clickImageProfile={this.clickImageProfile.bind(this)}
                       editPost={this.editPost.bind(this)}
                       updateAndSortPosts={() => null}
                     />
-                )}
-              />
-              {!this.state.posts.length ? (
-                <View
-                  style={{
-                    width: Dimensions.get('window').width,
-                    height: Dimensions.get('window').height,
-                    padding: 20,
-                    position: 'absolute',
-                    backgroundColor: '#FFF',
-                  }}
-                >
-                  <View style={{ height: this.state.tamBio + this.state.tamFrameProfile }} />
-                  <Text style={{ color: '#08F', fontSize: 16 }}>
-                    Parece que é sua primeira vez,
-                    comesse configurando seu perfil,
-                    adicionando suas redes sociais,
-                    adicionando uma breve biografia
-                    e faça uma postagem de boas vindas.
-                      </Text>
-                </View>
-              ) : null}
-
-              <Animated.View
-                style={{
-                  position: 'absolute',
-                  transform: [{
-                    translateY: this.state.animatedValueToProfileHeader.interpolate({
-                      inputRange: [0, .5, 1],
-                      outputRange: [-20, -20, 0]
-                    })
-                  }],
-                  opacity: this.state.animatedValueToProfileHeader.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, 1]
-                  })
-                }}
-              >
-                <HeaderProfile
-                  user_id={this.state.user._id}
-                  my_user_id={this.props.account.user._id}
-                  bio={this.state.user.bio}
-                  firstName={this.state.user.name.first}
-                  lastName={this.state.user.name.last}
-                  nickname={this.state.user.name.nickname}
-                  thumbnail={this.state.user.photo.thumbnail}
-                  goBack={this._goBack.bind(this)}
-                  settings={this.goSttings.bind(this)}
-                  following={this.state.following}
-                  follow={this.follow.bind(this)}
-                  clickSocialMedia={this.socialMedia.bind(this)}
-                  socialMedia={this.state.user.socialMedia}
-                  animatedValueToTransform={this.state.animatedValueToTransform}
-                  animatedValueFromScrollY={this.state.animatedValueFromScrollY}
-                  tamBio={this.state.tamBio}
-                  tamFrameProfile={this.state.tamFrameProfile + this.state.tamBio}
+                  )}
                 />
-              </Animated.View>
+              )}
 
+            <Animated.View
+              style={{
+                width: Dimensions.get('window').width, height: 30,
+                position: 'absolute',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#08F',
+                transform: [{
+                  translateY: this.state.animatedValueToBottomNotificationFollowing.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-30, Dimensions.get('window').height - 30]
+                  })
+                }]
+              }}
+            >
+              <Text style={{ fontSize: 12, color: '#FFF' }}>Seguindo</Text>
+            </Animated.View>
 
+            <Animated.View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: Dimensions.get('window').width - 50,
+                height: 100,
+                borderRadius: 10,
+                position: 'absolute',
+                backgroundColor: '#FFF',
+                transform: [{
+                  translateY: this.state.animatedValueToNotificationErrorOrWhatsappNumber.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-Dimensions.get('window').height / 2, Dimensions.get('window').height / 2]
+                  })
+                }]
+              }}
+            >
+              <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
+            </Animated.View>
 
-              <Animated.View
-                style={{
-                  width: Dimensions.get('window').width, height: 30,
-                  position: 'absolute',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#08F',
-                  transform: [{
-                    translateY: this.state.animatedValueToBottomNotificationFollowing.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [-30, Dimensions.get('window').height - 30]
-                    })
-                  }]
-                }}
-              >
-                <Text style={{ fontSize: 12, color: '#FFF' }}>Seguindo</Text>
-              </Animated.View>
-              <Animated.View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: Dimensions.get('window').width - 50,
-                  height: 100,
-                  borderRadius: 10,
-                  position: 'absolute',
-                  backgroundColor: '#FFF',
-                  transform: [{
-                    translateY: this.state.animatedValueToNotificationErrorOrWhatsappNumber.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [-Dimensions.get('window').height / 2, Dimensions.get('window').height / 2]
-                    })
-                  }]
-                }}
-              >
-                <Text style={{ color: '#08F', textAlign: 'center', fontSize: 18 }}>{this.state.messageSocialMedia}</Text>
-              </Animated.View>
-            </View>
             {this.state.postController.edit ? (
               <Animated.View
                 style={{
@@ -692,18 +661,60 @@ class Profile extends Component {
                 />
               </Animated.View>
             ) : null}
-          </Animated.View>
+          </View>
         ) : (
-            <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
               <ProgressBarAndroid
+                style={{ width: 20, heigth: 20, top: Dimensions.get('window').height / 6, position: 'absolute' }}
                 indeterminate={true}
                 color={'#08F'}
-                styleAttr='Normal'
+              />
+              <ProgressBarAndroid
+                style={{ width: 20, heigth: 20, bottom: Dimensions.get('window').height / 4, position: 'absolute' }}
+                indeterminate={true}
+                color={'#08F'}
               />
             </View>
           )
         }
-      </MinhaView>
+        {!this.state.loading ? (
+          <Animated.View
+            style={{
+              position: 'absolute',
+              transform: [{
+                translateY: this.state.animatedValueToProfileHeader.interpolate({
+                  inputRange: [0, .5, 1],
+                  outputRange: [-20, -20, 0]
+                })
+              }],
+              opacity: this.state.animatedValueToProfileHeader.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 1]
+              })
+            }}
+          >
+            <HeaderProfile
+              user_id={this.state.user._id}
+              my_user_id={this.props.account.user._id}
+              bio={this.state.user.bio}
+              firstName={this.state.user.name.first}
+              lastName={this.state.user.name.last}
+              nickname={this.state.user.name.nickname}
+              thumbnail={this.state.user.photo.thumbnail}
+              goBack={this._goBack.bind(this)}
+              settings={this.goSttings.bind(this)}
+              following={this.state.following}
+              follow={this.follow.bind(this)}
+              clickSocialMedia={this.socialMedia.bind(this)}
+              socialMedia={this.state.user.socialMedia}
+              animatedValueToTransform={this.state.animatedValueToTransform}
+              animatedValueFromScrollY={this.state.animatedValueFromScrollY}
+              tamBio={this.state.tamBio}
+              tamFrameProfile={this.state.tamFrameProfile + this.state.tamBio}
+            />
+          </Animated.View>
+        ) : null}
+      </Animated.View>
     );
   }
 }

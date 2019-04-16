@@ -11,10 +11,8 @@ import {
   Share,
   Linking,
   Easing,
-  BackHandler
+  BackHandler,
 } from 'react-native'
-
-// import { generateSecureRandom } from 'react-native-securerandom'; ISSO È UM DEMONIO LEMBRE DE TIRALO DE DESLINKALO
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from "redux";
@@ -22,17 +20,13 @@ import * as Actions from '../redux/actions';
 
 import Api from '../api';
 
-import FlameBlueIco from '../assets/FlameBlueDiaD.svg';
-import FlameRedIco from '../assets/FlameRedDiaD.svg';
 import ScrolltoUpIco from '../assets/ScrollToUp.svg';
 
-import { MinhaView } from "../styles/standard";
 import { FooterPost } from '../styles/FooterComponent';
 
 import Post from './Post';
-import FeedHeader from './FeedHeaderComp';
 
-import { editOrNewComment, newComment, pushPost, decreasePostsUserName, resizeImage, decreaseUserName } from "../funcs";
+import { decreasePostsUserName, decreaseUserName } from "../funcs";
 
 import Debug from '../funcs/debug';
 class Feed extends Component {
@@ -43,11 +37,6 @@ class Feed extends Component {
   constructor() {
     super();
 
-    this.editOrNewComment = editOrNewComment.bind(this);
-    this.newComment = newComment.bind(this);
-    this.pushPost = pushPost.bind(this);
-
-    this.tamSearchBar = 60;
     this.tamBottomBar = 50;
 
     this.state = {
@@ -57,9 +46,9 @@ class Feed extends Component {
       loading: true,
       refresh: false,
       loadingMore: false,
-      userSearch: '',
-      limit: 5,
+      limit: 10,
       page: 0,
+      indexDisplayed: 0,
       listComplete: false,
       commentController: {
         edit: false,
@@ -74,18 +63,16 @@ class Feed extends Component {
       },
       animatedValueToFooterPost: new Animated.Value(0),
       valueToAnimatedContainerView: new Animated.Value(0),
-      animatedValueToContentScrollY: new Animated.Value(0),
     };
   }
   componentWillMount() {
-    this.props.navigation.addListener('didFocus', () => {
-      this.loadFromApi();
-      this.setState({ onFeed: true });
-    });
+    this.props.navigation.addListener('didFocus', () => this.setState({ onFeed: true }));
 
     this.props.navigation.addListener('willBlur', () => this.setState({ onFeed: false }));
 
     BackHandler.addEventListener('hardwareBackPress', this._goBack.bind(this));
+
+    this.loadFromApi();
   }
   loadFromApi() {
     const config = {
@@ -108,20 +95,14 @@ class Feed extends Component {
       }
 
       decreasePostsUserName(data.posts).then(_posts => {
-
         let { posts } = this.state;
-
         if (page > 0) {
           _posts.forEach(post => posts.push(post));
           this.setState({ posts, loadingMore: false });
-
-        } else {
-          posts = _posts;
-          this.setState({ posts, loading: false, refresh: false }, () => {
-            this.animeContainerView(true);
-          });
         }
-
+        else {
+          this.setState({ posts: _posts, loading: false, refresh: false });
+        }
 
       }).catch(err => {
         Debug.post({ err, local: 'Feed.js loadFromApi(){ decrasePostUserName() }' });
@@ -132,7 +113,6 @@ class Feed extends Component {
       Debug.post({ err, local: 'Feed.js loadFromApi(){ Api.get() }' });
     })
   }
-
   loadMorePosts() {
     const { listComplete } = this.state;
 
@@ -144,31 +124,33 @@ class Feed extends Component {
     });
 
   }
+  donePostRender(index) {
+    if (++index >= this.state.posts.length) {
+      this.animeContainerView(true);
+    }
+  }
   handleRefresh() {
     this.setState({ page: 0, listComplete: false, refresh: true }, () => {
       this.loadFromApi();
     });
   }
-  animeContainerView(arg) {
+  animeContainerView(arg, cb) {
     let value = arg ? 1 : 0;
-
+    let date = Date.now();
+    Debug.post({ msg: 'Comeco da animacao', date: date - Date.now() })
     Animated.sequence([
-      Animated.delay(200),
+      Animated.delay(500),
       Animated.timing(
         this.state.valueToAnimatedContainerView,
         {
           toValue: value,
-          duration: 200,
-          useNativeDriver: true,
-          easing: Easing.in(Easing.ease)
+          duration: 1000,
         }
       )
-    ]).start(() => this.setState({ onFeed: arg }));
-  }
-  clickImageProfile(_id) {
-    this.animeContainerView(false);
-    this.props.setProfileId(_id);
-    this.props.navigation.navigate('Profile', { animFeedContainer: this.animeContainerView.bind(this) });
+    ]).start(() => {
+      cb ? cb() : null
+      Debug.post({ msg: 'Final da animacao', date: Date.now() - date + ' ms' })
+    });
   }
   updateAndSortPosts(_id, post) {
     return new Promise(resolve => {
@@ -211,106 +193,89 @@ class Feed extends Component {
   render() {
     console.disableYellowBox = true;
     return (
-      <MinhaView white style={{ justifyContent: 'flex-end' }}>
-        <StatusBar barStyle='dark-content' backgroundColor='#FFF' hidden />
+      <Animated.View
+        style={{
+          flexDirection: 'row',
+          width: Dimensions.get('window').width * 2,
+          heigth: Dimensions.get('window').heigth,
+          left: this.state.valueToAnimatedContainerView.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -Dimensions.get('window').width]
+          }),
+          marginTop: this.props.animatedValueToContentScrollY.interpolate({
+            inputRange: [0, this.props.tamSearchBar * 20, this.props.tamSearchBar * 30],
+            outputRange: [this.props.tamSearchBar, this.props.tamSearchBar, 0],
+            extrapolate: 'clamp'
+          })
+        }}
+      >
+        <StatusBar barStyle='' backgroundColor='#FFF' hidden={false} />
+        <View
+          style={{
+            width: Dimensions.get('window').width,
+            height: Dimensions.get('window').height,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFF'
+          }}
+        >
+          <ProgressBarAndroid
+            indeterminate={this.state.loading}
+            progress={this.state.indexDisplayed * .1}
+            color='#08F'
+            styleAttr={'Horizontal'}
+          />
+        </View>
+
         {!this.state.loading ? (
-          <Animated.View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              transform: [{
-                translateX: this.state.valueToAnimatedContainerView.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [Dimensions.get('window').width, 0]
-                })
-              }]
-            }}
-          >
-
-            <Animated.View
-              style={{
-                flex: 1,
-                marginTop: this.state.animatedValueToContentScrollY.interpolate({
-                  inputRange: [0, this.tamSearchBar * 20, this.tamSearchBar * 30],
-                  outputRange: [this.tamSearchBar, this.tamSearchBar, 0],
-                  extrapolate: 'clamp'
-                })
-              }}
-            >
-              <FlatList
-                ref={(ref) => this.flatListRef = ref}
-                onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.state.animatedValueToContentScrollY } } }])}
-                onRefresh={this.handleRefresh.bind(this)}
-                refreshing={this.state.refresh}
-                onEndReached={this.loadMorePosts.bind(this)}
-                onEndReachedThreshold={1}
-                ItemSeparatorComponent={() => (
-                  <View style={{ alignSelf: 'center', height: 1, marginVertical: 25, width: Dimensions.get('window').width * .75, backgroundColor: '#BABABF' }} />
-                )}
-                ListFooterComponent={() => (
-                  <FooterPost
-                    animatedValueToFooterPost={this.state.animatedValueToFooterPost}
-                    listComplete={this.state.listComplete}
-                  />
-                )}
-                data={this.state.posts}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={item => item._id}
-                renderItem={({ item }) => (
-                  <Post
-                    post={item}
-                    environment='Feed'
-                    clickImageProfile={this.clickImageProfile.bind(this)}
-                    updateAndSortPosts={this.updateAndSortPosts.bind(this)}
-                  />
-                )}
+          <FlatList
+            ref={(ref) => this.flatListRef = ref}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.props.animatedValueToContentScrollY } } }])}
+            onRefresh={this.handleRefresh.bind(this)}
+            refreshing={this.state.refresh}
+            onEndReached={this.loadMorePosts.bind(this)}
+            onEndReachedThreshold={1}
+            ItemSeparatorComponent={() => (
+              <View style={{ alignSelf: 'center', height: 1, marginVertical: 25, width: Dimensions.get('window').width * .75, backgroundColor: '#BABABF' }} />
+            )}
+            ListFooterComponent={() => (
+              <FooterPost
+                animatedValueToFooterPost={this.state.animatedValueToFooterPost}
+                listComplete={this.state.listComplete}
               />
-            </Animated.View>
-
-            <Animated.View
-              style={{
-                position: 'absolute',
-                top: this.state.animatedValueToContentScrollY.interpolate({
-                  inputRange: [0, this.tamSearchBar * 40, this.tamSearchBar * 50],
-                  outputRange: [0, 0, this.tamSearchBar * -1],
-                  extrapolate: 'clamp'
-                })
-              }}
-            >
-              <FeedHeader
-                placeholder='Buscar Usuário'
-                profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
-                clickImageProfile={this.clickImageProfile.bind(this)}
+            )}
+            data={this.state.posts}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={item => item._id}
+            renderItem={({ item, index }) => (
+              <Post
+                post={item}
+                index={index}
+                donePostRender={this.donePostRender.bind(this)}
+                environment='Feed'
+                clickImageProfile={this.props.clickImageProfile}
+                updateAndSortPosts={this.updateAndSortPosts.bind(this)}
               />
-            </Animated.View>
+            )}
+          />
+        ) : null}
 
-            <Animated.View
-              style={{
-                position: 'absolute',
-                right: 20,
-                bottom: this.state.animatedValueToContentScrollY.interpolate({
-                  inputRange: [0, this.tamSearchBar * 70, this.tamSearchBar * 80],
-                  outputRange: [-this.tamBottomBar, -this.tamBottomBar, 20],
-                  extrapolate: 'clamp'
-                })
-              }}
-            >
-              <TouchableOpacity onPressOut={() => this.scrollTo()}>
-                <ScrolltoUpIco width={50} height={50} />
-              </TouchableOpacity>
-            </Animated.View>
-
-          </Animated.View>
-        ) : (
-            <View style={{ flex: 1, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
-              <ProgressBarAndroid
-                indeterminate={true}
-                color={'#08F'}
-                styleAttr='Normal'
-              />
-            </View>
-          )}
-      </MinhaView>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            right: 20,
+            bottom: this.props.animatedValueToContentScrollY.interpolate({
+              inputRange: [0, this.props.tamSearchBar * 70, this.props.tamSearchBar * 80],
+              outputRange: [-this.tamBottomBar, -this.tamBottomBar, 20],
+              extrapolate: 'clamp'
+            })
+          }}
+        >
+          <TouchableOpacity onPressOut={() => this.scrollTo()}>
+            <ScrolltoUpIco width={50} height={50} />
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
     )
   }
 }

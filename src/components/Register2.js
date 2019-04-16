@@ -126,12 +126,12 @@ export class Register2 extends Component {
             }
           });
 
-          this.props.navigation.navigate('Geral');
+          this.props.navigation.navigate('MainScreen');
 
         }).catch(err => { this.setState({ error: 'Verifique sua conexão', loading: false }); });
       } else {
         console.log('Nao registrou imagem');
-        this.props.navigation.navigate('Geral');
+        this.props.navigation.navigate('MainScreen');
       }
 
     }).catch(err => {

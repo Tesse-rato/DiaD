@@ -1,75 +1,113 @@
-import React from 'react';
-import { createBottomTabNavigator } from "react-navigation";
+import React, { Component } from 'react';
+import { View, Text, Animated, Dimensions } from 'react-native';
+import { connect } from 'react-redux';
 
-import Geral from './Geral';
-import Justice from './Justice';
-import NewPost from './NewPost';
-import Bussines from './Bussines';
-import Favorites from './Favorites';
+import FeedHeader from './FeedHeaderComp';
+import Profile from './Profile';
+import Feed from './Feed';
 
-import FeedIco from '../assets/GeneralDiaD.svg';
-import JusticeIco from '../assets/JusticeDiaD.svg';
-import NewPostIco from '../assets/NewPostDiaD.svg';
-import BussinesIco from '../assets/BussinesDiaD.svg';
-import FavoritesIco from '../assets/FavoritesDiaD.svg';
+class MainScreen extends Component {
 
-export default TabBarBottom = createBottomTabNavigator({
-  Geral: {
-    screen: Geral,
-    navigationOptions: {
-      tabBarLabel: 'Geral',
-      tabBarIcon: () => (
-        <FeedIco width={26} height={26} />
-      ),
-    }
-  },
-  NewPost: {
-    screen: NewPost,
-    navigationOptions: {
-      tabBarLabel: 'Novo Post',
-      tabBarIcon: () => (
-        <NewPostIco width={26} height={26} />
-      ),
-    }
-  },
-  Justice: {
-    screen: Justice,
-    navigationOptions: {
-      tabBarLabel: 'Justiça',
-      tabBarIcon: () => (
-        <JusticeIco width={26} height={26} />
-      ),
-    }
-  },
-  Favorites: {
-    screen: Favorites,
-    navigationOptions: {
-      tabBarLabel: 'Favoritos',
-      tabBarIcon: () => (
-        <FavoritesIco width={26} height={26} />
-      ),
-    }
-  },
-  Bussines: {
-    screen: Bussines,
-    navigationOptions: {
-      tabBarLabel: 'Negoçios',
-      tabBarIcon: () => (
-        <BussinesIco width={26} height={26} />
-      ),
+  static navigationOptions = {
+    header: null
+  }
 
+  constructor() {
+    super();
+
+    this.tamSearchBar = 60;
+
+    this.state = {
+      visitinProfile: false,
+      idToVisitProfile: '',
+      animatedValueToContentScrollY: new Animated.Value(0),
+      animatedValueToProfileContent: new Animated.Value(0),
     }
   }
-},
-  {
-    initialRouteName: 'Geral',
-    order: ['Geral', 'Justice', 'NewPost', 'Bussines', 'Favorites'],
-    navigationOptions: {
-      header: null,
 
-    },
-    tabBarOptions: {
-      activeTintColor: '#08F',
-    }
+  animProfileContainer(arg, cb) {
+    const value = arg ? 1 : 0;
+    Animated.sequence([
+      Animated.delay(200),
+      Animated.timing(
+        this.state.animatedValueToProfileContent,
+        {
+          toValue: value,
+          duration: 500
+        }
+      )
+    ]).start(cb ? cb() : null);
   }
-);
+  returnProfileScreen() {
+    this.animProfileContainer(false, () => {
+      this.setState({
+        visitinProfile: false,
+        idToVisitProfile: '',
+      });
+    });
+  }
+  clickImageProfile(_id) {
+    this.animProfileContainer(true, () => {
+      this.setState({
+        visitinProfile: true,
+        idToVisitProfile: _id,
+      });
+    });
+  }
+
+  render() {
+    return (
+      <View style={{ flex: 1, width: Dimensions.get('window').width, height: Dimensions.get('window').height }}>
+        <Feed
+          navigation={this.props.navigation}
+          tamSearchBar={this.tamSearchBar}
+          clickImageProfile={this.clickImageProfile.bind(this)}
+          animatedValueToContentScrollY={this.state.animatedValueToContentScrollY}
+        />
+
+        <Animated.View
+          style={{
+            position: 'absolute',
+            top: this.state.animatedValueToContentScrollY.interpolate({
+              inputRange: [0, this.tamSearchBar * 40, this.tamSearchBar * 50],
+              outputRange: [0, 0, this.tamSearchBar * -1],
+              extrapolate: 'clamp'
+            })
+          }}
+        >
+          <FeedHeader
+            placeholder='Buscar Usuário'
+            profilePhotoSource={{ uri: this.props.account.user.photo.thumbnail }}
+            clickImageProfile={() => this.clickImageProfile(this.props.account.user._id)}
+          />
+        </Animated.View>
+
+        {this.state.visitinProfile ? (
+          <Animated.View
+            style={{
+              position: 'absolute',
+              top: 0,
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height,
+              left: this.state.animatedValueToProfileContent.interpolate({
+                inputRange: [0, 1],
+                outputRange: [Dimensions.get('window').width * .15, 0]
+              })
+            }}
+          >
+            <Profile
+              _id={this.state.idToVisitProfile}
+              returnProfileScreen={this.returnProfileScreen.bind(this)}
+            />
+          </Animated.View>
+        ) : null}
+      </View>
+    );
+  }
+}
+
+const mapStateToProps = state => ({
+  account: state.account
+});
+
+export default connect(mapStateToProps)(MainScreen);
